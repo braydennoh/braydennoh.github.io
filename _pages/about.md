@@ -12,17 +12,17 @@ profile:
     <p>1200 E California Blvd</p>
     <p>Pasadena, CA 91125</p>
 
-selected_papers: true
-social: true
+selected_papers: false
+social: false
 
 announcements:
-  enabled: true
-  scrollable: true
+  enabled: false
+  scrollable: false
   limit: 5
 
 latest_posts:
-  enabled: true
-  scrollable: true
+  enabled: false
+  scrollable: false
   limit: 3
 ---
 
