@@ -6,10 +6,9 @@ subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute
 
 profile:
   align: right
-  image: profile.jpg
+  image: flumepic.png
   image_circular: false
   more_info: >
-    <p>MC 100-23, Caltech</p>
     <p>1200 E California Blvd</p>
     <p>Pasadena, CA 91125</p>
 
