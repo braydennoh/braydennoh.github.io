@@ -38,6 +38,7 @@ repo_trophies:
 # will use title and url fields
 # Take a look to https://github.com/jekyll/jekyll-feed for more customization
 
+
 rss_icon: true
 
 # -----------------------------------------------------------------------------
@@ -166,6 +167,9 @@ kramdown:
     block:
       line_numbers: false
       start_line: 1
+
+include:
+  - googlea9b9e3badb3217f6.html
 
 # Includes & excludes
 include: ["_pages", "_scripts"]
