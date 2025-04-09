@@ -38,7 +38,6 @@ repo_trophies:
 # will use title and url fields
 # Take a look to https://github.com/jekyll/jekyll-feed for more customization
 
-
 rss_icon: true
 
 # -----------------------------------------------------------------------------
@@ -85,9 +84,8 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: ""
-blog_description: ""
-
+blog_name: al-folio # blog_name will be displayed in your blog page
+blog_description: a simple whitespace theme for academics
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
 
@@ -168,9 +166,6 @@ kramdown:
     block:
       line_numbers: false
       start_line: 1
-
-include:
-  - googlea9b9e3badb3217f6.html
 
 # Includes & excludes
 include: ["_pages", "_scripts"]
@@ -258,12 +253,9 @@ jekyll-archives:
   books:
     enabled: [year, tags, categories] # enables year, tag and category archives (remove if you need to disable one of them).
 
-display_tags: []
-display_categories: []
+display_tags: ["formatting", "images", "links", "math", "code", "blockquotes"] # these tags will be displayed on the front page of your blog
+display_categories: ["external-services"] # these categories will be displayed on the front page of your blog
 
-featured:
-  enabled: false
-  
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
 # -----------------------------------------------------------------------------
