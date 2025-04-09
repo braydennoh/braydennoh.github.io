@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | Earth Science | Computational Modeling
+subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | snoh@caltech.edu
 
 profile:
   align: right
