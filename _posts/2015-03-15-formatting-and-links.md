@@ -17,7 +17,9 @@ I landed at Sea-Tac just before sunset (~4:30 PM). Since I planned to be outdoor
 
 Unfortunately, I arrived on Thanksgiving night, so nearly all restaurants were closed—except for Hard Rock Cafe. So yes, dinner that night was a 2000-calorie cheeseburger with two IPAs.
 
-![Pike Place](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/1.webp)
+<div class="gallery">
+  <img src="https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/1.webp" alt="Pike Place" />
+</div>
 
 ---
 
@@ -27,7 +29,9 @@ Friday morning, it poured. Still, I went out for a run. There's something refres
 
 I ran through downtown and around the Space Needle, soaking in the city.
 
-![Space Needle](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/2.webp)
+<div class="gallery">
+  <img src="https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/2.webp" alt="Running in Seattle" />
+</div>
 
 ---
 
@@ -37,11 +41,10 @@ The highlight of the trip came the next day. I rented a Toyota Tacoma from the a
 
 In November, the only open visitor center is the Henry M. Jackson Memorial Visitor Center in the Paradise area. Roads are open but require snow chains for all non-4x4 vehicles. Luckily, the Tacoma was a 4×4 off-road model—this is when I truly appreciated the rental, especially since rental companies prohibit putting chains on their cars.
 
-![On the way](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/3.webp)
-
-As I made my way up, the landscape shifted dramatically. Partway through the ascent, I spotted a meandering river, completely frozen. By the time I reached the top, everything was blanketed in snow.
-
-![Frozen River](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/4.webp)
+<div class="gallery">
+  <img src="https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/3.webp" alt="Drive to Mt. Rainier" />
+  <img src="https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/4.webp" alt="Frozen River and Snow" />
+</div>
 
 This was my first time driving in snow—and in a rental, no less (sorry, Alamo). Thankfully, nothing went wrong.
 
