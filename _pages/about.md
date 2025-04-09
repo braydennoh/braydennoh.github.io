@@ -6,7 +6,7 @@ subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute
 
 profile:
   align: right
-  image: prof_pic.jpg
+  image: IMG_1381.jpeg
   image_circular: false
   more_info: >
     <p>MC 100-23, Caltech</p>
