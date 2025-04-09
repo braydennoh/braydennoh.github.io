@@ -3,7 +3,7 @@ layout: cv
 permalink: /cv/
 title: CV
 nav: true
-nav_order: 5
+nav_order: 3
 cv_pdf: braydennohresume.pdf
 description: Full curriculum vitae for Brayden Noh. PDF version available above.
 toc:
