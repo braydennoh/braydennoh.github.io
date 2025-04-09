@@ -1,36 +1,52 @@
 ---
 layout: post
-title: a post with formatting and links
-date: 2015-03-15 16:40:16
-description: march & april, looking forward to summer
-tags: formatting links
-categories: sample-posts
+title: "Seattle and Mount Rainier National Park"
+date: 2022-11-29
+description: Thanksgiving trip to Seattle and Mount Rainier
+categories: travel
+tags: [Seattle, Mount Rainier, travel, solo trip]
 ---
 
-Jean shorts raw denim Vice normcore, art party High Life PBR skateboard stumptown vinyl kitsch. Four loko meh 8-bit, tousled banh mi tilde forage Schlitz dreamcatcher twee 3 wolf moon. Chambray asymmetrical paleo salvia, sartorial umami four loko master cleanse drinking vinegar brunch. [Pinterest](https://www.pinterest.com) DIY authentic Schlitz, hoodie Intelligentsia butcher trust fund brunch shabby chic Kickstarter forage flexitarian. Direct trade <a href="https://en.wikipedia.org/wiki/Cold-pressed_juice">cold-pressed</a> meggings stumptown plaid, pop-up taxidermy. Hoodie XOXO fingerstache scenester Echo Park. Plaid ugh Wes Anderson, freegan pug selvage fanny pack leggings pickled food truck DIY irony Banksy.
+I had the opportunity to visit Seattle during Thanksgiving break of 2022—opportunity here meaning I had saved just enough money and found a cheap flight. From LAX to Sea-Tac takes just under three hours. Funny enough, the public transportation from Caltech to LAX takes nearly the same amount of time—around two hours by a combination of bus, metro, and the FlyAway bus from Union Station.
 
-#### Hipster list
+---
 
-- brunch
-- fixie
-- raybans
-- messenger bag
+### Arriving in Seattle
 
-#### Check List
+I landed at Sea-Tac just before sunset (~4:30 PM). Since I planned to be outdoors most of the time, I booked a hostel near the main attractions. It ended up being right next to Pike Place Market.
 
-- [x] Brush Teeth
-- [ ] Put on socks
-  - [x] Put on left sock
-  - [ ] Put on right sock
-- [x] Go to school
+Unfortunately, I arrived on Thanksgiving night, so nearly all restaurants were closed—except for Hard Rock Cafe. So yes, dinner that night was a 2000-calorie cheeseburger with two IPAs.
 
-Hoodie Thundercats retro, tote bag 8-bit Godard craft beer gastropub. Truffaut Tumblr taxidermy, raw denim Kickstarter sartorial dreamcatcher. Quinoa chambray slow-carb salvia readymade, bicycle rights 90's yr typewriter selfies letterpress cardigan vegan.
+![Pike Place](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/1.webp)
 
-<hr>
+---
 
-Pug heirloom High Life vinyl swag, single-origin coffee four dollar toast taxidermy reprehenderit fap distillery master cleanse locavore. Est anim sapiente leggings Brooklyn ea. Thundercats locavore excepteur veniam eiusmod. Raw denim Truffaut Schlitz, migas sapiente Portland VHS twee Bushwick Marfa typewriter retro id keytar.
+### Running in the Rain
 
-> We do not grow absolutely, chronologically. We grow sometimes in one dimension, and not in another, unevenly. We grow partially. We are relative. We are mature in one realm, childish in another.
-> —Anais Nin
+Friday morning, it poured. Still, I went out for a run. There's something refreshing about running in the rain—it makes you feel less tired. The water cools you down, washes away the sweat, and you don’t have to worry about dehydration.
 
-Fap aliqua qui, scenester pug Echo Park polaroid irony shabby chic ex cardigan church-key Odd Future accusamus. Blog stumptown sartorial squid, gastropub duis aesthetic Truffaut vero. Pinterest tilde twee, odio mumblecore jean shorts lumbersexual.
+I ran through downtown and around the Space Needle, soaking in the city.
+
+![Space Needle](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/2.webp)
+
+---
+
+### Mount Rainier National Park
+
+The highlight of the trip came the next day. I rented a Toyota Tacoma from the airport and drove ~80 miles down to Mount Rainier National Park. The drive took me through small towns, forests, and stunning lake views.
+
+In November, the only open visitor center is the Henry M. Jackson Memorial Visitor Center in the Paradise area. Roads are open but require snow chains for all non-4x4 vehicles. Luckily, the Tacoma was a 4×4 off-road model—this is when I truly appreciated the rental, especially since rental companies prohibit putting chains on their cars.
+
+![On the way](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/3.webp)
+
+As I made my way up, the landscape shifted dramatically. Partway through the ascent, I spotted a meandering river, completely frozen. By the time I reached the top, everything was blanketed in snow.
+
+![Frozen River](https://raw.githubusercontent.com/braydennoh/braydennoh.github.io/main/assets/img/seattle/4.webp)
+
+This was my first time driving in snow—and in a rental, no less (sorry, Alamo). Thankfully, nothing went wrong.
+
+The trip was unforgettable. The only thing I would’ve changed is having someone to split the cost of the rental. Maybe next time.
+
+---
+
+_Thanks for reading._
