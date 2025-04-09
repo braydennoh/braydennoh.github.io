@@ -1,4 +1,4 @@
-![profile](https://github.com/user-attachments/assets/2998c165-03e0-4b39-8210-d63c9c3aa994)---
+---
 layout: about
 title: about
 permalink: /
