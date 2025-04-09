@@ -1,4 +1,4 @@
----
+![profile](https://github.com/user-attachments/assets/2998c165-03e0-4b39-8210-d63c9c3aa994)---
 layout: about
 title: about
 permalink: /
@@ -6,7 +6,7 @@ subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute
 
 profile:
   align: right
-  image: IMG_1381.jpeg
+  image: profile.jpg
   image_circular: false
   more_info: >
     <p>MC 100-23, Caltech</p>
