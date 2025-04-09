@@ -8,6 +8,7 @@ profile:
   align: right
   image: flumepic.png
   image_circular: false
+  more_info: >
 
 selected_papers: false
 social: false
