@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Caltech | Earth Science | Computational Modeling</a>
+subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | Earth Science | Computational Modeling
 
 profile:
   align: right
@@ -29,6 +29,6 @@ latest_posts:
 
 Hi, I’m **Brayden**, a senior at **Caltech** studying **Earth science** and **computational modeling**. My work focuses on combining field observations, remote sensing, and physics-based models to better understand landscape evolution and natural hazards.
 
-I’ve been fortunate to collaborate with **Michael Lamb** ([lamb.caltech.edu](https://lamb.caltech.edu/)), **Omar Wani** ([omarwani.com](https://www.omarwani.com/)), and **Karl Lang** ([karllang.info](https://www.karllang.info/)) on projects ranging from probabilistic risk modeling for river migration to tectonic geomorphology. Starting this fall, I’ll be pursuing a PhD in Earth and Planetary Sciences at **Harvard**, advised by **Brendan Meade** ([brendanjmeade.github.io](https://brendanjmeade.github.io/)).
+I’ve been fortunate to work with [**Michael Lamb**](https://lamb.caltech.edu/), [**Omar Wani**](https://www.omarwani.com/), [**Karl Lang**](https://www.karllang.info/), and [**Vinamra Agrawal**](https://vinagr.github.io/) on projects ranging from asteroid impact simulations to probabilistic risk modeling of river migration. Starting this fall, I’ll be pursuing a PhD in Earth and Planetary Sciences at **Harvard**, advised by [**Brendan Meade**](https://brendanjmeade.github.io/).
 
 You’ll find a few of my selected projects and publications below, along with updates and contact information. Thanks for visiting.
