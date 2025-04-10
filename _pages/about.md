@@ -4,14 +4,18 @@ title: about
 permalink: /
 subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | snoh@caltech.edu
 
+
+
 profile:
   align: right
   image: flumepic.png
   image_circular: false
-  more_info: 
+  more_info: >
+    <p>555 your office number</p>
+    <p>123 your address street</p>
+    <p>Your City, State 12345</p>
 
-selected_papers: false
-social: false
+selected_papers: true # includes a list of papers marked as "selected={true}"
 
 announcements:
   enabled: false
