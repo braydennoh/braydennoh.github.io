@@ -409,12 +409,7 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-project-4",
-          title: 'project 4',
-          description: "another without an image",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/4_project/";
-            },},{id: "projects-project-5",
+          section: "News",},{id: "projects-project-5",
           title: 'project 5',
           description: "a project with a background image",
           section: "Projects",handler: () => {
@@ -439,6 +434,11 @@ ninja.data = [{
           description: "another project with an image 🎉",
           section: "Projects",handler: () => {
               window.location.href = "/projects/9_project/";
+            },},{id: "projects-bobcat-fire-co-emissions",
+          title: 'Bobcat Fire CO Emissions',
+          description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/BobcatFire/";
             },},{id: "projects-fractalcnn",
           title: 'FractalCNN',
           description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
