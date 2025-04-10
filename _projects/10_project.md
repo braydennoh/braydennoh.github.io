@@ -3,7 +3,7 @@ layout: page
 title: High Sierra Hike
 description: A trek through Sequoia National Park
 img: assets/img/highsierra/6.jpeg
-importance: 1
+importance: 2
 category: travel
 related_publications: false
 ---
