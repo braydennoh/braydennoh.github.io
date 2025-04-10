@@ -24,6 +24,10 @@ last_updated: false # set to true if you want to display last updated in the foo
 impressum_path: # set to path to include impressum link in the footer, use the same path as permalink in a page, helps to conform with EU GDPR
 back_to_top: true # set to false to disable the back to top button
 
+# -----------------------------------------------------------------------------
+# Theme
+# -----------------------------------------------------------------------------
+
 # repo color theme
 repo_theme_light: default # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
 repo_theme_dark: dark # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
@@ -168,7 +172,7 @@ kramdown:
       start_line: 1
 
 # Includes & excludes
-include: ["googlea9b9e3badb3217f6.html", "_pages", "_scripts"]
+include: ["_pages", "_scripts"]
 exclude:
   - bin/
   - CONTRIBUTING.md
