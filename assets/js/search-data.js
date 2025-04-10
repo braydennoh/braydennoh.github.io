@@ -454,9 +454,9 @@ ninja.data = [{
           description: "another project with an image 🎉",
           section: "Projects",handler: () => {
               window.location.href = "/projects/9_project/";
-            },},{id: "projects-fractalcnn",
-          title: 'FractalCNN',
-          description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
+            },},{id: "projects-",
+          title: '',
+          description: "",
           section: "Projects",handler: () => {
               window.location.href = "/projects/FractalCNN/";
             },},{
