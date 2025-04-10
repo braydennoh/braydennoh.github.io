@@ -2,15 +2,11 @@
 layout: page
 title: Pasadena NDVI
 description: Assessing urbanization and green space change in Pasadena using satellite NDVI data
-img: /assets/img/pasadenaNDVI/caltechnvdi.png
+img: /assets/img/pasadenaNDVI/pasadenamap.png
 importance: 2
 category: project
 giscus_comments: true
 ---
-
-# Pasadena NDVI
-
-## Assessing Urbanization and Green Space using NDVI
 
 Urbanization, while offering economic growth and infrastructure, poses challenges to sustaining healthy green spaces. This project examines how vegetation greenness in Pasadena, California changed from 2000 to 2020 using NDVI derived from Landsat 7 satellite data. We focus on the August scenes for 2000, 2010, and 2020.
 
