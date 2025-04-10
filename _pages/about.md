@@ -8,10 +8,7 @@ profile:
   align: right
   image: flumepic.png
   image_circular: false
-  more_info: |
-    <p>555 MSC 903</p>
-    <p>123 1200 E California Blvd </p>
-    <p>Pasadena, CA 91125</p>
+
 
 selected_papers: true
 
