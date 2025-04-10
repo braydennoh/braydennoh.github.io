@@ -1,81 +1,19 @@
 ---
 layout: page
-title: project 1
-description: with background image
-img: assets/img/12.jpg
+title: High Sierra Hike
+description: A trek through Sequoia National Park
+img: assets/img/highsierra/6.jpeg
 importance: 1
-category: work
-related_publications: true
+category: travel
+related_publications: false
 ---
 
-Every project has a beautiful feature showcase page.
-It's easy to include images in a flexible 3-column grid format.
-Make your photos 1/3, 2/3, or full width.
+After hiking the Swiss Alps in the summer of 2024, I found myself craving more outdoor adventures. My free time quickly turned into an endless search on AllTrails and Google Maps for the perfect California trek. That’s when I stumbled on the 12-mile hike to Pear Lake in Sequoia National Park—images of the rugged Sierra peaks reminded me of the Alps I’d just explored.
 
-To give your project a background in the portfolio page, just add the img tag to the front matter like so:
+At first, the trail wound through humid forests alive with mosquitoes. I regretted not bringing a head net and became an easy target. But as I pushed onward, the thick woods thinned out, revealing massive granite slabs underfoot. From the Watchtower Trail, my first stop, I was rewarded with a sweeping view of the entire mountain range—a scene that rekindled my early excitement.
 
-    ---
-    layout: page
-    title: project
-    description: a project with a background image
-    img: /assets/img/12.jpg
-    ---
+Eventually, fatigue caught up with me as I climbed higher. By the time I reached Pear Lake—close to 10,000 feet above sea level—my lungs and legs felt every step. I paused there for a measured break, aware that lingering too long would make the journey down even tougher. Several hikers were setting up camp along the tranquil lakeshore, but with only a single day’s worth of water and food, I knew I had to start the descent.
 
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/1.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/3.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    Caption photos easily. On the left, a road goes through a tunnel. Middle, leaves artistically fall in a hipster photoshoot. Right, in another hipster photoshoot, a lumberjack grasps a handful of pine needles.
-</div>
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    This image can also have a caption. It's like magic.
-</div>
+In the Alps, I would have just hopped on a cable car for the ride back, but no such luxuries exist in the High Sierras. There is an uncompromising effort from those who enter. There are no shortcuts here, no crowds spilling. The wilderness remains a place for those willing to earn its beauty, step by step. As much as I dreaded the long descent, I found a quiet satisfaction in knowing the Sierras preserve that raw, unfiltered connection to the natural world.
 
-You can also put regular text between your rows of images, even citations {% cite einstein1950meaning %}.
-Say you wanted to write a bit about your project before you posted the rest of the images.
-You describe how you toiled, sweated, _bled_ for your project, and then... you reveal its glory in the next row of images.
-
-<div class="row justify-content-sm-center">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    You can also have artistically styled 2/3 + 1/3 images, like these.
-</div>
-
-The code is simple.
-Just wrap your images with `<div class="col-sm">` and place them inside `<div class="row">` (read more about the <a href="https://getbootstrap.com/docs/4.4/layout/grid/">Bootstrap Grid</a> system).
-To make images responsive, add `img-fluid` class to each; for rounded corners and shadows use `rounded` and `z-depth-1` classes.
-Here's the code for the last row of images above:
-
-{% raw %}
-
-```html
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm-4 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-```
-
-{% endraw %}
+<div class="row"> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/1.jpeg" class="img-fluid rounded z-depth-1" %} </div> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/2.jpeg" class="img-fluid rounded z-depth-1" %} </div> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/3.jpeg" class="img-fluid rounded z-depth-1" %} </div> </div> <div class="row mt-4"> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/4.jpeg" class="img-fluid rounded z-depth-1" %} </div> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/5.jpeg" class="img-fluid rounded z-depth-1" %} </div> <div class="col-sm mt-3 mt-md-0"> {% include figure.liquid path="assets/img/highsierra/6.jpeg" class="img-fluid rounded z-depth-1" %} </div> </div>
