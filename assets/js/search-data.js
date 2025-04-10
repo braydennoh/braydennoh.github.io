@@ -409,12 +409,7 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-high-sierra-hike",
-          title: 'High Sierra Hike',
-          description: "A trek through Sequoia National Park",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/10_project/";
-            },},{id: "projects-project-4",
+          section: "News",},{id: "projects-project-4",
           title: 'project 4',
           description: "another without an image",
           section: "Projects",handler: () => {
@@ -459,6 +454,11 @@ ninja.data = [{
           description: "Assessing urbanization and green space change in Pasadena using satellite NDVI data",
           section: "Projects",handler: () => {
               window.location.href = "/projects/NDVI/";
+            },},{id: "projects-london-amp-beyond",
+          title: 'London &amp;amp; Beyond',
+          description: "Photo journal from London, Sevenoaks, and Cambridge",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/UK/";
             },},{
         id: 'social-email',
         title: 'email',
