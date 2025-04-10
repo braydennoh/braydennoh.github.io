@@ -2,7 +2,7 @@
 layout: page
 title: blogs
 permalink: /projects/
-description: A growing collection of your cool projects.
+description: Cool Projects and Travels
 nav: true
 nav_order: 3
 display_categories: [work, travel]
