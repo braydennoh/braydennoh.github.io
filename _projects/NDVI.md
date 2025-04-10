@@ -4,7 +4,7 @@ title: Pasadena NDVI
 description: Assessing urbanization and green space change in Pasadena using satellite NDVI data
 img: /assets/img/pasadenaNDVI/caltechnvdi.png
 importance: 2
-category: work
+category: project
 giscus_comments: true
 ---
 
