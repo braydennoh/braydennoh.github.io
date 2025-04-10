@@ -23,8 +23,8 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "nav-projects",
-          title: "projects",
+        },{id: "nav-blogs",
+          title: "blogs",
           description: "A growing collection of your cool projects.",
           section: "Navigation",
           handler: () => {
@@ -410,6 +410,11 @@ ninja.data = [{
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
           section: "News",},{id: "projects-high-sierra-hike",
+          title: 'High Sierra Hike',
+          description: "A trek through Sequoia National Park",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/10_project/";
+            },},{id: "projects-high-sierra-hike",
           title: 'High Sierra Hike',
           description: "A trek through Sequoia National Park",
           section: "Projects",handler: () => {
