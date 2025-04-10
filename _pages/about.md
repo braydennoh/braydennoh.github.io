@@ -2,20 +2,18 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | snoh@caltech.edu
-
-
+subtitle: "<a href='https://www.caltech.edu' target='_blank'>California Institute of Technology</a> | snoh@caltech.edu"
 
 profile:
   align: right
   image: flumepic.png
   image_circular: false
-  more_info: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+  more_info: |
+    <p>555 MSC 903</p>
+    <p>123 1200 E California Blvd </p>
+    <p>Pasadena, CA 91125</p>
 
-selected_papers: true # includes a list of papers marked as "selected={true}"
+selected_papers: true
 
 announcements:
   enabled: false
@@ -30,4 +28,6 @@ latest_posts:
 
 Hi, I’m **Brayden**, a senior at **Caltech** studying Earth science and computational modeling. My work focuses on coupling surface and subsurface processes to quantitatively understand landscape evolution and natural hazards.
 
-I have previously worked wit [Michael Lamb](https://lamb.caltech.edu/), [Omar Wani](https://www.omarwani.com/), [Karl Lang](https://www.karllang.info/), and [Vinamra Agrawal](https://vinagr.github.io/) on projects ranging from asteroid impact simulations to geomorphic probabilistic risk modeling. Starting this fall, I’ll be pursuing a PhD in Earth and Planetary Sciences at **Harvard**, advised by [Brendan Meade](https://brendanjmeade.github.io/)
+I’ve previously worked with [Michael Lamb](https://lamb.caltech.edu/), [Omar Wani](https://www.omarwani.com/), [Karl Lang](https://www.karllang.info/), and [Vinamra Agrawal](https://vinagr.github.io/) on projects ranging from asteroid impact simulations to geomorphic probabilistic risk modeling.
+
+Starting this fall, I’ll be pursuing a PhD in Earth and Planetary Sciences at **Harvard**, where I’ll be advised by [Brendan Meade](https://brendanjmeade.github.io/).
