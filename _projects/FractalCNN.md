@@ -2,12 +2,11 @@
 layout: page
 title: FractalCNN
 description: Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs
-img: /assets/img/publication_preview/flocrotate.gif
+img: /assets/img/publication_preview/floccnncover.png
 importance: 1
 category: work
 giscus_comments: true
 ---
-
 
 # FractalCNN
 
@@ -15,7 +14,14 @@ giscus_comments: true
 
 How can the fractal dimension, a fundamental 3D geometric property, be accurately inferred from 2D projections of flocs? This challenge highlights the inherent loss of information when transitioning from higher-dimensional data to lower-dimensional representations.
 
-![Rotating Floc Visualization](https://github.com/braydennoh/fractalCNN/raw/main/images/flocrotate.gif)
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid path="https://github.com/braydennoh/fractalCNN/raw/main/images/flocrotate.gif" title="Rotating Floc Visualization" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Animated 3D visualization of a rotating floc aggregate.
+</div>
 
 ---
 
@@ -23,7 +29,14 @@ How can the fractal dimension, a fundamental 3D geometric property, be accuratel
 
 We generate synthetic fractal aggregates and compute their fractal dimension using the **Grassberger-Procaccia algorithm**.
 
-![Fractal Aggregates](https://github.com/braydennoh/fractalCNN/raw/main/images/Slide1.png)
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid path="https://github.com/braydennoh/fractalCNN/raw/main/images/Slide1.png" title="Synthetic Fractal Aggregates" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  Examples of generated 2D projections of 3D synthetic fractal aggregates.
+</div>
 
 ---
 
@@ -32,4 +45,11 @@ We generate synthetic fractal aggregates and compute their fractal dimension usi
 We train a **convolutional neural network (CNN)** to predict the fractal dimension using 2D input images.  
 We found that applying various levels of **Gaussian blur** improves prediction accuracy.
 
-![CNN Predictions](https://github.com/braydennoh/fractalCNN/raw/main/images/Slide2.png)
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid path="https://github.com/braydennoh/fractalCNN/raw/main/images/Slide2.png" title="CNN Predictions" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+<div class="caption">
+  CNN prediction performance improves with pre-blurring of input images.
+</div>
