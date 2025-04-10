@@ -414,11 +414,6 @@ ninja.data = [{
           description: "A trek through Sequoia National Park",
           section: "Projects",handler: () => {
               window.location.href = "/projects/10_project/";
-            },},{id: "projects-high-sierra-hike",
-          title: 'High Sierra Hike',
-          description: "A trek through Sequoia National Park",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/1_project/";
             },},{id: "projects-project-4",
           title: 'project 4',
           description: "another without an image",
@@ -454,6 +449,11 @@ ninja.data = [{
           description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
           section: "Projects",handler: () => {
               window.location.href = "/projects/FractalCNN/";
+            },},{id: "projects-high-sierra-hike",
+          title: 'High Sierra Hike',
+          description: "A trek through Sequoia National Park",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/HighSierra/";
             },},{id: "projects-pasadena-ndvi",
           title: 'Pasadena NDVI',
           description: "Assessing urbanization and green space change in Pasadena using satellite NDVI data",
