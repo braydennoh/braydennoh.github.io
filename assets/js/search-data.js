@@ -409,9 +409,9 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-iceland",
-          title: 'Iceland',
-          description: "Photo journal from London, Sevenoaks, and Cambridge",
+          section: "News",},{id: "projects-iceland-adventures",
+          title: 'Iceland Adventures',
+          description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
           section: "Projects",handler: () => {
               window.location.href = "/projects/5_project/";
             },},{id: "projects-project-6",
