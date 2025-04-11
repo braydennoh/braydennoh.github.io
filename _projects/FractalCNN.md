@@ -2,7 +2,7 @@
 layout: page
 title: FractalCNN
 description: Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs
-img: /assets/img/publication_preview/flocrotate.gif
+img: assets/img/blogcover/Slide2.jpeg
 importance: 1
 category: project
 giscus_comments: true
