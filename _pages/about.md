@@ -6,7 +6,7 @@ subtitle: "<a href='https://www.caltech.edu' target='_blank'>California Institut
 
 profile:
   align: right
-  image: seoulprofile.jpg
+  image: swissprofile.png
   image_circular: false
 
 
