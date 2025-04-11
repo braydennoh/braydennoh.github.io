@@ -409,12 +409,7 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-iceland-adventures",
-          title: 'Iceland Adventures',
-          description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/5_project/";
-            },},{id: "projects-project-6",
+          section: "News",},{id: "projects-project-6",
           title: 'project 6',
           description: "a project with no image",
           section: "Projects",handler: () => {
@@ -449,6 +444,11 @@ ninja.data = [{
           description: "A trek through Sequoia National Park",
           section: "Projects",handler: () => {
               window.location.href = "/projects/HighSierra/";
+            },},{id: "projects-iceland-adventures",
+          title: 'Iceland Adventures',
+          description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/Iceland/";
             },},{id: "projects-pasadena-ndvi",
           title: 'Pasadena NDVI',
           description: "Assessing urbanization and green space change in Pasadena using satellite NDVI data",
