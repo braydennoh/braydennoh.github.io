@@ -1,51 +1,65 @@
 ---
 layout: page
-title: Iceland
-description: Photo journal from London, Sevenoaks, and Cambridge
-img: assets/img/blogcover/Slide6.jpeg
-importance: 100
-category: travelasdf
+title: Iceland Adventures
+description: Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature
+img: assets/img/iceland/southcoast1.jpeg
+importance: 5
+category: travel
 related_publications: false
 ---
 
-## London
+## Reykjavík
 
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london1.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/rey1.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london2.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/rey2.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london3.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-
-## Sevenoaks
-
-<div class="row mt-4">
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven1.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven2.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven3.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/rey3.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 
-## Cambridge
+## Akureyri
 
 <div class="row mt-4">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam1.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/akureyri1.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam2.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/akureyri2.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam3.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/iceland/akureyri3.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+
+## South Coast
+
+<div class="row mt-4">
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/southcoast1.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/southcoast2.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/southcoast3.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
+
+## Nature
+
+<div class="row mt-4">
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/nature1.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/nature2.jpeg" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/iceland/nature3.jpeg" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
