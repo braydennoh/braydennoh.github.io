@@ -34,7 +34,7 @@
       "summary": "Developed risk maps for river migration using Monte Carlo simulations and Bayesian inference from satellite data.",
       "highlights": [
         "Transformed deterministic models into probabilistic forecasts.",
-        "Improved erosion hazard assessments through uncertainty quantification."
+        "Improved erosion hazard through uncertainty quantification."
       ]
     },
     {
@@ -46,7 +46,7 @@
       "summary": "Enhanced photogrammetry tools and built probabilistic sediment transport models for Puerto Rican rivers.",
       "highlights": [
         "Converted MATLAB photogrammetry algorithms to Python.",
-        "Generated 3D riverbed models for sediment transport analysis."
+        "Generated 3D riverbed models for sediment transport modeling."
       ]
     },
     {
@@ -57,7 +57,8 @@
       "endDate": "2021-11-01",
       "summary": "Simulated meteoroid impacts with the SALE hydrocode.",
       "highlights": [
-        "Modeled atmospheric entry and crater formation using Fortran."
+        "Modeled atmospheric entry and crater formation using Fortran.",
+        "Characterized asteroid shape to investigate its influence on resulting impact crater morphology."
       ]
     }
   ],
@@ -66,43 +67,43 @@
     "title": "NSF Graduate Research Fellowship",
     "date": "2025-04-01",
     "awarder": "National Science Foundation",
-    "summary": "Awarded for outstanding potential in science and engineering research."
-  },
-  {
-    "title": "17001 Braydennoh",
-    "date": "2022-01-01",
-    "awarder": "Minor Planet Center",
-    "summary": "An asteroid officially named in recognition of contributions to science fair research."
+    "summary": "The GRFP provides three years of support over a five-year fellowship period for the graduate education of individuals who have demonstrated their potential for significant research achievements in STEM or STEM education."
   },
   {
     "title": "ThinkSwiss Summer School Travel Grant",
     "date": "2024-07-01",
     "awarder": "Embassy of Switzerland",
-    "summary": "Attended the EAWAG Summer School in Environmental System Analysis."
+    "summary": "Awarded to participate in the Swiss Federal Institute of Aquatic Science and Technology (EAWAG) Summer School in Environmental System Analysis in Kastanienbaum, Switzerland."
   },
   {
     "title": "Caltech James Michelin Scholarship",
     "date": "2024-05-01",
     "awarder": "Caltech",
-    "summary": "Awarded for outstanding work in geology or geophysics."
+    "summary": "Awarded for contributions to the field of geology or geophysics as an undergraduate student at Caltech."
   },
   {
     "title": "Caltech Howard Reynolds Memorial Prize",
     "date": "2023-05-01",
     "awarder": "Caltech",
-    "summary": "Recognizes excellence in geology and contribution to student life."
+    "summary": "Awarded for demonstrating excellence in geology and for contributions to student life at Caltech."
+  },
+  {
+    "title": "17001 Braydennoh",
+    "date": "2022-01-01",
+    "awarder": "Minor Planet Center",
+    "summary": "An asteroid named in recognition of a Grand Award at the International Science and Engineering Fair (ISEF), awarded for achievement in scientific research."
   },
   {
     "title": "AGU Michael H. Freilich Student Visualization Grand Prize",
     "date": "2021-12-01",
     "awarder": "AGU",
-    "summary": "Presented on the NASA Hyperwall at AGU Fall Meeting."
+    "summary": "Awarded for excellence in scientific visualization, including a travel grant and a presentation on the NASA Hyperwall at the AGU Annual Meeting."
   },
   {
     "title": "ISEF Grand Prize in Energy",
     "date": "2019-05-01",
     "awarder": "ISEF",
-    "summary": "Finalist in 2018–2021; Grand Prize in 2019."
+    "summary": "Awarded for outstanding achievement in the field of energy at the International Science and Engineering Fair in 2019."
   }
 ]
 
