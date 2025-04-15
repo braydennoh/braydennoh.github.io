@@ -91,19 +91,21 @@
     "title": "17001 Braydennoh",
     "date": "2022-01-01",
     "awarder": "The International Astronomical Union Minor Planet Center",
-    "summary": "An asteroid named in recognition of a Grand Award at the International Science and Engineering Fair (ISEF), awarded for achievement in scientific research."
+    "summary": "An asteroid named in recognition of a Grand Award at the International Science and Engineering Fair (ISEF)."
   },
   {
     "title": "AGU Michael H. Freilich Student Visualization Grand Prize",
     "date": "2021-12-01",
     "awarder": "American Geophysical Union",
-    "summary": "Awarded for excellence in scientific visualization, including a travel grant and a presentation on the NASA Hyperwall at the AGU Annual Meeting."
+    "summary": "Awarded for creative data visualization in Earth and space sciences, which includes a $3,000 grant, an invited presentation on the NASA Hyperwall, and multi-year professional development support."
   },
+
+  
   {
     "title": "ISEF Grand Prize in Energy",
     "date": "2019-05-01",
     "awarder": "International Science and Engineering Fair",
-    "summary": "Awarded for outstanding achievement in the field of energy at the International Science and Engineering Fair in 2019."
+    "summary": "Awarded for second place in the field of energy at the International Science and Engineering Fair in 2019."
   }
 ]
 
