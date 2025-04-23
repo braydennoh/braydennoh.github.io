@@ -6,8 +6,8 @@ subtitle: "<a href='https://www.caltech.edu' target='_blank'>California Institut
 
 profile:
   align: right
-  image: swissprofile.png
-  image_circular: false
+  image: harvardpfp.jpeg
+  image_circular: true
 
 
 selected_papers: true
