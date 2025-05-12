@@ -7,7 +7,7 @@ subtitle: "<a href='https://www.caltech.edu' target='_blank'>California Institut
 profile:
   align: right
   image: hawaiiprofile.jpeg
-  image_circular: true
+  image_circular: false
 
 
 selected_papers: true
