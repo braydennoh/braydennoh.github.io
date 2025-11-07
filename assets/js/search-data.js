@@ -424,9 +424,9 @@ ninja.data = [{
           description: "an other project with a background image and giscus comments",
           section: "Projects",handler: () => {
               window.location.href = "/projects/8_project/";
-            },},{id: "projects-fractalcnn-test-another-page",
-          title: 'FractalCNN_test_another_page',
-          description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
+            },},{id: "projects-what-is-worthy-of-a-scientific-questions",
+          title: 'What is Worthy of a Scientific Questions?',
+          description: "Opinion",
           section: "Projects",handler: () => {
               window.location.href = "/projects/9_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
