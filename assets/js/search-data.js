@@ -424,9 +424,9 @@ ninja.data = [{
           description: "an other project with a background image and giscus comments",
           section: "Projects",handler: () => {
               window.location.href = "/projects/8_project/";
-            },},{id: "projects-project-9",
-          title: 'project 9',
-          description: "another project with an image 🎉",
+            },},{id: "projects-fractalcnn-test-another-page",
+          title: 'FractalCNN_test_another_page',
+          description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
           section: "Projects",handler: () => {
               window.location.href = "/projects/9_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
