@@ -459,6 +459,11 @@ ninja.data = [{
           description: "Photo journal from London, Sevenoaks, and Cambridge",
           section: "Projects",handler: () => {
               window.location.href = "/projects/UK/";
+            },},{id: "projects-fractalcnn",
+          title: 'FractalCNN',
+          description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/himalaya/";
             },},{
         id: 'social-email',
         title: 'email',
