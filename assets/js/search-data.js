@@ -424,11 +424,6 @@ ninja.data = [{
           description: "an other project with a background image and giscus comments",
           section: "Projects",handler: () => {
               window.location.href = "/projects/8_project/";
-            },},{id: "projects-what-is-worthy-of-a-scientific-questions",
-          title: 'What is Worthy of a Scientific Questions?',
-          description: "Opinion",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/9_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
           title: 'Bobcat Fire CO Emissions',
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
@@ -454,6 +449,11 @@ ninja.data = [{
           description: "Assessing urbanization and green space change in Pasadena using satellite NDVI data",
           section: "Projects",handler: () => {
               window.location.href = "/projects/NDVI/";
+            },},{id: "projects-what-is-worthy-of-a-scientific-questions",
+          title: 'What is Worthy of a Scientific Questions?',
+          description: "Opinion",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/ScientificQuestion/";
             },},{id: "projects-london-amp-beyond",
           title: 'London &amp;amp; Beyond',
           description: "Photo journal from London, Sevenoaks, and Cambridge",
