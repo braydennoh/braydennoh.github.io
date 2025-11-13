@@ -419,16 +419,16 @@ ninja.data = [{
           description: "with background image",
           section: "Projects",handler: () => {
               window.location.href = "/projects/7_project/";
-            },},{id: "projects-project-8",
-          title: 'project 8',
-          description: "an other project with a background image and giscus comments",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/8_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
           title: 'Bobcat Fire CO Emissions',
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
           section: "Projects",handler: () => {
               window.location.href = "/projects/BobcatFire/";
+            },},{id: "projects-cameras",
+          title: 'Cameras',
+          description: "Short essay on cameras",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/Cameras/";
             },},{id: "projects-fractalcnn",
           title: 'FractalCNN',
           description: "Inferring 3D fractal dimension from 2D floc images using synthetic datasets and CNNs",
