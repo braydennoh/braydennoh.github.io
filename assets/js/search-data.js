@@ -18,7 +18,7 @@ ninja.data = [{
           },
         },{id: "nav-cv",
           title: "CV",
-          description: "Full curriculum vitae for Katherine Avanesov.",
+          description: "Full curriculum vitae for Brayden Noh.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/cv/";
