@@ -18,7 +18,7 @@ ninja.data = [{
           },
         },{id: "nav-cv",
           title: "CV",
-          description: "Full curriculum vitae for Brayden Noh. PDF version available above.",
+          description: "Full curriculum vitae for Katherine Avanesov.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/cv/";
