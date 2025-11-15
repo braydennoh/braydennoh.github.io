@@ -414,11 +414,6 @@ ninja.data = [{
           description: "a project with no image",
           section: "Projects",handler: () => {
               window.location.href = "/projects/6_project/";
-            },},{id: "projects-molnar-inversion",
-          title: 'Molnar Inversion',
-          description: "Inversion of uplift rate to fault geometry",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/7_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
           title: 'Bobcat Fire CO Emissions',
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
@@ -449,6 +444,11 @@ ninja.data = [{
           description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
           section: "Projects",handler: () => {
               window.location.href = "/projects/Iceland/";
+            },},{id: "projects-molnar-inversion",
+          title: 'Molnar Inversion',
+          description: "Inversion of uplift rate to fault geometry",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/Molnar/";
             },},{id: "projects-pasadena-ndvi",
           title: 'Pasadena NDVI',
           description: "Assessing urbanization and green space change in Pasadena using satellite NDVI data",
