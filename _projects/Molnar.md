@@ -15,12 +15,10 @@ This is a brief summary of the methods used in Peter Molnar's 1987 paper, "Inver
 Assumes a simple uplift function of the form
 
 $$
-u(x) \;=\; 
-u_0 \left(\frac{x}{d}\right)
-\exp\!\left( 1 - \frac{x}{d} \right),
+u(x) = u_0\,\frac{x}{d}\,\exp\!\left(1 - \frac{x}{d}\right),
 $$
 
-where \(u_0\) is the maximum uplift rate at \(x = d\).  
+where $u_0$ is the maximum uplift rate at $x = d$.
 
 ## Vertical Shear: Basic Derivation
 
