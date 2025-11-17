@@ -27,8 +27,6 @@ Hi, I’m **Brayden Noh**, a PhD student in **Earth and Planetary Sciences** at 
 
 I completed my undergraduate studies at **Caltech**, where I worked with [Michael Lamb](https://lamb.caltech.edu/), [Omar Wani](https://www.omarwani.com/), [Karl Lang](https://www.karllang.info/), and [Vinamra Agrawal](https://vinagr.github.io/) on projects ranging from asteroid impact simulations to probabilistic geomorphic risk modeling.
 
-<br><br>
-
 <div class="row mt-4">
   <div class="col-sm mt-3 mt-md-0">
     {% include figure.liquid path="assets/img/group1.jpeg" class="img-fluid rounded z-depth-1" %}
