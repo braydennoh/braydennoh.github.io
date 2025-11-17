@@ -1,51 +1,45 @@
 ---
 layout: page
-title: London & Beyond
-description: Photo journal from London, Sevenoaks, and Cambridge
-img: assets/img/blogcover/Slide4.jpeg
-importance: 2
+title: Cambridge
+description: Running from Cambridge to Boston
+img: assets/img/cambridge/cover.jpeg
+importance: 1
 category: travel
 related_publications: false
 ---
 
-## London
-
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london1.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/1.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london2.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/2.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/london3.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
-
-## Sevenoaks
-
-<div class="row mt-4">
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven1.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven2.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/seven3.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/3.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 
-## Cambridge
+<div class="row mt-4">
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/cambridge/4.JPG" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/cambridge/5.JPG" class="img-fluid rounded z-depth-1" %}
+  </div>
+  <div class="col-sm mt-3 mt-md-0">
+    {% include figure.liquid path="assets/img/cambridge/6.JPG" class="img-fluid rounded z-depth-1" %}
+  </div>
+</div>
 
 <div class="row mt-4">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam1.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/7.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam2.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/8.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/londonpic/cam3.jpeg" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="assets/img/cambridge/9.JPG" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
