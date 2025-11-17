@@ -419,6 +419,11 @@ ninja.data = [{
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
           section: "Projects",handler: () => {
               window.location.href = "/projects/BobcatFire/";
+            },},{id: "projects-london-amp-beyond",
+          title: 'London &amp;amp; Beyond',
+          description: "Photo journal from London, Sevenoaks, and Cambridge",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/Cambridge/";
             },},{id: "projects-cameras",
           title: 'Cameras',
           description: "Short essay on cameras",
