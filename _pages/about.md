@@ -26,17 +26,3 @@ latest_posts:
 Hi, I’m **Brayden Noh**, a PhD student in **Earth and Planetary Sciences** at **Harvard University**, where I am advised by [Brendan Meade](https://brendanjmeade.github.io/). My research focuses on earthquake cycles and the interactions between tectonic deformation and landscape evolution, combining physical process modeling with statistical approaches.
 
 I completed my undergraduate studies at **Caltech**, where I worked with [Michael Lamb](https://lamb.caltech.edu/), [Omar Wani](https://www.omarwani.com/), [Karl Lang](https://www.karllang.info/), and [Vinamra Agrawal](https://vinagr.github.io/) on projects ranging from asteroid impact simulations to probabilistic geomorphic risk modeling.
-
-<div class="row mt-4">
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/group1.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/group2.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-
-  <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/group3.jpeg" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
