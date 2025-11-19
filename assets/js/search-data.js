@@ -469,6 +469,11 @@ ninja.data = [{
           description: "Photo journal from London, Sevenoaks, and Cambridge",
           section: "Projects",handler: () => {
               window.location.href = "/projects/UK/";
+            },},{id: "projects-london-amp-beyond",
+          title: 'London &amp;amp; Beyond',
+          description: "Photo journal from London, Sevenoaks, and Cambridge",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/new/";
             },},{
         id: 'social-email',
         title: 'email',
