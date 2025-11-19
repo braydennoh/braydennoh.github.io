@@ -13,8 +13,12 @@ The optimization is recursive, updating the cost function as topography evolves.
 
 Secondary effects such as strain weakening (where active faults progressively become weaker/memory) and surface erosion are not currently implemented. The simulation focuses only on the competition between frictional and gravitational work in a homogenous crust.
 
-<div style="text-align:center;">
-  <img src="/assets/img/rampislocked/minmount.gif" style="display:block; margin:0 auto; border:none; padding:0; box-shadow:none;" />
+<div class="row justify-content-center">
+  <div class="col-sm-10">
+    <img src="/assets/img/rampislocked/minmount.gif"
+         class="img-fluid"
+         style="display:block; margin:0 auto; border:none; box-shadow:none; padding:0;">
+  </div>
 </div>
 
 ## 1. Physical Parameters
@@ -222,7 +226,10 @@ def update_topography(h: np.ndarray, path_segments):
 
 {% endraw %}
 
-<div style="text-align:center;">
-  <img src="/assets/img/rampislocked/minmount.png" style="display:block; margin:0 auto; border:none; padding:0; box-shadow:none;" />
+<div class="row justify-content-center">
+  <div class="col-sm-10">
+    <img src="/assets/img/rampislocked/minmount.png"
+         class="img-fluid"
+         style="display:block; margin:0 auto; border:none; box-shadow:none; padding:0;">
+  </div>
 </div>
-
