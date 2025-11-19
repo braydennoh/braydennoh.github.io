@@ -2,7 +2,7 @@
 layout: page
 title: Minimum Mountain
 description: A Python implementation of Masek & Duncan (1998)
-importance: 1
+importance: 994
 category: project
 giscus_comments: false
 ---
