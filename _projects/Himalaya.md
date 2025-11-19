@@ -2,7 +2,7 @@
 layout: page
 title: Himalayan Uplift
 description: Kinematic dislocation model to vertical uplift in the Himalayas
-importance: 13
+importance: 995
 category: project
 giscus_comments: false
 ---
