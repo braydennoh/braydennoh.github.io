@@ -409,12 +409,7 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-minimum-work-mountain-building",
-          title: 'Minimum-Work Mountain Building',
-          description: "A Python implementation of Masek &amp; Duncan (1998)",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/6_project/";
-            },},{id: "projects-bobcat-fire-co-emissions",
+          section: "News",},{id: "projects-bobcat-fire-co-emissions",
           title: 'Bobcat Fire CO Emissions',
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
           section: "Projects",handler: () => {
@@ -449,6 +444,11 @@ ninja.data = [{
           description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
           section: "Projects",handler: () => {
               window.location.href = "/projects/Iceland/";
+            },},{id: "projects-minimum-work-mountain-building",
+          title: 'Minimum-Work Mountain Building',
+          description: "A Python implementation of Masek &amp; Duncan (1998)",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/MinMountain/";
             },},{id: "projects-molnar-inversion",
           title: 'Molnar Inversion',
           description: "Inversion of uplift rate to fault geometry",
