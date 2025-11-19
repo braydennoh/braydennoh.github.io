@@ -47,7 +47,12 @@ It seems clear that in the Himalayas, there is a flat–ramp–flat structure, a
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
-    {% include figure.liquid path="/assets/img/rampislocked/rampislocked.gif" title="Evolution of Uplift" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid 
+         path="/assets/img/rampislocked/rampislocked.gif" 
+         title="Evolution of Uplift" 
+         class="img-fluid"
+         style="border:none; box-shadow:none; padding:0; margin:0; border-radius:0;" 
+    %}
   </div>
 </div>
 
