@@ -7,11 +7,11 @@ category: project
 giscus_comments: false
 ---
 
-This is a Python implementation of the [Masek and Duncan 1998](/assets/pdf/minmountain.pdf). The model minimize the total mechanical work (frictional and gravitational) and produces topography based on kinematic equations. 
+This is a Python implementation of the [Masek and Duncan 1998](/assets/pdf/minmountain.pdf). The model minimize the total mechanical work (frictional and gravitational) and produces topography based on kinematic equations. It is analogous to applying the variational principle in physics, however, the gravity term is updated after topography is added to the system. 
 
 ## 1. Physical Parameters
 
-I define the domain dimensions, crustal density ($\rho_c$), and the coefficient of friction ($\mu$). A key parameter here is `shorten_dx`, which represents the incremental shortening applied at every time step.
+First, define the domain dimensions, crustal density ($\rho_c$), and the coefficient of friction ($\mu$). A key parameter here is `shorten_dx`, which represents the incremental shortening applied at every time step.
 
 {% raw %}
 ```python
@@ -50,7 +50,7 @@ def segment_theta(up_steps: int) -> float:
 
 ## 3\. Resolving Stresses
 
-To calculate friction, we must resolve the regional stresses onto the specific fault plane $\theta$. [cite\_start]We use Anderson's theory of faulting[cite: 64]. [cite\_start]The function below calculates the effective normal stress ($\sigma_{eff}$) and the shear stress ($\tau_{fric}$) required for sliding, accounting for pore fluid pressure ($\lambda$)[cite: 73].
+To calculate friction, we must resolve the regional stresses onto the specific fault plane $\theta$. The paper uses Anderson's theory of faulting. The function below calculates the effective normal stress ($\sigma_{eff}$) and the shear stress ($\tau_{fric}$) required for sliding, accounting for pore fluid pressure ($\lambda$).
 
 {% raw %}
 
@@ -78,10 +78,9 @@ def sigma_components(d: float, h_local: float, theta: float):
 
 This function is the core of the physics engine. For a candidate fault segment, it calculates two work terms:
 
-1.  **Gravitational Work ($W_g$):** The work done against gravity to uplift the rock column. [cite\_start]This depends on the depth $d$ plus the local topography $h$[cite: 157].
-2.  [cite\_start]**Frictional Work ($W_f$):** The work done to overcome friction along the fault plane[cite: 162].
+1.  **Gravitational Work ($W_g$):** The work done against gravity to uplift the rock column. This depends on the depth $d$ plus the local topography $h$.
+2.  **Frictional Work ($W_f$):** The work done to overcome friction along the fault plane.
 
-[cite\_start]The paper notes that the system finds a compromise: steep faults minimize frictional path length but maximize gravitational work, while shallow faults do the reverse[cite: 143].
 
 {% raw %}
 
@@ -115,7 +114,7 @@ def segment_work(k: int, i: int, di: int, dk: int, h: np.ndarray):
 
 ## 5\. Finding the Minimum Work Path
 
-We use Dijkstra's algorithm to find the optimal fault trajectory. [cite\_start]The algorithm searches the grid graph starting from the detachment depth (`START`) to find the path to the surface that minimizes the sum of $W_g + W_f$[cite: 167].
+I used Dijkstra's algorithm to find the optimal fault trajectory. The algorithm searches the grid graph starting from the detachment depth (`START`) to find the path to the surface that minimizes the sum of $W_g + W_f$.
 
 {% raw %}
 
@@ -179,7 +178,7 @@ def min_work_path(h: np.ndarray):
 
 ## 6\. Updating Topography
 
-Once the optimal fault path is identified, we simulate slip along it. This uplifts the surface topography $h$. [cite\_start]This is a dynamic model: the new topography increases the gravitational work penalty for subsequent steps, forcing future faults to migrate or change geometry[cite: 169, 170].
+Once the optimal fault path is identified, slip is applied along the fault. This uplifts the surface topography $h$. This is a recursive model: the new topography increases the gravitational work penalty for subsequent steps, forcing future faults to migrate or change geometry.
 
 {% raw %}
 
