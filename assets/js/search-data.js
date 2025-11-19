@@ -469,11 +469,11 @@ ninja.data = [{
           description: "Photo journal from London, Sevenoaks, and Cambridge",
           section: "Projects",handler: () => {
               window.location.href = "/projects/UK/";
-            },},{id: "projects-london-amp-beyond",
-          title: 'London &amp;amp; Beyond',
-          description: "Photo journal from London, Sevenoaks, and Cambridge",
+            },},{id: "projects-unbalanced-river",
+          title: 'Unbalanced River',
+          description: "A Python implementation of Meade (2010)",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/new/";
+              window.location.href = "/projects/Unbalanced/";
             },},{
         id: 'social-email',
         title: 'email',
