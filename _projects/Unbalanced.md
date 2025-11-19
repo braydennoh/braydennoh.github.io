@@ -7,7 +7,7 @@ category: project
 giscus_comments: false
 ---
 
-This is a Python implementation of the unbalanced  mountain building model proposed by [Brendan Meade (2010)]([/assets/pdf/minmountain.pdf](https://pubs.geoscienceworld.org/gsa/geology/article-abstract/38/11/987/130140/The-signature-of-an-unbalanced-earthquake-cycle-in)). The fundamental hypothesis is that crustal deformation minimizes the total mechanical work, $W_{total}$, defined as the sum of dissipative frictional work ($W_f$) and gravitational potential work ($W_g$).
+This is a Python implementation of the unbalanced  mountain building model proposed by [Meade (2010)](https://pubs.geoscienceworld.org/gsa/geology/article-abstract/38/11/987/130140/The-signature-of-an-unbalanced-earthquake-cycle-in). The fundamental hypothesis is that crustal deformation minimizes the total mechanical work, $W_{total}$, defined as the sum of dissipative frictional work ($W_f$) and gravitational potential work ($W_g$).
 
 The optimization is recursive, updating the cost function as topography evolves. Although this approach is analogous to variational principles in Lagrangian Mechanics, it differs by neglecting the kinetic energy term, thereby treating the system as a quasi-static evolution of static equilibrium states (therefore, "controversial"). This is the [Jupyter Code](/assets/jupyter/MinimumMountain.ipynb).
 
