@@ -1,80 +1,207 @@
 ---
 layout: page
-title: project 6
-description: a project with no image
-img:
-importance: 4
-category: fun
+title: Minimum-Work Mountain Building
+description: A Python implementation of Masek & Duncan (1998)
+importance: 1
+category: project
+giscus_comments: false
 ---
 
-Every project has a beautiful feature showcase page.
-It's easy to include images in a flexible 3-column grid format.
-Make your photos 1/3, 2/3, or full width.
+This is a Python implementation of the [Masek and Duncan 1998](/assets/pdf/minmountain.pdf). The model minimize the total mechanical work (frictional and gravitational) and produces topography based on kinematic equations. 
 
-To give your project a background in the portfolio page, just add the img tag to the front matter like so:
+## 1. Physical Parameters
 
-    ---
-    layout: page
-    title: project
-    description: a project with a background image
-    img: /assets/img/12.jpg
-    ---
+I define the domain dimensions, crustal density ($\rho_c$), and the coefficient of friction ($\mu$). A key parameter here is `shorten_dx`, which represents the incremental shortening applied at every time step.
 
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/1.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/3.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    Caption photos easily. On the left, a road goes through a tunnel. Middle, leaves artistically fall in a hipster photoshoot. Right, in another hipster photoshoot, a lumberjack grasps a handful of pine needles.
-</div>
-<div class="row">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/5.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    This image can also have a caption. It's like magic.
-</div>
+{% raw %}
+```python
+@dataclass
+class Params:
+    W: float = 200e3           # Domain width (m)
+    H: float = 30e3            # Crustal thickness (m)
+    dx: float = 4e3            # Horizontal node spacing (m)
+    dz: float = 2e3            # Vertical node spacing (m)
+    shorten_dx: float = 160.0  # Horizontal shortening increment (m)
+    rho_c: float = 2700.0      # Crustal density (kg/m^3)
+    g: float = 9.81            # Gravity (m/s^2)
+    mu: float = 0.20           # Friction coefficient
+    lam: float = 0.37          # Hubbert–Rubey pore fluid ratio
+    deltaxx: float = 1.0e8     # Tectonic driving stress (Pa)
+    max_up: int = 3            # Max vertical steps per horizontal step
 
-You can also put regular text between your rows of images.
-Say you wanted to write a little bit about your project before you posted the rest of the images.
-You describe how you toiled, sweated, _bled_ for your project, and then... you reveal its glory in the next row of images.
+P = Params()
+````
 
-<div class="row justify-content-sm-center">
-    <div class="col-sm-8 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-    <div class="col-sm-4 mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    You can also have artistically styled 2/3 + 1/3 images, like these.
-</div>
+{% endraw %}
 
-The code is simple.
-Just wrap your images with `<div class="col-sm">` and place them inside `<div class="row">` (read more about the <a href="https://getbootstrap.com/docs/4.4/layout/grid/">Bootstrap Grid</a> system).
-To make images responsive, add `img-fluid` class to each; for rounded corners and shadows use `rounded` and `z-depth-1` classes.
-Here's the code for the last row of images above:
+## 2\. Fault Geometry
+
+The model is discretized into a grid. A fault segment connects one node to another. We calculate the dip angle $\theta$ for any given segment based on how many vertical steps (`up_steps`) are taken for one horizontal step.
 
 {% raw %}
 
-```html
-<div class="row justify-content-sm-center">
-  <div class="col-sm-8 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/6.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-  <div class="col-sm-4 mt-3 mt-md-0">
-    {% include figure.liquid path="assets/img/11.jpg" title="example image" class="img-fluid rounded z-depth-1" %}
-  </div>
-</div>
+```python
+def segment_theta(up_steps: int) -> float:
+    dz = up_steps * P.dz
+    return math.atan2(dz, P.dx)
 ```
 
 {% endraw %}
+
+## 3\. Resolving Stresses
+
+To calculate friction, we must resolve the regional stresses onto the specific fault plane $\theta$. [cite\_start]We use Anderson's theory of faulting[cite: 64]. [cite\_start]The function below calculates the effective normal stress ($\sigma_{eff}$) and the shear stress ($\tau_{fric}$) required for sliding, accounting for pore fluid pressure ($\lambda$)[cite: 73].
+
+{% raw %}
+
+```python
+def sigma_components(d: float, h_local: float, theta: float):
+    # Vertical lithostatic stress
+    sigma3 = P.rho_c * P.g * (d + h_local)
+    # Horizontal tectonic stress
+    sigma1 = sigma3 + P.deltaxx
+    
+    # Normal stress on the dipping plane (Eq 1 in paper)
+    sigma_n = 0.5 * (sigma1 + sigma3) - 0.5 * (sigma1 - sigma3) * math.cos(2.0 * theta)
+    
+    # Effective normal stress (Hubbert-Rubey)
+    sigma_eff = max(sigma_n - P.lam * sigma3, 0.0)
+    
+    # Shear stress (Coulomb friction)
+    tau_fric = P.mu * sigma_eff
+    return sigma3, sigma1, sigma_n, tau_fric
+```
+
+{% endraw %}
+
+## 4\. Calculating Work
+
+This function is the core of the physics engine. For a candidate fault segment, it calculates two work terms:
+
+1.  **Gravitational Work ($W_g$):** The work done against gravity to uplift the rock column. [cite\_start]This depends on the depth $d$ plus the local topography $h$[cite: 157].
+2.  [cite\_start]**Frictional Work ($W_f$):** The work done to overcome friction along the fault plane[cite: 162].
+
+[cite\_start]The paper notes that the system finds a compromise: steep faults minimize frictional path length but maximize gravitational work, while shallow faults do the reverse[cite: 143].
+
+{% raw %}
+
+```python
+def segment_work(k: int, i: int, di: int, dk: int, h: np.ndarray):
+    k2, i2 = k + dk, i + di
+    # Check grid bounds
+    if not (0 <= i2 < Nx and 0 <= k2 <= k):
+        return None
+
+    up = -dk
+    theta = segment_theta(up)
+
+    horiz_len = P.dx
+    along_fault = math.hypot(P.dx, up * P.dz)
+
+    d = z_nodes[k]
+    h_local = h[i]
+
+    # Gravitational work (Eq 11)
+    Wg = P.rho_c * P.g * horiz_len * (d + h_local) * (P.shorten_dx * math.sin(theta))
+
+    # Frictional work (Eq 12)
+    _, _, _, tau = sigma_components(d, h_local, theta)
+    Wf = tau * along_fault * P.shorten_dx
+
+    return Wg + Wf, theta, (k2, i2)
+```
+
+{% endraw %}
+
+## 5\. Finding the Minimum Work Path
+
+We use Dijkstra's algorithm to find the optimal fault trajectory. [cite\_start]The algorithm searches the grid graph starting from the detachment depth (`START`) to find the path to the surface that minimizes the sum of $W_g + W_f$[cite: 167].
+
+{% raw %}
+
+```python
+def min_work_path(h: np.ndarray):
+    INF = float("inf")
+    dist = np.full((Nz, Nx), INF, dtype=float)
+    parent = np.full((Nz, Nx, 2), -1, dtype=int)
+    theta_to = np.zeros((Nz, Nx), dtype=float)
+
+    dist[START] = 0.0
+    pq = [(0.0, START)]
+
+    while pq:
+        cur_cost, (k, i) = heapq.heappop(pq)
+        if cur_cost > dist[k, i]:
+            continue
+
+        for di, dk in DIRS:
+            out = segment_work(k, i, di, dk, h)
+            if out is None:
+                continue
+            seg_cost, theta, (k2, i2) = out
+            new_cost = cur_cost + seg_cost
+            if new_cost < dist[k2, i2]:
+                dist[k2, i2] = new_cost
+                parent[k2, i2] = (k, i)
+                theta_to[k2, i2] = theta
+                heapq.heappush(pq, (new_cost, (k2, i2)))
+
+    # Find the global minimum cost node on the surface (k=0)
+    best_surface_node = None
+    best_cost = INF
+    for ix in range(Nx):
+        if dist[0, ix] < best_cost:
+            best_cost = dist[0, ix]
+            best_surface_node = (0, ix)
+
+    if best_surface_node is None:
+        return []
+
+    # Backtrack to reconstruct the path
+    path_segments = []
+    node = best_surface_node
+    while node != START:
+        k2, i2 = node
+        prev_k, prev_i = parent[k2, i2]
+        if prev_k == -1:
+            break
+        th = theta_to[k2, i2]
+        x0, z0 = x_nodes[prev_i], z_nodes[prev_k]
+        x1, z1 = x_nodes[i2], z_nodes[k2]
+        path_segments.append(((x0, z0), (x1, z1), th))
+        node = (prev_k, prev_i)
+
+    path_segments.reverse()
+    return path_segments
+```
+
+{% endraw %}
+
+## 6\. Updating Topography
+
+Once the optimal fault path is identified, we simulate slip along it. This uplifts the surface topography $h$. [cite\_start]This is a dynamic model: the new topography increases the gravitational work penalty for subsequent steps, forcing future faults to migrate or change geometry[cite: 169, 170].
+
+{% raw %}
+
+```python
+def update_topography(h: np.ndarray, path_segments):
+    for (x0, z0), (x1, z1), th in path_segments:
+        if abs(math.cos(th)) < 1e-6:
+            continue
+        # Uplift calculation
+        delta_h = P.shorten_dx * math.tan(th)
+        
+        # Apply uplift to nodes spanning this segment
+        i0 = int(round(x0 / P.dx))
+        i1 = int(round(x1 / P.dx))
+        start_idx = min(i0, i1)
+        end_idx = max(i0, i1)
+        for ii in range(start_idx, end_idx + 1):
+            if 0 <= ii < len(h):
+                h[ii] += delta_h
+```
+
+{% endraw %}
+
+```
+```
