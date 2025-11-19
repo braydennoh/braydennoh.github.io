@@ -220,5 +220,7 @@ def update_topography(h: np.ndarray, path_segments):
 
 {% endraw %}
 
-```
-```
+<div style="text-align:center;">
+  <img src="/assets/img/rampislocked/minmount.png" style="display:block; margin:0 auto; border:none; padding:0; box-shadow:none;" />
+</div>
+
