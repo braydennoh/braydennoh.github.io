@@ -7,11 +7,11 @@ category: project
 giscus_comments: false
 ---
 
-This is a Python implementation of the [Masek and Duncan 1998](/assets/pdf/minmountain.pdf). The model minimize the total mechanical work (frictional and gravitational) and produces topography based on kinematic equations. It is analogous to applying the variational principle in physics, however, the gravity term is updated after topography is added to the system. 
+This is a Python implementation of the minimum-work mountain building model proposed by Masek and Duncan (1998). The fundamental hypothesis is that crustal deformation minimizes the total mechanical work, $W_{total}$, defined as the sum of dissipative frictional work ($W_f$) and gravitational potential work ($W_g$).
+
+The optimization is recursive, updating the cost function as topography evolves. Although this approach is analogous to variational principles in Lagrangian Mechanics, it differs by neglecting the kinetic energy term, thereby treating the system as a quasi-static evolution of static equilibrium states (therefore, "controversial").
 
 ## 1. Physical Parameters
-
-First, define the domain dimensions, crustal density ($\rho_c$), and the coefficient of friction ($\mu$). A key parameter here is `shorten_dx`, which represents the incremental shortening applied at every time step.
 
 {% raw %}
 ```python
@@ -74,12 +74,26 @@ def sigma_components(d: float, h_local: float, theta: float):
 
 {% endraw %}
 
+
 ## 4\. Calculating Work
 
-This function is the core of the physics engine. For a candidate fault segment, it calculates two work terms:
+For a candidate fault segment, it calculates two work terms:
 
-1.  **Gravitational Work ($W_g$):** The work done against gravity to uplift the rock column. This depends on the depth $d$ plus the local topography $h$.
-2.  **Frictional Work ($W_f$):** The work done to overcome friction along the fault plane.
+1.  Gravitational Work ($W_g$): The work done against gravity to uplift the rock column. This depends on the crustal density $\rho_c$, gravity $g$, and the total burden defined by the depth $d$ plus the local topography $h$. The work is calculated as the force of gravity multiplied by the vertical displacement ($u \sin \theta$):
+
+    $$
+    W_g = \rho_c A_h g (d + h) (u \sin \theta)
+    $$
+
+    where $A_h$ is the horizontal area of the column segment.
+
+2.  Frictional Work ($W_f$): The work done to overcome friction along the fault plane. This is a function of the shear stress $\tau$ and the fault surface area $A_f$:
+
+    $$
+    W_f = \tau A_f u
+    $$
+
+    where $u$ is the total slip along the fault segment.
 
 
 {% raw %}
@@ -178,7 +192,7 @@ def min_work_path(h: np.ndarray):
 
 ## 6\. Updating Topography
 
-Once the optimal fault path is identified, slip is applied along the fault. This uplifts the surface topography $h$. This is a recursive model: the new topography increases the gravitational work penalty for subsequent steps, forcing future faults to migrate or change geometry.
+Once the optimal fault path is identified, slip is applied along the fault. This uplifts the surface topography $h$. This is a recursive model. The new topography increases the gravitational work penalty for subsequent steps, forcing future faults to migrate or change geometry.
 
 {% raw %}
 
