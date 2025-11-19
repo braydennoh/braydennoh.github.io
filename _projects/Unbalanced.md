@@ -7,17 +7,14 @@ category: project
 giscus_comments: false
 ---
 
-This is a Python implementation of the unbalanced  mountain building model proposed by [Meade (2010)](https://pubs.geoscienceworld.org/gsa/geology/article-abstract/38/11/987/130140/The-signature-of-an-unbalanced-earthquake-cycle-in). The fundamental hypothesis is that crustal deformation minimizes the total mechanical work, $W_{total}$, defined as the sum of dissipative frictional work ($W_f$) and gravitational potential work ($W_g$).
+This is a Python implementation of the unbalanced  mountain building model proposed by [Brendan Meade (2010)](https://pubs.geoscienceworld.org/gsa/geology/article-abstract/38/11/987/130140/The-signature-of-an-unbalanced-earthquake-cycle-in). 
 
-The optimization is recursive, updating the cost function as topography evolves. Although this approach is analogous to variational principles in Lagrangian Mechanics, it differs by neglecting the kinetic energy term, thereby treating the system as a quasi-static evolution of static equilibrium states (therefore, "controversial"). This is the [Jupyter Code](/assets/jupyter/MinimumMountain.ipynb).
-
-Secondary effects such as strain weakening (where active faults progressively become weaker/memory) and surface erosion are not currently implemented. The simulation focuses only on the competition between frictional and gravitational work in a homogenous crust.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
     {% include figure.liquid 
-         path="/assets/img/rampislocked/minmount.gif" 
-         title="Evolution of Uplift" 
+         path="/assets/img/rampislocked/riverbalance.gif" 
+         title="Balanced River" 
          class="img-fluid"
          style="border:none; box-shadow:none; padding:0; margin:0; border-radius:0;" 
     %}
