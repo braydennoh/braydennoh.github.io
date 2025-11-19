@@ -11,6 +11,8 @@ This is a Python implementation of the minimum-work mountain building model prop
 
 The optimization is recursive, updating the cost function as topography evolves. Although this approach is analogous to variational principles in Lagrangian Mechanics, it differs by neglecting the kinetic energy term, thereby treating the system as a quasi-static evolution of static equilibrium states (therefore, "controversial"). This is the [Jupyter Code](/assets/jupyter/MinimumMountain.ipynb).
 
+Secondary effects such as strain weakening (where active faults progressively become weaker/memory) and surface erosion are not currently implemented. The simulation focuses only on the competition between frictional and gravitational work in a homogenous crust.
+
 <div style="text-align:center;">
   <img src="/assets/img/rampislocked/minmount.gif" style="display:block; margin:0 auto; border:none; padding:0; box-shadow:none;" />
 </div>
