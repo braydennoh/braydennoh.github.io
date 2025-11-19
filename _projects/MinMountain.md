@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Minimum-Work Mountain Building
+title: Minimum Mountain
 description: A Python implementation of Masek & Duncan (1998)
 importance: 1
 category: project
@@ -10,6 +10,10 @@ giscus_comments: false
 This is a Python implementation of the minimum-work mountain building model proposed by [Masek and Duncan (1998)](/assets/pdf/6571592.pdf). The fundamental hypothesis is that crustal deformation minimizes the total mechanical work, $W_{total}$, defined as the sum of dissipative frictional work ($W_f$) and gravitational potential work ($W_g$).
 
 The optimization is recursive, updating the cost function as topography evolves. Although this approach is analogous to variational principles in Lagrangian Mechanics, it differs by neglecting the kinetic energy term, thereby treating the system as a quasi-static evolution of static equilibrium states (therefore, "controversial"). This is the [Jupyter Code](/assets/jupyter/MinimumMountain.ipynb).
+
+<div style="text-align:center;">
+  <img src="/assets/img/rampislocked/minmount.gif" style="display:block; margin:0 auto; border:none; padding:0; box-shadow:none;" />
+</div>
 
 ## 1. Physical Parameters
 
