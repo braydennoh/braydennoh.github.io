@@ -444,8 +444,8 @@ ninja.data = [{
           description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
           section: "Projects",handler: () => {
               window.location.href = "/projects/Iceland/";
-            },},{id: "projects-minimum-work-mountain-building",
-          title: 'Minimum-Work Mountain Building',
+            },},{id: "projects-minimum-mountain",
+          title: 'Minimum Mountain',
           description: "A Python implementation of Masek &amp; Duncan (1998)",
           section: "Projects",handler: () => {
               window.location.href = "/projects/MinMountain/";
