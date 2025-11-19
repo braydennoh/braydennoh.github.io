@@ -409,9 +409,9 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-project-6",
-          title: 'project 6',
-          description: "a project with no image",
+          section: "News",},{id: "projects-minimum-work-mountain-building",
+          title: 'Minimum-Work Mountain Building',
+          description: "A Python implementation of Masek &amp; Duncan (1998)",
           section: "Projects",handler: () => {
               window.location.href = "/projects/6_project/";
             },},{id: "projects-bobcat-fire-co-emissions",
