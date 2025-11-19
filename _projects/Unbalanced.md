@@ -139,7 +139,7 @@ def segment_work(k: int, i: int, di: int, dk: int, h: np.ndarray):
 
 ## 5\. Finding the Minimum Work Path
 
-I used Dijkstra's algorithm to find the optimal fault trajectory. The algorithm searches the grid graph starting from the detachment depth (`START`) to find the path to the surface that minimizes the sum of $W_g + W_f$.
+We use the Dijkstra's algorithm to find the optimal fault trajectory. The algorithm searches the grid graph starting from the detachment depth (`START`) to find the path to the surface that minimizes the sum of $W_g + W_f$.
 
 {% raw %}
 
