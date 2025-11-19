@@ -2,7 +2,7 @@
 layout: page
 title: Cameras
 description: Short essay on cameras
-importance: 6
+importance: 996
 category: project
 giscus_comments: true
 ---
