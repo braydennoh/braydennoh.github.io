@@ -24,10 +24,6 @@ To picture this, place a river on top of a thrust system where the coseismic sli
   </div>
 </div>
 
-Therefore, it must be that bedrock rivers profile some information regarding the balance between the coseismic and interseismic balance! This is crucial for the Himalayas because earthquakes are rare and hypotheized to be slip deficit. The Meade (2010) uses a "linear fault" in which from the free surface and the angle of the fault, it extends all the way down in a line, and this creates a characteristic uplift if all section of the fault has the same slip rate or long term slip. 
-
-However, the Himayalas has ramp structures which itself is likely to produce localized uplift whether earthquake cycle is balanced or not. Slip over the ramp drives the hanging wall upward as it is translated across the bend, producing a fold and localized uplift at the ramp. One can model the ramp system by adding a fold, and imposing kinematic dislocation on both ramp and fold...
-
 Consequently, bedrock river profiles must encode vital signals regarding the equilibrium between coseismic and interseismic activity. This is crucial for the Himalayas because earthquakes are rare events here and the region is hypothesized to be locked in a significant slip deficit. Meade (2010) models a planar geometry where the fault extends from the free surface all the way down in a continuous straight trajectory. This configuration creates a characteristic signature of uplift if every section of the fault maintains the same long term slip rate.
 
 However, the Himalayan architecture is complicated by ramp structures which are likely to produce localized uplift regardless of whether the earthquake cycle is balanced. As slip drives the hanging wall over these deep geologic bends, the crust is forced upward. This translation across the ramp acts like a conveyor belt moving over a bump and produces a fold and a focused zone of uplift directly above the structure. 
