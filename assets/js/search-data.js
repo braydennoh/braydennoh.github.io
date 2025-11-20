@@ -473,7 +473,7 @@ ninja.data = [{
           title: 'Unbalanced River',
           description: "A Python implementation of Meade (2010)",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/Unbalanced/";
+              window.location.href = "/projects/UnbalancedRiver/";
             },},{
         id: 'social-email',
         title: 'email',
