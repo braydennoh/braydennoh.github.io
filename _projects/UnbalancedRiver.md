@@ -43,7 +43,7 @@ Let’s use this concept to build a minimal representation of the Himalayan faul
   </div>
 </div>
 
-Grandin et al. (2012) argue that the interseismic uplift peak lies exactly where long-term uplift is highest based on InSAR observation, even though a simple flat–ramp–flat dislocation model predicts that these peaks should be offset by ~20 km. They interpret this mismatch as evidence that the mid-crustal ramp must have recently migrated southward. But once ramp-fold kinematics are included, uplift becomes more distributed across the entire ramp, which reduces the predicted spatial offset. This makes the observed coincidence between interseismic and long-term peaks less diagnostic of ramp migration than in the simple dislocation-only model.
+[Grandin et al. (2012)](https://pubs.geoscienceworld.org/gsa/geology/article/40/12/1059/130749/Long-term-growth-of-the-Himalaya-inferred-from) argue that the interseismic uplift peak lies exactly where long-term uplift is highest based on InSAR observation, even though a simple flat–ramp–flat dislocation model predicts that these peaks should be offset by ~20 km. They interpret this mismatch as evidence that the mid-crustal ramp must have recently migrated southward. But once ramp-fold kinematics are included, uplift becomes more distributed across the entire ramp, which reduces the predicted spatial offset. This makes the observed coincidence between interseismic and long-term peaks less diagnostic of ramp migration than in the simple dislocation-only model.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
