@@ -42,3 +42,19 @@ Let’s use this concept to build a minimal representation of the Himalayan faul
     %}
   </div>
 </div>
+
+Grandin et al. (2012) argue that the interseismic uplift peak lies exactly where long-term uplift is highest based on InSAR observation, even though a simple flat–ramp–flat dislocation model predicts that these peaks should be offset by ~20 km. They interpret this mismatch as evidence that the mid-crustal ramp must have recently migrated southward. But once ramp-fold kinematics are included, uplift becomes more distributed across the entire ramp, which reduces the predicted spatial offset. This makes the observed coincidence between interseismic and long-term peaks less diagnostic of ramp migration than in the simple dislocation-only model.
+
+<div class="row justify-content-sm-center">
+  <div class="col-sm-10 mt-3 mt-md-0">
+    {% include figure.liquid 
+         path="/assets/img/rampislocked/Grandin.png" 
+         title="Balanced River" 
+         class="img-fluid"
+         style="border:none; box-shadow:none; padding:0; margin:0; border-radius:0;" 
+    %}
+  </div>
+</div>
+
+
+
