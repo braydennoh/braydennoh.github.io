@@ -2,16 +2,16 @@
 layout: page
 title: Unbalanced River
 description: A Python implementation of Meade (2010)
-importance: 993
+importance: 990
 category: project
 giscus_comments: false
 ---
 
 This is a Python implementation of the unbalanced  mountain building model proposed by Brendan Meade (2010).
 
-In an ideal sense, the long term uplift of a thrust system should reflect the combined effects of interseismic and coseismic deformation, which I will refer to as a balanced system. In a simple thrust fault geometry, the cumulative uplift forms a broad block that settles into a characteristic concave bedrock river profile predicted by the stream power equation. But imagine if the coseismic events, for some reason, never catch up to the timescale over which a river adjusts its channel slope. 
+In an ideal sense, the long term uplift of a thrust system should reflect the combined effects of interseismic and coseismic deformation, which I will refer to as a balanced system. In a simple thrust fault geometry, the cumulative uplift forms a broad block that translates into a concave bedrock river profile predicted by the stream power equation. But imagine if the coseismic events, for some reason, never catch up to the timescale over which a river adjusts its channel slope. 
 
-To picture this, place a river on top of a thrust system where the coseismic slip never releases. At the depth where deformation shifts from brittle failure to creeping flow, the interseismic deformation alone generates an uplift. The bedrock river that carves across this landscape will not show the characteristic concavity. Instead, it will carry the imprint of this localized uplift.
+Consider a bedrock river traversing a thrust system characterized by an absence of coseismic slip. At the transition depth between the locked and creeping regimes, interseismic deformation drives localized uplift along the x-axis. Consequently, the river profile will record the signature of this deformation.
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
@@ -24,7 +24,7 @@ To picture this, place a river on top of a thrust system where the coseismic sli
   </div>
 </div>
 
-Consequently, bedrock river profiles must encode vital signals regarding the equilibrium between coseismic and interseismic activity. This is crucial for the Himalayas because earthquakes are rare events here and the region is hypothesized to be locked in a significant slip deficit. Meade (2010) models a planar geometry where the fault extends from the free surface all the way down in a continuous straight trajectory. This configuration creates a characteristic signature of uplift if every section of the fault maintains the same long term slip rate.
+Consequently, bedrock river profiles offer insights into the partitioning between coseismic and interseismic activity. This is pertinent to the Himalayas, a region characterized by infrequent major seismic events and a hypothesized significant accumulation of slip deficit. Meade (2010) used a planar fault model extending continuously from the free surface to depth. Under the assumption of a uniform long-term slip rate, this geometry yields a characteristic uplift signature.
 
 However, the Himalayan architecture is complicated by ramp structures which are likely to produce localized uplift regardless of whether the earthquake cycle is balanced. As slip drives the hanging wall over these deep geologic bends, the crust is forced upward. This translation across the ramp acts like a conveyor belt moving over a bump and produces a fold and a focused zone of uplift directly above the structure. 
 
