@@ -39,7 +39,7 @@ $$
 \end{aligned}
 $$
 
-Here, $\mathbf{v}*{\text{structural}}$ represents the steady, long-term block motion, while $\mathbf{v}*{\text{coseismic}}$ represents the contribution from finite dislocations (earthquakes). Rearranging this yields a definition for the interseismic signal:
+Here, the structural velocity represents the steady, long-term block motion, while the coseismic velocity represents the contribution from finite dislocations (earthquakes). Rearranging this yields a definition for the interseismic signal:
 
 $$
 \begin{aligned}
