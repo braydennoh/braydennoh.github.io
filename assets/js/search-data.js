@@ -412,9 +412,9 @@ ninja.data = [{
           description: "A trek through Sequoia National Park",
           section: "Projects",handler: () => {
               window.location.href = "/projects/HighSierra/";
-            },},{id: "projects-himalayan-uplift",
-          title: 'Himalayan Uplift',
-          description: "Kinematic dislocation model to vertical uplift in the Himalayas",
+            },},{id: "projects-structural-elastic-faulting",
+          title: 'Structural+Elastic Faulting',
+          description: "Structural kinematics and elastic dislocation are the same.",
           section: "Projects",handler: () => {
               window.location.href = "/projects/Himalaya%20(1)/";
             },},{id: "projects-himalayan-uplift",
