@@ -95,6 +95,6 @@ The sign of $S_{\text{fold}}$ is determined by whether the fault steepens or fla
 
 <div class="row justify-content-sm-center">
   <div class="col-sm-10 mt-3 mt-md-0">
-    {% include figure.liquid path="/assets/img/rampislocked/faultfoldexamples.png" title="Fold Ramp" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid path="/assets/img/rampislocked/12.14.fig2.png" title="Fold Ramp" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
