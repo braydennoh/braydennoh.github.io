@@ -416,6 +416,11 @@ ninja.data = [{
           title: 'Himalayan Uplift',
           description: "Kinematic dislocation model to vertical uplift in the Himalayas",
           section: "Projects",handler: () => {
+              window.location.href = "/projects/Himalaya%20(1)/";
+            },},{id: "projects-himalayan-uplift",
+          title: 'Himalayan Uplift',
+          description: "Kinematic dislocation model to vertical uplift in the Himalayas",
+          section: "Projects",handler: () => {
               window.location.href = "/projects/Himalaya/";
             },},{id: "projects-iceland-adventures",
           title: 'Iceland Adventures',
