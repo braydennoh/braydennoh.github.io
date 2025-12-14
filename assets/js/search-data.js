@@ -412,11 +412,6 @@ ninja.data = [{
           description: "A trek through Sequoia National Park",
           section: "Projects",handler: () => {
               window.location.href = "/projects/HighSierra/";
-            },},{id: "projects-structural-elastic-faulting",
-          title: 'Structural+Elastic Faulting',
-          description: "Structural kinematics and elastic dislocation are the same.",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/Himalaya%20(1)/";
             },},{id: "projects-himalayan-uplift",
           title: 'Himalayan Uplift',
           description: "Kinematic dislocation model to vertical uplift in the Himalayas",
@@ -447,6 +442,11 @@ ninja.data = [{
           description: "Opinion",
           section: "Projects",handler: () => {
               window.location.href = "/projects/ScientificQuestion/";
+            },},{id: "projects-structural-elastic-faulting",
+          title: 'Structural+Elastic Faulting',
+          description: "Structural kinematics and elastic dislocation are the same.",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/StructuralAndElastic/";
             },},{id: "projects-london-amp-beyond",
           title: 'London &amp;amp; Beyond',
           description: "Photo journal from London, Sevenoaks, and Cambridge",
