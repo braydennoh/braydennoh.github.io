@@ -387,7 +387,12 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-bobcat-fire-co-emissions",
+          section: "News",},{id: "projects-iceland-adventures",
+          title: 'Iceland Adventures',
+          description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/Berlin/";
+            },},{id: "projects-bobcat-fire-co-emissions",
           title: 'Bobcat Fire CO Emissions',
           description: "Satellite-based modeling of carbon monoxide emissions from the 2020 Bobcat Fire",
           section: "Projects",handler: () => {
