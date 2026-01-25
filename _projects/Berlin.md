@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Berlin 2015
+title: Berlin
 description: Winter Break in Berlin
 img: assets/img/berlinimage/berlincover.jpeg
 importance: 1000
