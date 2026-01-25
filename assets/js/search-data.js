@@ -387,9 +387,9 @@ ninja.data = [{
             },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
           title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
           description: "",
-          section: "News",},{id: "projects-iceland-adventures",
-          title: 'Iceland Adventures',
-          description: "Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature",
+          section: "News",},{id: "projects-berlin-2015",
+          title: 'Berlin 2015',
+          description: "Winter Break in Berlin",
           section: "Projects",handler: () => {
               window.location.href = "/projects/Berlin/";
             },},{id: "projects-bobcat-fire-co-emissions",
