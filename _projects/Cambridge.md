@@ -3,7 +3,7 @@ layout: page
 title: Cambridge
 description: Running from Cambridge to Boston
 img: assets/img/cambridge/cover.jpeg
-importance: 1
+importance: 1001
 category: travel
 related_publications: false
 ---
