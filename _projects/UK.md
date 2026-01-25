@@ -3,7 +3,7 @@ layout: page
 title: London & Beyond
 description: Photo journal from London, Sevenoaks, and Cambridge
 img: assets/img/blogcover/Slide4.jpeg
-importance: 2
+importance: 1003
 category: travel
 related_publications: false
 ---
