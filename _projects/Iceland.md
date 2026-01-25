@@ -3,7 +3,7 @@ layout: page
 title: Iceland Adventures
 description: Photo journal from Reykjavík, Akureyri, South Coast, and Icelandic Nature
 img: assets/img/blogcover/Slide6.jpeg
-importance: 5
+importance: 1004
 category: travel
 related_publications: false
 ---
