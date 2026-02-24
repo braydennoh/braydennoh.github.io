@@ -201,3 +201,37 @@ h1 {
   font-size: 15px;
   margin-bottom: 4px;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 700px) {
+  body {
+    padding: 20px 20px;
+  }
+
+  .columns {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .projects {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .research-item {
+    gap: 14px;
+  }
+
+  .research-item img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .about-page .sidebar img.portrait {
+    max-width: 200px;
+  }
+}
