@@ -172,18 +172,27 @@ h1 {
   line-height: 1.5;
 }
 
-/* Stub pages */
-.page-content {
-  max-width: 600px;
-  margin-top: 10px;
+/* About page */
+.about-page .sidebar img.portrait {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  display: block;
+  margin-bottom: 20px;
 }
 
-.page-content h2 {
-  font-size: 20px;
-  font-weight: normal;
-  margin-bottom: 12px;
+.about-page .sidebar .contact {
+  font-size: 13px;
+  color: #555;
+  margin-top: 16px;
 }
 
-.page-content p {
-  margin-bottom: 12px;
+.about-page .main p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.about-page .main h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
 }
