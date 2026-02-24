@@ -50,7 +50,6 @@
         <button id="chaos-play" style="padding:0.2em 0.8em; cursor:pointer;">&#9654; Play</button>
         <button id="chaos-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
         <input type="range" id="chaos-scrub" min="0" max="200" value="0" style="flex:1; min-width:120px;">
-        <label style="white-space:nowrap;">Delay: <input type="range" id="chaos-delay" min="0" max="200" value="50" style="width:60px; vertical-align:middle;"> <span id="chaos-delay-val">50</span>ms</label>
         <label style="white-space:nowrap;">Grid: <input type="range" id="chaos-grid" min="10" max="100" step="5" value="50" style="width:70px; vertical-align:middle;"> <span id="chaos-grid-val">50</span> m</label>
       </div>
       <div style="position:relative; line-height:0;">
@@ -131,6 +130,7 @@
     xhr.send();
 
     spriteImg = new Image();
+    spriteImg.crossOrigin = "anonymous";
     spriteImg.onload = function () {
       imgDone = true;
       if (metaDone) finish();
@@ -217,6 +217,9 @@
     }
     bufCtx.putImageData(imgData, 0, 0);
 
+    /* fill background so no black cells leak through */
+    ctx.fillStyle = "#1a1a2e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(buf, 0, 0, canvas.width, canvas.height);
 
@@ -292,8 +295,6 @@
 
   var playBtn = document.getElementById("chaos-play");
   var scrubEl = document.getElementById("chaos-scrub");
-  var delayEl = document.getElementById("chaos-delay");
-  var delayVal = document.getElementById("chaos-delay-val");
   var gridSlider = document.getElementById("chaos-grid");
   var gridVal = document.getElementById("chaos-grid-val");
   playBtn.addEventListener("click", function () {
@@ -304,11 +305,6 @@
   scrubEl.addEventListener("input", function () {
     state.frame = parseInt(this.value, 10);
     renderFrame();
-  });
-
-  delayEl.addEventListener("input", function () {
-    state.delay = parseInt(this.value, 10);
-    delayVal.textContent = this.value;
   });
 
   gridSlider.addEventListener("input", function () {
