@@ -50,7 +50,7 @@
         <button id="chaos-play" style="padding:0.2em 0.8em; cursor:pointer;">&#9654; Play</button>
         <button id="chaos-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
         <input type="range" id="chaos-scrub" min="0" max="200" value="0" style="flex:1; min-width:120px;">
-        <label style="white-space:nowrap;">Grid: <input type="range" id="chaos-grid" min="10" max="100" step="5" value="50" style="width:70px; vertical-align:middle;"> <span id="chaos-grid-val">50</span> m</label>
+        <label style="white-space:nowrap;">Grid: <input type="range" id="chaos-grid" min="10" max="100" step="5" value="10" style="width:70px; vertical-align:middle;"> <span id="chaos-grid-val">10</span> m</label>
       </div>
       <div style="position:relative; line-height:0;">
         <canvas id="chaos-canvas" width="720" height="360" style="width:100%; background:#1a1a2e; display:block; image-rendering:pixelated; image-rendering:crisp-edges;"></canvas>
@@ -93,7 +93,7 @@
     grids: null,
     meta: null,
     lut: null,
-    gridSize: 50,
+    gridSize: 10,
     frame: SKIP,
     playing: false,
     timer: null,
