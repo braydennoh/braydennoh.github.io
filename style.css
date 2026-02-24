@@ -92,6 +92,10 @@ h1 {
   gap: 32px;
 }
 
+.project {
+  min-width: 0;
+}
+
 .project a {
   display: block;
 }
