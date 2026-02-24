@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: Georgia, "Times New Roman", Times, serif;
+  font-family: Aptos, Arial, Helvetica, sans-serif;
   font-size: 15px;
   line-height: 1.5;
   color: #222;
@@ -29,7 +29,6 @@ a:visited {
 
 /* Top nav */
 nav {
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   margin-bottom: 20px;
 }
@@ -45,9 +44,9 @@ nav .sep {
 
 /* Name heading */
 h1 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: normal;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 /* Two-column layout */
@@ -57,10 +56,9 @@ h1 {
 }
 
 .sidebar {
-  width: 220px;
+  width: 280px;
   flex-shrink: 0;
-  font-size: 13px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -69,7 +67,7 @@ h1 {
 }
 
 .sidebar h3 {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
   margin-bottom: 6px;
 }
@@ -85,17 +83,6 @@ h1 {
 
 .main {
   flex: 1;
-}
-
-.main p {
-  margin-bottom: 16px;
-}
-
-.main .earlier {
-  font-size: 14px;
-  font-style: italic;
-  color: #444;
-  margin-bottom: 16px;
 }
 
 /* Project grid */
@@ -117,7 +104,6 @@ h1 {
 }
 
 .project .caption {
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   color: #444;
 }
