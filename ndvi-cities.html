@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NDVI Change in American Cities - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>NDVI Change in American Cities</h1>
+
+    <p>Mapping a decade of greening and browning across US cities using satellite-derived vegetation indices, overlaid on OpenStreetMap building footprints and road networks.</p>
+
+    <hr class="separator">
+
+    <p>By Brayden Noh.</p>
+  </div>
+
+  <div class="main">
+
+    <p>These maps show the net change in vegetation greenness across American cities from 2010 to 2020. Each pixel encodes the Sen's slope of the Normalized Difference Vegetation Index (NDVI) time series, estimated with a Mann-Kendall trend test to account for seasonal weather variability. Green means a pixel got greener over the decade; red means it lost vegetation.</p>
+
+    <p>The NDVI rasters are overlaid with OpenStreetMap road networks and building footprints, pulled via OSMnx and reprojected into the raster's native CRS. The result is a kind of urban portrait: you can read the city's street grid, its parks, its coastline, and see exactly where it gained or lost greenness over ten years.</p>
+
+    <p style="font-size: 85%; color: #767676; margin-bottom: 24px;">Click any image to view full resolution.</p>
+
+    <a href="assets/img/ndvi/manhattan.png"><img src="assets/img/ndvi/manhattan.png" alt="Manhattan"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Manhattan</b></p>
+
+    <a href="assets/img/ndvi/chicago.png"><img src="assets/img/ndvi/chicago.png" alt="Chicago"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Chicago</b></p>
+
+    <a href="assets/img/ndvi/dc.png"><img src="assets/img/ndvi/dc.png" alt="Washington, D.C."></a>
+    <p style="font-size: 85%; color: #767676;"><b>Washington, D.C.</b></p>
+
+    <a href="assets/img/ndvi/bay.png"><img src="assets/img/ndvi/bay.png" alt="San Francisco Bay"></a>
+    <p style="font-size: 85%; color: #767676;"><b>San Francisco Bay</b></p>
+
+    <a href="assets/img/ndvi/seattle.png"><img src="assets/img/ndvi/seattle.png" alt="Seattle"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Seattle</b></p>
+
+    <a href="assets/img/ndvi/portland.png"><img src="assets/img/ndvi/portland.png" alt="Portland"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Portland</b></p>
+
+    <a href="assets/img/ndvi/austin.png"><img src="assets/img/ndvi/austin.png" alt="Austin"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Austin</b></p>
+
+    <a href="assets/img/ndvi/dallas.png"><img src="assets/img/ndvi/dallas.png" alt="Dallas"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Dallas</b></p>
+
+    <a href="assets/img/ndvi/denver.png"><img src="assets/img/ndvi/denver.png" alt="Denver"></a>
+    <p style="font-size: 85%; color: #767676;"><b>Denver</b></p>
+
+  </div>
+
+</div>
+
+</body>
+</html>
