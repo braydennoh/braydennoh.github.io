@@ -98,7 +98,8 @@ h1 {
 
 .project img {
   width: 85%;
-  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   display: block;
   margin-bottom: 4px;
 }
