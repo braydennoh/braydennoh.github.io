@@ -143,11 +143,15 @@ h1 {
   margin-bottom: 28px;
 }
 
+.research-item > a {
+  flex-shrink: 0;
+}
+
 .research-item img {
   width: 120px;
   height: 120px;
   object-fit: cover;
-  flex-shrink: 0;
+  display: block;
 }
 
 .research-item .details h3 {
