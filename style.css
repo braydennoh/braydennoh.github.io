@@ -1,0 +1,139 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #222;
+  background: #fff;
+  padding: 30px 40px;
+  max-width: 960px;
+}
+
+a {
+  color: #003399;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #555;
+}
+
+/* Top nav */
+nav {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin-right: 4px;
+}
+
+nav .sep {
+  margin-right: 4px;
+  color: #999;
+}
+
+/* Name heading */
+h1 {
+  font-size: 28px;
+  font-weight: normal;
+  margin-bottom: 24px;
+}
+
+/* Two-column layout */
+.columns {
+  display: flex;
+  gap: 40px;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+.sidebar p {
+  margin-bottom: 16px;
+}
+
+.sidebar h3 {
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.sidebar ul {
+  list-style: none;
+  margin-bottom: 16px;
+}
+
+.sidebar ul li {
+  margin-bottom: 2px;
+}
+
+.main {
+  flex: 1;
+}
+
+.main p {
+  margin-bottom: 16px;
+}
+
+.main .earlier {
+  font-size: 14px;
+  font-style: italic;
+  color: #444;
+  margin-bottom: 16px;
+}
+
+/* Project grid */
+.projects {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.project a {
+  display: block;
+}
+
+.project img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.project .caption {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #444;
+}
+
+/* Stub pages */
+.page-content {
+  max-width: 600px;
+  margin-top: 10px;
+}
+
+.page-content h2 {
+  font-size: 20px;
+  font-weight: normal;
+  margin-bottom: 12px;
+}
+
+.page-content p {
+  margin-bottom: 12px;
+}
