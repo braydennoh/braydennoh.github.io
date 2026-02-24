@@ -40,7 +40,7 @@
 
     <p>There's been previous work on sensitivity to initial conditions in meandering rivers, but most of it tracked global parameters like sinuosity. The problem is that sinuosity doesn't really describe the shape of the river. Two completely different planforms can have the same sinuosity. We wanted to track the actual geometry.</p>
 
-    <p>To do this, we used <a href="https://github.com/zsylvester/meanderpy"><i>meanderpy</i></a>, a kinematic meander model where lateral migration is driven by curvature. But there's a catch: the river centerline changes length over time as bends grow and cutoffs remove loops, so you can't directly compare two Lagrangian state vectors. We got around this by mapping each centerline onto a fixed Eulerian grid of binary cells (channel or floodplain), giving a fixed-dimensional state for comparison. The number of cells that differ between two runs is the Hamming distance, and if that grows exponentially, the system is chaotic.</p>
+    <p>But there's a catch: the river centerline changes length over time as bends grow and cutoffs remove loops, so you can't directly compare two Lagrangian state vectors. We got around this by mapping each centerline onto a fixed Eulerian grid of binary cells (channel or floodplain), giving a fixed-dimensional state for comparison. The number of cells that differ between two runs is the Hamming distance, and if that grows exponentially, the system is chaotic.</p>
 
     <!-- Interactive Chaos-River Divergence Simulator -->
     <div id="chaos-sim" style="margin: 1em 0;">
@@ -67,11 +67,6 @@
     <b>Figure 1.</b> Interactive Eulerian occupancy heatmap of 100 ensemble simulations with cutoffs enabled. Drag the grid slider to change resolution continuously (10&ndash;100 m); scrub through time to see trajectories diverge.
     </p>
 
-    <p>The result is clean. When cutoffs are disabled, two nearly identical rivers stay identical forever. When cutoffs are enabled, they diverge exponentially. The growth rate (the finite-time Lyapunov exponent) converges with grid refinement, doesn't depend on how big the initial perturbation is, and shows up consistently across different starting river shapes. It scales with how fast the river migrates, but is invariant to the cutoff threshold.</p>
-
-    <p>In short: cutoffs alone are sufficient for chaos, and they impose a finite predictability horizon on river planform evolution. Past that horizon, even infinitesimally different starting channels end up in completely different places.</p>
-
-    <p>By Brayden Noh (Harvard) and Omar Wani (NYU). Code and data at <a href="https://github.com/braydennoh/MeanderChaos">github.com/braydennoh/MeanderChaos</a>.</p>
 
   </div>
 
