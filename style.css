@@ -108,6 +108,34 @@ h1 {
   color: #444;
 }
 
+/* Project pages */
+.project-page .sidebar h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.project-page .sidebar .separator {
+  border: none;
+  border-top: 1px dotted #ccc;
+  margin: 16px 0;
+}
+
+.project-page .sidebar h3 {
+  margin-top: 4px;
+}
+
+.project-page .main img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.project-page .main p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
 /* Stub pages */
 .page-content {
   max-width: 600px;
