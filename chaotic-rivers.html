@@ -39,6 +39,8 @@
 
     <p>Cutoffs create abrupt changes in a river's geometry. Omar and I were curious whether a small perturbation in a river's initial condition could create exponential divergence in its shape over time. If so, that would mean river evolution is fundamentally chaotic, with a hard limit on how far into the future you can predict where the channel will be.</p>
 
+    <img src="assets/img/chaotic_rivers_ensemble.png" alt="Ensemble of diverging river planforms">
+
     <p>There's been previous work on sensitivity to initial conditions in meandering rivers, but most of it tracked global parameters like sinuosity. The problem is that sinuosity doesn't really describe the shape of the river. Two completely different planforms can have the same sinuosity. We wanted to track the actual geometry.</p>
 
     <p>But there's a catch: the river centerline changes length over time as bends grow and cutoffs remove loops, so you can't directly compare two Lagrangian state vectors. We got around this by mapping each centerline onto a fixed Eulerian grid of binary cells (channel or floodplain), giving a fixed-dimensional state for comparison. The number of cells that differ between two runs is the Hamming distance, and if that grows exponentially, the system is chaotic.</p>
@@ -69,8 +71,6 @@
     </p>
 
     <p>When cutoffs are disabled, two nearly identical rivers stay identical forever. When cutoffs are enabled, they diverge exponentially. The growth rate (the finite-time Lyapunov exponent) converges with grid refinement, doesn't depend on how big the initial perturbation is, and shows up consistently across different starting river shapes. It scales with how fast the river migrates, but is invariant to the cutoff threshold.</p>
-
-    <img src="assets/img/chaotic_rivers_ensemble.png" alt="Ensemble of diverging river planforms">
 
   </div>
 
