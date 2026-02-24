@@ -24,7 +24,7 @@ a:hover {
 }
 
 a:visited {
-  color: #555;
+  color: #003399;
 }
 
 /* Top nav */
@@ -89,7 +89,7 @@ h1 {
 .projects {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 32px;
 }
 
 .project a {
@@ -97,7 +97,7 @@ h1 {
 }
 
 .project img {
-  width: 100%;
+  width: 85%;
   height: auto;
   display: block;
   margin-bottom: 4px;
