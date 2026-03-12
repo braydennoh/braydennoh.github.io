@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meander Village - Critical Displacement - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>Meander Village</h1>
+
+    <p>Settlements on meandering river floodplains face a fundamental tension: the river creates fertile land, but also erodes it away. As soil quality decays with time since the last channel visit, households must periodically relocate. This model explores how <b>population density</b> transforms displacement from local reshuffling into long-distance forced migration.</p>
+
+    <hr class="separator">
+
+    <p>By Brayden Noh.</p>
+  </div>
+
+  <div class="main">
+
+    <p>The floodplain is an Eulerian grid where each cell tracks when the <b style="color:#0028ff;">river</b> last occupied it. Soil quality decays exponentially:</p>
+
+    \[
+    q(\mathbf{x}, t) = 0.5^{\,(t - t_{\text{last}}(\mathbf{x})) \,/\, T_{1/2}}
+    \]
+
+    <p>A household must relocate when \(q < 0.5\) or when the river erodes its cell. It searches outward in expanding <b>Chebyshev rings</b> (ring 1 = 8 neighbors, ring 2 = 16, &hellip;) until finding an unoccupied cell with \(q \geq 0.5\). The <b>Chebyshev distance</b> \(d = \max(|\Delta r|, |\Delta c|)\) measures displacement effort. Single occupancy is enforced.</p>
+
+    <p>At low density, most moves are ring&nbsp;1 (local). As population approaches the <b>carrying capacity</b> (~2200 habitable cells at 50&thinsp;m resolution), search rings explode and displacement becomes long-range. Press <b>Play</b> and adjust the population slider.</p>
+
+    <!-- Simulator -->
+    <div id="sim-container" style="margin: 1em 0; display: flex; gap: 12px; align-items: flex-start;">
+      <canvas id="sim-canvas" style="flex: 1 1 auto; image-rendering: pixelated; background: #000; display: block;"></canvas>
+      <canvas id="hist-canvas" width="240" height="360" style="flex: 0 0 240px; background: #111; display: block; border: 1px solid #333;"></canvas>
+    </div>
+
+    <div id="sim-info" style="font-family: monospace; font-size: 13px; margin-bottom: 0.4em;">
+      Timestep: <span id="info-timestep">0</span> / <span id="info-total">1000</span> &nbsp;&bull;&nbsp;
+      Population: <span id="info-pop">0</span> &nbsp;&bull;&nbsp;
+      Habitable: <span id="info-habitable">0</span>
+    </div>
+    <div id="sim-legend" style="font-family: monospace; font-size: 12px; margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px;">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#0028ff;vertical-align:middle;margin-right:3px;"></span>River</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#87ceeb;vertical-align:middle;margin-right:3px;"></span>Fertile land</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#ff4500;vertical-align:middle;margin-right:3px;"></span>Stable <span id="info-stable">0</span></span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#1aff1a;vertical-align:middle;margin-right:3px;"></span>Relocated <span id="info-relocated">0</span></span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#ff1a1a;vertical-align:middle;margin-right:3px;"></span>Drowned <span id="info-drowned">0</span></span>
+      <span>&nbsp; Mean Chebyshev dist: <span id="info-ring">0</span></span>
+    </div>
+
+    <div id="sim-controls" style="margin-bottom: 1em;">
+      <div style="margin-bottom: 0.4em;">
+        <button id="btn-play" style="padding:0.2em 0.8em; cursor:pointer;">&#9654; Play</button>
+        <button id="btn-pause" disabled style="padding:0.2em 0.8em; cursor:pointer;">&#9646;&#9646; Pause</button>
+        <button id="btn-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 420px; font-size: 85%;">
+        <label for="sl-pop">Population</label>
+        <input id="sl-pop" type="range" min="1" max="3000" step="1" value="300">
+        <span id="val-pop">300</span>
+
+        <label for="sl-speed">Frame delay</label>
+        <input id="sl-speed" type="range" min="0" max="500" step="10" value="50">
+        <span id="val-speed">50 ms</span>
+      </div>
+    </div>
+
+    <p id="loading-msg" style="font-size: 85%; color: #767676;"><i>Loading river data&hellip;</i></p>
+
+  </div>
+
+</div>
+
+<script>
+(function() {
+"use strict";
+
+/* ── Grid parameters (matching Python model, 50m cells) ── */
+var CELL_SIZE = 50;
+var XMIN = 5000, XMAX = 15000;
+var YMIN = -3000, YMAX = 3000;
+var COLS = Math.round((XMAX - XMIN) / CELL_SIZE);  // 200
+var ROWS = Math.round((YMAX - YMIN) / CELL_SIZE);  // 120
+var NCELLS = ROWS * COLS;
+
+/* Quality decay: every web step = 5 real steps, T_HALF = 100/5 = 20 */
+var T_HALF = 100.0 / 5.0;
+var Q_THRESH = 0.5;
+var WARM_UP = 200;  /* 1000/5: river warm-up steps before agents */
+
+/* ── State ── */
+var riverTimesteps = null;
+var lastChannelTime;  /* Int32Array, -9999 = never visited */
+var river;            /* Uint8Array, current river mask */
+var agents;           /* [{r, c, moved, drowned, ring}] */
+var agentGrid;        /* Uint8Array, occupancy */
+var currentStep = 0;
+var playing = false;
+var animFrameId = null;
+var lastFrameTime = 0;
+
+/* ── DOM ── */
+var canvas = document.getElementById("sim-canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = COLS;
+canvas.height = ROWS;
+
+var histCanvas = document.getElementById("hist-canvas");
+var histCtx = histCanvas.getContext("2d");
+var HIST_W = histCanvas.width, HIST_H = histCanvas.height;
+var MAX_RING_BINS = 30;  /* bins 1..29, then 30+ */
+var ringHist = new Float64Array(MAX_RING_BINS + 1);  /* cumulative counts */
+var ringHistTotal = 0;
+
+var infoStep     = document.getElementById("info-timestep");
+var infoTotal    = document.getElementById("info-total");
+var infoPop      = document.getElementById("info-pop");
+var infoHab      = document.getElementById("info-habitable");
+var infoStable   = document.getElementById("info-stable");
+var infoRelocated = document.getElementById("info-relocated");
+var infoDrowned  = document.getElementById("info-drowned");
+var infoRing     = document.getElementById("info-ring");
+var loadingMsg   = document.getElementById("loading-msg");
+var btnPlay  = document.getElementById("btn-play");
+var btnPause = document.getElementById("btn-pause");
+var btnReset = document.getElementById("btn-reset");
+var slPop    = document.getElementById("sl-pop");
+var valPop   = document.getElementById("val-pop");
+var slSpeed  = document.getElementById("sl-speed");
+var valSpeed = document.getElementById("val-speed");
+
+slPop.addEventListener("input", function() { valPop.textContent = slPop.value; });
+slSpeed.addEventListener("input", function() { valSpeed.textContent = slSpeed.value + " ms"; });
+
+/* ── Load river data ── */
+function loadRiverData(cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "assets/meander_village_river_data.json");
+  xhr.onload = function() {
+    var data = JSON.parse(xhr.responseText);
+    riverTimesteps = data.timesteps;
+    infoTotal.textContent = riverTimesteps.length - 1 - WARM_UP;
+    loadingMsg.style.display = "none";
+    cb();
+  };
+  xhr.send();
+}
+
+/* ── Rasterize channel (matching Python: interpolate between vertices) ── */
+function rasterizeChannel(flatCoords) {
+  var grid = new Uint8Array(NCELLS);
+  var nPts = flatCoords.length / 2;
+  for (var i = 0; i < nPts - 1; i++) {
+    var x0 = flatCoords[i*2],     y0 = flatCoords[i*2+1];
+    var x1 = flatCoords[(i+1)*2], y1 = flatCoords[(i+1)*2+1];
+    for (var t = 0; t <= 15; t++) {
+      var f = t / 15;
+      var px = x0 + (x1 - x0) * f;
+      var py = y0 + (y1 - y0) * f;
+      var c = Math.floor((px - XMIN) / CELL_SIZE);
+      var r = Math.floor((py - YMIN) / CELL_SIZE);
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+        grid[r * COLS + c] = 1;
+      }
+    }
+  }
+  return grid;
+}
+
+/* ── Quality ── */
+function getQuality(idx, step) {
+  if (lastChannelTime[idx] < 0) return 0;
+  var age = step - lastChannelTime[idx];
+  if (age <= 0) return 1;
+  return Math.pow(0.5, age / T_HALF);
+}
+
+/* ── Ring search (capped for web performance) ── */
+function findNearestFertile(quality, ar, ac) {
+  var maxRing = 60;  /* cap search radius for interactivity */
+
+  /* Pass 1: q >= Q_THRESH */
+  for (var ring = 1; ring <= maxRing; ring++) {
+    var bestR = ar, bestC = ac;
+    var bestD2 = ring * ring * 4 + 1;
+    var found = false;
+    var rLo = Math.max(0, ar - ring), rHi = Math.min(ROWS - 1, ar + ring);
+    var cLo = Math.max(0, ac - ring), cHi = Math.min(COLS - 1, ac + ring);
+
+    for (var r = rLo; r <= rHi; r++) {
+      for (var c = cLo; c <= cHi; c++) {
+        if (Math.max(Math.abs(r - ar), Math.abs(c - ac)) !== ring) continue;
+        var idx = r * COLS + c;
+        if (!river[idx] && !agentGrid[idx] && quality[idx] >= Q_THRESH) {
+          var d2 = (r - ar) * (r - ar) + (c - ac) * (c - ac);
+          if (d2 < bestD2) { bestD2 = d2; bestR = r; bestC = c; found = true; }
+        }
+      }
+    }
+    if (found) return { r: bestR, c: bestC, ring: ring };
+  }
+
+  /* Pass 2: fallback to highest quality floodplain cell (q > 0), same cap */
+  for (var ring = 1; ring <= maxRing; ring++) {
+    var bestR = ar, bestC = ac;
+    var bestQ = 0;
+    var found = false;
+    var rLo = Math.max(0, ar - ring), rHi = Math.min(ROWS - 1, ar + ring);
+    var cLo = Math.max(0, ac - ring), cHi = Math.min(COLS - 1, ac + ring);
+
+    for (var r = rLo; r <= rHi; r++) {
+      for (var c = cLo; c <= cHi; c++) {
+        if (Math.max(Math.abs(r - ar), Math.abs(c - ac)) !== ring) continue;
+        var idx = r * COLS + c;
+        if (!river[idx] && !agentGrid[idx] && quality[idx] > bestQ) {
+          bestQ = quality[idx]; bestR = r; bestC = c; found = true;
+        }
+      }
+    }
+    if (found) return { r: bestR, c: bestC, ring: ring };
+  }
+
+  return { r: ar, c: ac, ring: 0 };
+}
+
+/* ── Place agents randomly on fertile cells ── */
+function placeAgents(pop) {
+  agents = [];
+  agentGrid = new Uint8Array(NCELLS);
+  var candidates = [];
+  for (var i = 0; i < NCELLS; i++) {
+    if (!river[i] && lastChannelTime[i] >= 0 && getQuality(i, currentStep) > 0) {
+      candidates.push(i);
+    }
+  }
+  /* Shuffle */
+  for (var i = candidates.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = candidates[i]; candidates[i] = candidates[j]; candidates[j] = tmp;
+  }
+  var n = Math.min(pop, candidates.length);
+  for (var i = 0; i < n; i++) {
+    var idx = candidates[i];
+    var r = Math.floor(idx / COLS), c = idx % COLS;
+    agents.push({ r: r, c: c, moved: false, drowned: false, ring: 0 });
+    agentGrid[idx] = 1;
+  }
+}
+
+/* ── Adjust population (add/remove agents) ── */
+function adjustPopulation(targetPop) {
+  var curPop = agents.length;
+  if (targetPop > curPop) {
+    /* Add new agents on fertile unoccupied cells */
+    var candidates = [];
+    for (var i = 0; i < NCELLS; i++) {
+      if (!river[i] && !agentGrid[i] && getQuality(i, currentStep) > 0) {
+        candidates.push(i);
+      }
+    }
+    for (var i = candidates.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = candidates[i]; candidates[i] = candidates[j]; candidates[j] = tmp;
+    }
+    var toAdd = Math.min(targetPop - curPop, candidates.length);
+    for (var i = 0; i < toAdd; i++) {
+      var idx = candidates[i];
+      var r = Math.floor(idx / COLS), c = idx % COLS;
+      agents.push({ r: r, c: c, moved: false, drowned: false, ring: 0 });
+      agentGrid[idx] = 1;
+    }
+  } else if (targetPop < curPop) {
+    /* Remove excess agents (from end) */
+    while (agents.length > targetPop) {
+      var a = agents.pop();
+      agentGrid[a.r * COLS + a.c] = 0;
+    }
+  }
+}
+
+/* ── Initialize ── */
+function init() {
+  currentStep = 0;
+  lastChannelTime = new Int32Array(NCELLS);
+  for (var i = 0; i < NCELLS; i++) lastChannelTime[i] = -9999;
+
+  /* Warm up: run river for WARM_UP steps (no agents, just build quality) */
+  for (var s = 0; s <= WARM_UP && s < riverTimesteps.length; s++) {
+    river = rasterizeChannel(riverTimesteps[s]);
+    for (var i = 0; i < NCELLS; i++) {
+      if (river[i]) lastChannelTime[i] = s;
+    }
+    currentStep = s;
+  }
+
+  /* Reset histogram */
+  ringHist = new Float64Array(MAX_RING_BINS + 1);
+  ringHistTotal = 0;
+
+  /* Place agents */
+  var pop = parseInt(slPop.value);
+  placeAgents(pop);
+
+  render();
+  renderHist();
+  updateInfo(0, 0, 0);
+}
+
+/* ── Simulation step ── */
+function simStep() {
+  if (currentStep >= riverTimesteps.length - 1) { pause(); return; }
+  currentStep++;
+
+  /* Update river */
+  river = rasterizeChannel(riverTimesteps[currentStep]);
+  for (var i = 0; i < NCELLS; i++) {
+    if (river[i]) lastChannelTime[i] = currentStep;
+  }
+
+  /* Compute quality for all cells */
+  var quality = new Float32Array(NCELLS);
+  var nHabitable = 0;
+  for (var i = 0; i < NCELLS; i++) {
+    quality[i] = getQuality(i, currentStep);
+    if (!river[i] && quality[i] >= Q_THRESH) nHabitable++;
+  }
+
+  /* Check population slider */
+  var targetPop = parseInt(slPop.value);
+  if (targetPop !== agents.length) adjustPopulation(targetPop);
+
+  /* Agent movement */
+  var totalRing = 0, nDisplaced = 0, nDrowned = 0;
+
+  for (var a = 0; a < agents.length; a++) {
+    var ar = agents[a].r, ac = agents[a].c;
+    var idx = ar * COLS + ac;
+    var onRiver = river[idx] ? true : false;
+    var mustMove = onRiver || quality[idx] < Q_THRESH;
+
+    agents[a].moved = false;
+    agents[a].drowned = false;
+
+    if (mustMove) {
+      if (onRiver) { agents[a].drowned = true; nDrowned++; }
+
+      /* Unmark self */
+      agentGrid[idx] = 0;
+
+      var result = findNearestFertile(quality, ar, ac);
+      agents[a].r = result.r;
+      agents[a].c = result.c;
+      agents[a].ring = result.ring;
+      agents[a].moved = true;
+
+      /* Remark new position */
+      agentGrid[result.r * COLS + result.c] = 1;
+
+      totalRing += result.ring;
+      nDisplaced++;
+
+      /* Accumulate histogram */
+      var bin = result.ring >= MAX_RING_BINS ? MAX_RING_BINS : result.ring;
+      if (bin > 0) { ringHist[bin]++; ringHistTotal++; }
+    } else {
+      agents[a].ring = 0;
+    }
+  }
+
+  var meanRing = nDisplaced > 0 ? (totalRing / nDisplaced) : 0;
+  render();
+  renderHist();
+  updateInfo(nDisplaced, nDrowned, meanRing);
+}
+
+/* ── Render ── */
+var imgData = ctx.createImageData(COLS, ROWS);
+
+function render() {
+  var pixels = imgData.data;
+
+  /* Draw quality gradient + river */
+  for (var i = 0; i < NCELLS; i++) {
+    var off = i * 4;
+    if (river[i]) {
+      pixels[off] = 0; pixels[off+1] = 40; pixels[off+2] = 255; pixels[off+3] = 255;
+    } else {
+      var q = getQuality(i, currentStep);
+      if (q > 0) {
+        /* Quality gradient: dark to light cyan */
+        var qc = Math.max(0, Math.min(1, q));
+        /* Subtle brightness boost above threshold */
+        var boost = q >= Q_THRESH ? 1.0 : 0.6;
+        pixels[off]   = Math.floor(135 * qc * boost);
+        pixels[off+1] = Math.floor(206 * qc * boost);
+        pixels[off+2] = Math.floor(250 * qc * boost);
+        pixels[off+3] = 255;
+      } else {
+        pixels[off] = 0; pixels[off+1] = 0; pixels[off+2] = 0; pixels[off+3] = 255;
+      }
+    }
+  }
+
+  /* Draw agents */
+  for (var a = 0; a < agents.length; a++) {
+    var idx = agents[a].r * COLS + agents[a].c;
+    var off = idx * 4;
+    if (agents[a].drowned) {
+      /* Red flash at old position is already overwritten; show new pos green */
+      pixels[off] = 255; pixels[off+1] = 26; pixels[off+2] = 26; pixels[off+3] = 255;
+    } else if (agents[a].moved) {
+      /* Green: just relocated */
+      pixels[off] = 26; pixels[off+1] = 255; pixels[off+2] = 26; pixels[off+3] = 255;
+    } else {
+      /* Orangered: stable */
+      pixels[off] = 255; pixels[off+1] = 69; pixels[off+2] = 0; pixels[off+3] = 255;
+    }
+  }
+
+  /* Flip vertically (row 0 = bottom) */
+  var flipped = ctx.createImageData(COLS, ROWS);
+  var fp = flipped.data;
+  for (var r = 0; r < ROWS; r++) {
+    var srcOff = r * COLS * 4, dstOff = (ROWS - 1 - r) * COLS * 4;
+    for (var c = 0; c < COLS * 4; c++) fp[dstOff + c] = pixels[srcOff + c];
+  }
+  ctx.putImageData(flipped, 0, 0);
+}
+
+/* ── Render CCDF + stats panel ── */
+function renderHist() {
+  histCtx.fillStyle = "#111";
+  histCtx.fillRect(0, 0, HIST_W, HIST_H);
+
+  if (ringHistTotal === 0) {
+    histCtx.fillStyle = "#555";
+    histCtx.font = "11px monospace";
+    histCtx.textAlign = "center";
+    histCtx.fillText("Displacement CCDF", HIST_W / 2, HIST_H / 2 - 10);
+    histCtx.fillText("(press Play)", HIST_W / 2, HIST_H / 2 + 10);
+    return;
+  }
+
+  /* ── Top: CCDF plot (log y-axis) ── */
+  var padL = 40, padR = 12, padT = 22, padB = 30;
+  var ccdfH = 180;
+  var plotW = HIST_W - padL - padR;
+  var plotH = ccdfH - padT - padB;
+
+  /* Compute CCDF: P(ring >= r) */
+  var ccdf = new Float64Array(MAX_RING_BINS + 2);
+  var cumul = ringHistTotal;
+  for (var b = 1; b <= MAX_RING_BINS; b++) {
+    ccdf[b] = cumul / ringHistTotal;
+    cumul -= ringHist[b];
+  }
+  ccdf[MAX_RING_BINS + 1] = cumul / ringHistTotal;
+
+  /* Log scale: 1 to 1e-4 */
+  var logMin = -4, logMax = 0;
+  function yPos(val) {
+    if (val <= 0) return padT + plotH;
+    var lv = Math.log10(val);
+    lv = Math.max(logMin, Math.min(logMax, lv));
+    return padT + plotH * (1 - (lv - logMin) / (logMax - logMin));
+  }
+  function xPos(ring) {
+    return padL + (ring - 1) / (MAX_RING_BINS - 1) * plotW;
+  }
+
+  /* Grid lines */
+  histCtx.strokeStyle = "#2a2a2a";
+  histCtx.lineWidth = 0.5;
+  for (var e = logMin; e <= logMax; e++) {
+    var gy = yPos(Math.pow(10, e));
+    histCtx.beginPath(); histCtx.moveTo(padL, gy); histCtx.lineTo(padL + plotW, gy); histCtx.stroke();
+  }
+
+  /* CCDF line */
+  histCtx.strokeStyle = "#ff4500";
+  histCtx.lineWidth = 2.5;
+  histCtx.beginPath();
+  var started = false;
+  for (var b = 1; b <= MAX_RING_BINS; b++) {
+    if (ccdf[b] <= 0) break;
+    var px = xPos(b), py = yPos(ccdf[b]);
+    if (!started) { histCtx.moveTo(px, py); started = true; }
+    else histCtx.lineTo(px, py);
+  }
+  histCtx.stroke();
+
+  /* CCDF dots */
+  histCtx.fillStyle = "#ff4500";
+  for (var b = 1; b <= MAX_RING_BINS; b++) {
+    if (ccdf[b] <= 0) break;
+    var px = xPos(b), py = yPos(ccdf[b]);
+    histCtx.beginPath(); histCtx.arc(px, py, 2.5, 0, 2*Math.PI); histCtx.fill();
+  }
+
+  /* Axes */
+  histCtx.strokeStyle = "#666";
+  histCtx.lineWidth = 1;
+  histCtx.beginPath();
+  histCtx.moveTo(padL, padT); histCtx.lineTo(padL, padT + plotH);
+  histCtx.lineTo(padL + plotW, padT + plotH);
+  histCtx.stroke();
+
+  /* Y-axis labels (log) */
+  histCtx.fillStyle = "#aaa";
+  histCtx.font = "9px monospace";
+  histCtx.textAlign = "right";
+  var yLabels = [1, 0.1, 0.01, 0.001, 0.0001];
+  var yLabelText = ["100%", "10%", "1%", "0.1%", "0.01%"];
+  for (var i = 0; i < yLabels.length; i++) {
+    histCtx.fillText(yLabelText[i], padL - 3, yPos(yLabels[i]) + 3);
+  }
+
+  /* X-axis labels */
+  histCtx.textAlign = "center";
+  var xTicks = [1, 5, 10, 15, 20, 25, 30];
+  for (var i = 0; i < xTicks.length; i++) {
+    if (xTicks[i] > MAX_RING_BINS) continue;
+    histCtx.fillText(xTicks[i], xPos(xTicks[i]), padT + plotH + 12);
+  }
+  histCtx.fillText("Chebyshev distance", padL + plotW / 2, padT + plotH + 25);
+
+  /* Title */
+  histCtx.fillStyle = "#ccc";
+  histCtx.font = "bold 10px monospace";
+  histCtx.textAlign = "center";
+  histCtx.fillText("P(displacement \u2265 d)", HIST_W / 2, 14);
+
+  /* ── Bottom: live stats ── */
+  var statsY = ccdfH + 8;
+
+  /* Compute stats from histogram */
+  var meanR = 0, varR = 0, maxR = 0, nR5 = 0, nR10 = 0;
+  for (var b = 1; b <= MAX_RING_BINS; b++) {
+    meanR += b * ringHist[b];
+    if (ringHist[b] > 0) maxR = b;
+    if (b >= 5) nR5 += ringHist[b];
+    if (b >= 10) nR10 += ringHist[b];
+  }
+  meanR /= ringHistTotal;
+  for (var b = 1; b <= MAX_RING_BINS; b++) {
+    var d = b - meanR;
+    varR += d * d * ringHist[b];
+  }
+  varR /= ringHistTotal;
+  var pctR5 = (nR5 / ringHistTotal * 100);
+  var pctR10 = (nR10 / ringHistTotal * 100);
+
+  histCtx.fillStyle = "#222";
+  histCtx.fillRect(6, statsY, HIST_W - 12, HIST_H - statsY - 6);
+  histCtx.strokeStyle = "#333";
+  histCtx.strokeRect(6, statsY, HIST_W - 12, HIST_H - statsY - 6);
+
+  histCtx.font = "bold 10px monospace";
+  histCtx.textAlign = "left";
+  var lx = 14, ly = statsY + 18, gap = 17;
+
+  histCtx.fillStyle = "#ccc";
+  histCtx.fillText("LIVE STATISTICS", lx, ly); ly += gap + 2;
+
+  histCtx.font = "10px monospace";
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("Mean d:", lx, ly);
+  histCtx.fillStyle = "#fff";
+  histCtx.fillText(meanR.toFixed(2), lx + 100, ly); ly += gap;
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("Variance:", lx, ly);
+  histCtx.fillStyle = "#fff";
+  histCtx.fillText(varR.toFixed(1), lx + 100, ly); ly += gap;
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("Max d:", lx, ly);
+  histCtx.fillStyle = "#fff";
+  histCtx.fillText(maxR === MAX_RING_BINS ? maxR + "+" : maxR, lx + 100, ly); ly += gap;
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("d \u22655:", lx, ly);
+  histCtx.fillStyle = pctR5 > 5 ? "#ff1a1a" : "#fff";
+  histCtx.fillText(pctR5.toFixed(1) + "%", lx + 100, ly); ly += gap;
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("d \u226510:", lx, ly);
+  histCtx.fillStyle = pctR10 > 2 ? "#ff1a1a" : "#fff";
+  histCtx.fillText(pctR10.toFixed(1) + "%", lx + 100, ly); ly += gap;
+
+  histCtx.fillStyle = "#ff4500";
+  histCtx.fillText("Total moves:", lx, ly);
+  histCtx.fillStyle = "#fff";
+  histCtx.fillText(ringHistTotal.toLocaleString(), lx + 100, ly);
+}
+
+/* ── Info display ── */
+function updateInfo(nDisplaced, nDrowned, meanRing) {
+  infoStep.textContent = currentStep - WARM_UP;
+  infoPop.textContent = agents.length;
+
+  var nHab = 0;
+  for (var i = 0; i < NCELLS; i++) {
+    if (!river[i] && getQuality(i, currentStep) >= Q_THRESH) nHab++;
+  }
+  infoHab.textContent = nHab;
+
+  var nStable = agents.length - nDisplaced;
+  infoStable.textContent = nStable;
+  infoRelocated.textContent = nDisplaced;
+  infoDrowned.textContent = nDrowned;
+  infoRing.textContent = meanRing > 0 ? meanRing.toFixed(1) : "0";
+}
+
+/* ── Animation loop ── */
+function animate(timestamp) {
+  if (!playing) return;
+  var delay = parseFloat(slSpeed.value);
+  if (timestamp - lastFrameTime >= delay) {
+    lastFrameTime = timestamp;
+    simStep();
+  }
+  animFrameId = requestAnimationFrame(animate);
+}
+
+function play() {
+  if (!riverTimesteps) return;
+  playing = true;
+  btnPlay.disabled = true;
+  btnPause.disabled = false;
+  lastFrameTime = performance.now();
+  animFrameId = requestAnimationFrame(animate);
+}
+
+function pause() {
+  playing = false;
+  btnPlay.disabled = false;
+  btnPause.disabled = true;
+  if (animFrameId) cancelAnimationFrame(animFrameId);
+}
+
+function reset() {
+  pause();
+  init();
+}
+
+btnPlay.addEventListener("click", play);
+btnPause.addEventListener("click", pause);
+btnReset.addEventListener("click", reset);
+
+slPop.addEventListener("change", function() {
+  if (!riverTimesteps) return;
+  var targetPop = parseInt(slPop.value);
+  adjustPopulation(targetPop);
+  /* Reset histogram on population change */
+  ringHist = new Float64Array(MAX_RING_BINS + 1);
+  ringHistTotal = 0;
+  render();
+  renderHist();
+  updateInfo(0, 0, 0);
+});
+
+/* ── Start ── */
+loadRiverData(function() { init(); });
+
+})();
+</script>
+
+</body>
+</html>
