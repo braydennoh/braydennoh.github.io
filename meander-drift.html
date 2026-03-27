@@ -42,6 +42,7 @@
     </div>
 
     <div id="sim-info" style="font-family:monospace; font-size:13px; margin-bottom:0.4em;">
+      Domain: <span id="info-domain">10.0 km &times; 2.0 km</span> &nbsp;&bull;&nbsp;
       Frame: <span id="info-frame">0</span> / <span id="info-total">0</span> &nbsp;&bull;&nbsp;
       Time: <span id="info-years">0</span> yr &nbsp;&bull;&nbsp;
       Mean drift: <span id="info-drift">0</span> m &nbsp;&bull;&nbsp;
@@ -150,13 +151,20 @@ var infoFrame = document.getElementById("info-frame");
 var infoTotal = document.getElementById("info-total");
 var infoYears = document.getElementById("info-years");
 var infoDrift = document.getElementById("info-drift");
-var infoPct   = document.getElementById("info-pct");
-var infoPop   = document.getElementById("info-pop");
+var infoPct    = document.getElementById("info-pct");
+var infoPop    = document.getElementById("info-pop");
+var infoDomain = document.getElementById("info-domain");
+
+function updateDomain() {
+  var w = (COLS * CELL_SIZE / 1000).toFixed(1);
+  var h = (ROWS * CELL_SIZE / 1000).toFixed(1);
+  infoDomain.textContent = w + " km \u00d7 " + h + " km";
+}
 
 /* ── Slider labels ── */
 slPop.addEventListener("input", function() { valPop.textContent = this.value; });
 slSkip.addEventListener("input", function() { valSkip.textContent = this.value + "x"; });
-slCell.addEventListener("input", function() { valCell.textContent = this.value + " m"; CELL_SIZE = +this.value; updateInfo(); });
+slCell.addEventListener("input", function() { valCell.textContent = this.value + " m"; CELL_SIZE = +this.value; updateDomain(); updateInfo(); });
 slScrub.addEventListener("input", function() {
   valScrub.textContent = this.value;
   scrubTo(+this.value);
