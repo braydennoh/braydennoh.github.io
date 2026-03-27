@@ -75,7 +75,7 @@
         <span id="val-pop">1000</span>
 
         <label for="sl-skip">Migration rate</label>
-        <input id="sl-skip" type="range" min="1" max="20" step="1" value="1">
+        <input id="sl-skip" type="range" min="1" max="10" step="1" value="1">
         <span id="val-skip">1x</span>
 
         <label for="sl-cell">Grid cell</label>
@@ -403,10 +403,11 @@ function render(river) {
     else { px[off] = COL_FLOOD[0]; px[off+1] = COL_FLOOD[1]; px[off+2] = COL_FLOOD[2]; }
     px[off+3] = 255;
   }
-  // Agents
+  // Agents (skip river cells so channel is always visible)
   var pop = agentR.length;
   for (var a = 0; a < pop; a++) {
     var idx = agentR[a] * COLS + agentC[a];
+    if (river[idx]) continue;
     var off2 = idx * 4;
     px[off2] = COL_AGENT[0]; px[off2+1] = COL_AGENT[1]; px[off2+2] = COL_AGENT[2];
   }
