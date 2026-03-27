@@ -1,0 +1,29 @@
+{
+  "tile_width": 500,
+  "tile_height": 100,
+  "tiles_per_row": 10,
+  "frames_per_combo": 2000,
+  "scenarios": [
+    "upstream_lag",
+    "no_lag",
+    "downstream_lag"
+  ],
+  "scenario_labels": [
+    "Upstream lag",
+    "No lag (symmetric)",
+    "Downstream lag"
+  ],
+  "grid": {
+    "xmin": 1000.0,
+    "xmax": 11000.0,
+    "ymin": -1000.0,
+    "ymax": 1000.0,
+    "cell_size": 20.0,
+    "cols": 500,
+    "rows": 100
+  },
+  "kl_myr": 12.0,
+  "dt_per_frame_years": 25.0,
+  "agent_steps_per_frame": 5,
+  "total_years": 50000.0
+}

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meander Drift - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>Meander Drift</h1>
+
+    <p>Meandering rivers migrate laterally across their floodplains, and communities that depend on the river are displaced in the process. The curvature-migration phase lag causes bends to sweep asymmetrically, producing a net along-valley drift of river-seeking agents. We call this mechanism <b>meander drift</b>.</p>
+
+    <hr class="separator">
+
+    <p>By Brayden Noh and Omar Wani.</p>
+
+    <hr class="separator">
+
+    <h3>Controls</h3>
+    <p style="font-size:12px; color:#767676; margin-bottom:8px;">Select a scenario, adjust parameters, then press Play. Reset reinitializes agents at the current settings.</p>
+  </div>
+
+  <div class="main">
+
+    <p>Agents (red) follow a single rule: move one cell per timestep toward the nearest river cell (blue). When the river erodes an agent's cell, the agent is relocated to the nearest available cell. No agent has any directional preference. Under an asymmetric migration kernel, agents systematically drift along the valley in the direction of the phase lag.</p>
+
+    <!-- Simulator -->
+    <div id="sim-container" style="margin: 1em 0;">
+      <canvas id="sim-canvas" style="width:100%; image-rendering:pixelated; background:#000; display:block;"></canvas>
+    </div>
+
+    <div id="sim-info" style="font-family:monospace; font-size:13px; margin-bottom:0.4em;">
+      Frame: <span id="info-frame">0</span> / <span id="info-total">0</span> &nbsp;&bull;&nbsp;
+      Time: <span id="info-years">0</span> yr &nbsp;&bull;&nbsp;
+      Mean drift: <span id="info-drift">0</span> m &nbsp;&bull;&nbsp;
+      Downstream: <span id="info-pct">0</span>%
+    </div>
+    <div id="sim-legend" style="font-family:monospace; font-size:12px; margin-bottom:0.8em; display:flex; flex-wrap:wrap; gap:6px 14px;">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#3365ff;vertical-align:middle;margin-right:3px;"></span>River</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#fb3333;vertical-align:middle;margin-right:3px;"></span>Agents (<span id="info-pop">0</span>)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#000;border:1px solid #444;vertical-align:middle;margin-right:3px;"></span>Floodplain</span>
+    </div>
+
+    <div id="sim-controls" style="margin-bottom:1em;">
+      <div style="margin-bottom:0.4em;">
+        <button id="btn-play" style="padding:0.2em 0.8em; cursor:pointer;">&#9654; Play</button>
+        <button id="btn-pause" disabled style="padding:0.2em 0.8em; cursor:pointer;">&#9646;&#9646; Pause</button>
+        <button id="btn-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
+      </div>
+
+      <div style="display:grid; grid-template-columns:auto 1fr auto; gap:4px 10px; align-items:center; max-width:420px; font-size:85%;">
+        <label for="sl-scenario">Lag</label>
+        <select id="sl-scenario" style="width:100%;">
+          <option value="0">Upstream lag</option>
+          <option value="1">No lag (symmetric)</option>
+          <option value="2" selected>Downstream lag</option>
+        </select>
+        <span></span>
+
+        <label for="sl-pop">Agents</label>
+        <input id="sl-pop" type="range" min="50" max="5000" step="50" value="1000">
+        <span id="val-pop">1000</span>
+
+        <label for="sl-skip">Migration rate</label>
+        <input id="sl-skip" type="range" min="1" max="20" step="1" value="4">
+        <span id="val-skip">4x</span>
+
+        <label for="sl-speed">Frame delay</label>
+        <input id="sl-speed" type="range" min="0" max="300" step="10" value="50">
+        <span id="val-speed">50 ms</span>
+
+        <label for="sl-scrub">Timeline</label>
+        <input id="sl-scrub" type="range" min="0" max="1999" step="1" value="0" style="width:100%;">
+        <span id="val-scrub">0</span>
+      </div>
+    </div>
+
+    <p>Under the downstream lag (the physically realistic regime for most natural rivers), agents accumulate at the downstream end of the domain. Reversing the lag reverses the drift. The symmetric kernel produces no directional bias. Increasing the migration rate strengthens the drift; increasing agent density suppresses it through crowding.</p>
+
+    <p id="loading-msg" style="font-size:85%; color:#767676;"><i>Loading river data&hellip;</i></p>
+
+  </div>
+
+</div>
+
+<script>
+(function() {
+"use strict";
+
+/* ── Grid params (must match prep script) ── */
+var COLS = 500, ROWS = 100;
+var CELL_SIZE = 20;
+var N = ROWS * COLS;
+/* no kl combos -- user controls effective speed via frame skip */
+
+/* ── Colors ── */
+var COL_FLOOD = [0, 0, 0];
+var COL_RIVER = [51, 101, 255];
+var COL_AGENT = [251, 51, 51];
+
+/* ── Moore neighborhood ── */
+var DR = [-1,-1,-1, 0, 0, 1, 1, 1];
+var DC = [-1, 0, 1,-1, 1,-1, 0, 1];
+
+/* ── State ── */
+var meta = null;
+var allRiverCells = null;  // array of Int32Arrays (sparse river indices per tile)
+var agentR = null, agentC = null, initC = null;
+var occupied = null;
+var playing = false;
+var currentFrame = 0;
+var animId = null;
+var lastTime = 0;
+
+/* ── DOM ── */
+var canvas = document.getElementById("sim-canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = COLS;
+canvas.height = ROWS;
+
+var btnPlay  = document.getElementById("btn-play");
+var btnPause = document.getElementById("btn-pause");
+var btnReset = document.getElementById("btn-reset");
+var loadMsg  = document.getElementById("loading-msg");
+
+var selScenario = document.getElementById("sl-scenario");
+var slPop   = document.getElementById("sl-pop");
+var slSkip  = document.getElementById("sl-skip");
+var slSpeed = document.getElementById("sl-speed");
+var slScrub = document.getElementById("sl-scrub");
+
+var valPop   = document.getElementById("val-pop");
+var valSkip  = document.getElementById("val-skip");
+var valSpeed = document.getElementById("val-speed");
+var valScrub = document.getElementById("val-scrub");
+
+var infoFrame = document.getElementById("info-frame");
+var infoTotal = document.getElementById("info-total");
+var infoYears = document.getElementById("info-years");
+var infoDrift = document.getElementById("info-drift");
+var infoPct   = document.getElementById("info-pct");
+var infoPop   = document.getElementById("info-pop");
+
+/* ── Slider labels ── */
+slPop.addEventListener("input", function() { valPop.textContent = this.value; });
+slSkip.addEventListener("input", function() { valSkip.textContent = this.value + "x"; });
+slSpeed.addEventListener("input", function() { valSpeed.textContent = this.value + " ms"; });
+slScrub.addEventListener("input", function() {
+  valScrub.textContent = this.value;
+  scrubTo(+this.value);
+});
+
+/* ── Data loading: pre-extract ALL tiles at startup ── */
+function loadData(cb) {
+  var metaDone = false, imgDone = false;
+  var metaObj, spriteImg;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "assets/meander_drift_meta.json");
+  xhr.onload = function() {
+    metaObj = JSON.parse(xhr.responseText);
+    metaDone = true;
+    if (imgDone) finish();
+  };
+  xhr.send();
+
+  spriteImg = new Image();
+  spriteImg.crossOrigin = "anonymous";
+  spriteImg.onload = function() { imgDone = true; if (metaDone) finish(); };
+  spriteImg.src = "assets/meander_drift_masks.png";
+
+  function finish() {
+    meta = metaObj;
+    var tw = meta.tile_width, th = meta.tile_height;
+    var tpr = meta.tiles_per_row;
+    var totalTiles = meta.scenarios.length * meta.frames_per_combo;
+
+    // Small canvas for extracting one tile at a time
+    var tc = document.createElement("canvas");
+    tc.width = tw; tc.height = th;
+    var tcx = tc.getContext("2d");
+
+    // Pre-extract all tiles: store only river cell indices (sparse, ~500 per frame)
+    loadMsg.textContent = "Extracting river masks...";
+    allRiverCells = new Array(totalTiles);
+
+    // Process in batches to avoid blocking UI
+    var batchSize = 100;
+    var t = 0;
+    function extractBatch() {
+      var end = Math.min(t + batchSize, totalTiles);
+      for (; t < end; t++) {
+        var tileRow = (t / tpr) | 0;
+        var tileCol = t % tpr;
+        var sx = tileCol * tw;
+        var sy = tileRow * th;
+        tcx.drawImage(spriteImg, sx, sy, tw, th, 0, 0, tw, th);
+        var px = tcx.getImageData(0, 0, tw, th).data;
+        var cells = [];
+        for (var i = 0; i < N; i++) {
+          if (px[i * 4] > 128) cells.push(i);
+        }
+        allRiverCells[t] = new Int32Array(cells);
+      }
+      if (t < totalTiles) {
+        loadMsg.textContent = "Extracting river masks... " + Math.round(t/totalTiles*100) + "%";
+        setTimeout(extractBatch, 0);
+      } else {
+        infoTotal.textContent = meta.frames_per_combo - 1;
+        slScrub.max = meta.frames_per_combo - 1;
+        loadMsg.style.display = "none";
+        cb();
+      }
+    }
+    extractBatch();
+  }
+}
+
+/* ── Pre-allocated buffers (zero allocation during animation) ── */
+var cachedRiver = new Uint8Array(N);
+var cachedDistArr = new Float32Array(N);
+var cacheKey = -1;
+var edtF = new Float32Array(N);
+var edtColBuf = new Float32Array(ROWS);
+var edtV = new Int32Array(COLS);
+var edtZ = new Float32Array(COLS + 1);
+var edtRowD = new Float32Array(COLS);
+var rdResult = { river: cachedRiver, dist: cachedDistArr };
+
+function getRiverAndDist(scenIdx, frameIdx) {
+  var key = scenIdx * 1000000 + frameIdx;
+  if (key === cacheKey) return rdResult;
+
+  // Rebuild river mask from pre-extracted sparse indices (no canvas ops)
+  var globalIdx = scenIdx * meta.frames_per_combo + frameIdx;
+  var cells = allRiverCells[globalIdx];
+  cachedRiver.fill(0);
+  for (var j = 0; j < cells.length; j++) cachedRiver[cells[j]] = 1;
+
+  // EDT using pre-allocated buffers
+  var INF = 1e10;
+  for (var i = 0; i < N; i++) edtF[i] = cachedRiver[i] ? 0 : INF;
+  for (var c = 0; c < COLS; c++) {
+    edtColBuf[0] = edtF[c];
+    for (var r = 1; r < ROWS; r++) edtColBuf[r] = Math.min(edtF[r*COLS+c], edtColBuf[r-1]+1);
+    for (var r2 = ROWS-2; r2 >= 0; r2--) edtColBuf[r2] = Math.min(edtColBuf[r2], edtColBuf[r2+1]+1);
+    for (var r3 = 0; r3 < ROWS; r3++) edtF[r3*COLS+c] = edtColBuf[r3]*edtColBuf[r3];
+  }
+  for (var r4 = 0; r4 < ROWS; r4++) {
+    var off = r4*COLS;
+    var k = 0; edtV[0] = 0; edtZ[0] = -INF; edtZ[1] = INF;
+    for (var q = 1; q < COLS; q++) {
+      var s = ((edtF[off+q]+q*q)-(edtF[off+edtV[k]]+edtV[k]*edtV[k]))/(2*q-2*edtV[k]);
+      while (s <= edtZ[k]) { k--; s = ((edtF[off+q]+q*q)-(edtF[off+edtV[k]]+edtV[k]*edtV[k]))/(2*q-2*edtV[k]); }
+      k++; edtV[k] = q; edtZ[k] = s; edtZ[k+1] = INF;
+    }
+    k = 0;
+    for (var q2 = 0; q2 < COLS; q2++) {
+      while (edtZ[k+1] < q2) k++;
+      var dq = q2-edtV[k]; edtRowD[q2] = dq*dq + edtF[off+edtV[k]];
+    }
+    for (var q3 = 0; q3 < COLS; q3++) cachedDistArr[off+q3] = Math.sqrt(edtRowD[q3]);
+  }
+
+  cacheKey = key;
+  return rdResult;
+}
+
+/* ── Agent initialization ── */
+function initAgents() {
+  var pop = +slPop.value;
+  var scenIdx = +selScenario.value;
+  currentFrame = 0;
+  slScrub.value = 0;
+  valScrub.textContent = "0";
+
+  var rd = getRiverAndDist(scenIdx, 0);
+  var river = rd.river;
+
+  // Collect valid (non-river) cells
+  var valid = [];
+  for (var i = 0; i < N; i++) { if (!river[i]) valid.push(i); }
+
+  // Shuffle and pick pop agents
+  for (var j = valid.length - 1; j > 0; j--) {
+    var k = (Math.random() * (j + 1)) | 0;
+    var tmp = valid[j]; valid[j] = valid[k]; valid[k] = tmp;
+  }
+  pop = Math.min(pop, valid.length);
+
+  agentR = new Int32Array(pop);
+  agentC = new Int32Array(pop);
+  initC  = new Int32Array(pop);
+  occupied = new Uint8Array(N);
+
+  for (var a = 0; a < pop; a++) {
+    var idx = valid[a];
+    agentR[a] = (idx / COLS) | 0;
+    agentC[a] = idx % COLS;
+    initC[a] = agentC[a];
+    occupied[idx] = 1;
+  }
+
+  infoPop.textContent = pop;
+  render(river);
+  updateInfo();
+}
+
+/* ── Step agents one frame (matches run.py step_local exactly) ── */
+function stepAgents(river, dist) {
+  var pop = agentR.length;
+  for (var i = 0; i < pop; i++) {
+    var r = agentR[i], c = agentC[i];
+    var idx = r * COLS + c;
+
+    if (river[idx]) {
+      // Displaced: collect ALL valid neighbors, pick randomly
+      var cr = [], cc = [];
+      for (var k = 0; k < 8; k++) {
+        var nr = r + DR[k], nc = c + DC[k];
+        if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
+        var ni = nr * COLS + nc;
+        if (!river[ni] && !occupied[ni]) { cr.push(nr); cc.push(nc); }
+      }
+      if (cr.length > 0) {
+        var p = (Math.random() * cr.length) | 0;
+        if (p >= cr.length) p = cr.length - 1;
+        occupied[idx] = 0;
+        agentR[i] = cr[p]; agentC[i] = cc[p];
+        occupied[cr[p] * COLS + cc[p]] = 1;
+      }
+      // if no valid neighbor, agent stays (matches Python behavior)
+    } else {
+      // Normal: gradient descent on distance field
+      var bd = dist[idx];
+      var tr = r, tc = c, nt = 1;
+      for (var k2 = 0; k2 < 8; k2++) {
+        var nr2 = r + DR[k2], nc2 = c + DC[k2];
+        if (nr2 < 0 || nr2 >= ROWS || nc2 < 0 || nc2 >= COLS) continue;
+        var ni2 = nr2 * COLS + nc2;
+        if (river[ni2] || occupied[ni2]) continue;
+        var dd = dist[ni2];
+        if (dd < bd) { bd = dd; tr = nr2; tc = nc2; nt = 1; }
+        else if (dd === bd) { nt++; if (Math.random() < 1/nt) { tr = nr2; tc = nc2; } }
+      }
+      if (tr !== r || tc !== c) {
+        occupied[idx] = 0;
+        occupied[tr * COLS + tc] = 1;
+      }
+      agentR[i] = tr; agentC[i] = tc;
+    }
+  }
+}
+
+/* ── Render ── */
+var imgData = ctx.createImageData(COLS, ROWS);
+
+function render(river) {
+  var px = imgData.data;
+  // Clear
+  for (var i = 0; i < N; i++) {
+    var off = i * 4;
+    if (river[i]) { px[off] = COL_RIVER[0]; px[off+1] = COL_RIVER[1]; px[off+2] = COL_RIVER[2]; }
+    else { px[off] = COL_FLOOD[0]; px[off+1] = COL_FLOOD[1]; px[off+2] = COL_FLOOD[2]; }
+    px[off+3] = 255;
+  }
+  // Agents
+  var pop = agentR.length;
+  for (var a = 0; a < pop; a++) {
+    var idx = agentR[a] * COLS + agentC[a];
+    var off2 = idx * 4;
+    px[off2] = COL_AGENT[0]; px[off2+1] = COL_AGENT[1]; px[off2+2] = COL_AGENT[2];
+  }
+  // Flip vertically (y increases upward)
+  var flipped = ctx.createImageData(COLS, ROWS);
+  var fp = flipped.data;
+  for (var r = 0; r < ROWS; r++) {
+    var srcOff = r * COLS * 4, dstOff = (ROWS - 1 - r) * COLS * 4;
+    for (var c = 0; c < COLS * 4; c++) fp[dstOff + c] = px[srcOff + c];
+  }
+  ctx.putImageData(flipped, 0, 0);
+}
+
+/* ── Info display ── */
+function updateInfo() {
+  infoFrame.textContent = currentFrame;
+  var yr = meta ? Math.round(currentFrame * meta.dt_per_frame_years) : 0;
+  infoYears.textContent = yr.toLocaleString();
+
+  var pop = agentR.length;
+  if (pop === 0) { infoDrift.textContent = "0"; infoPct.textContent = "0"; return; }
+  var sumDx = 0, nDown = 0;
+  for (var i = 0; i < pop; i++) {
+    var dx = (agentC[i] - initC[i]) * CELL_SIZE;
+    sumDx += dx;
+    if (dx > 0) nDown++;
+  }
+  infoDrift.textContent = Math.round(sumDx / pop);
+  infoPct.textContent = Math.round(nDown / pop * 100);
+}
+
+/* ── Simulation step ── */
+function simStep() {
+  if (!meta) return;
+  var maxFrame = meta.frames_per_combo - 1;
+  var skip = +slSkip.value;
+  var scenIdx = +selScenario.value;
+  var stepsPerFrame = meta.agent_steps_per_frame || 5;
+
+  for (var s = 0; s < skip; s++) {
+    if (currentFrame >= maxFrame) { pause(); return; }
+    currentFrame++;
+    var rd = getRiverAndDist(scenIdx, currentFrame);
+    for (var a = 0; a < stepsPerFrame; a++) {
+      stepAgents(rd.river, rd.dist);
+    }
+  }
+
+  slScrub.value = currentFrame;
+  valScrub.textContent = currentFrame;
+  render(cachedRiver);
+  updateInfo();
+}
+
+/* ── Scrub to a specific frame (re-simulate from start) ── */
+function scrubTo(targetFrame) {
+  if (!meta) return;
+  pause();
+  initAgents();
+  var scenIdx = +selScenario.value;
+  var stepsPerFrame = meta.agent_steps_per_frame || 5;
+  for (var f = 1; f <= targetFrame; f++) {
+    var rd = getRiverAndDist(scenIdx, f);
+    for (var a = 0; a < stepsPerFrame; a++) {
+      stepAgents(rd.river, rd.dist);
+    }
+    currentFrame = f;
+  }
+  render(cachedRiver);
+  slScrub.value = targetFrame;
+  valScrub.textContent = targetFrame;
+  updateInfo();
+}
+
+/* ── Play / Pause / Reset ── */
+function animate(timestamp) {
+  if (!playing) return;
+  var delay = +slSpeed.value;
+  if (timestamp - lastTime >= delay) {
+    lastTime = timestamp;
+    simStep();
+  }
+  animId = requestAnimationFrame(animate);
+}
+
+function play() {
+  if (!meta) return;
+  playing = true;
+  btnPlay.disabled = true; btnPause.disabled = false;
+  lastTime = performance.now();
+  animId = requestAnimationFrame(animate);
+}
+
+function pause() {
+  playing = false;
+  btnPlay.disabled = false; btnPause.disabled = true;
+  if (animId) cancelAnimationFrame(animId);
+}
+
+function reset() {
+  pause();
+  cacheKey = -1;
+  initAgents();
+}
+
+btnPlay.addEventListener("click", play);
+btnPause.addEventListener("click", pause);
+btnReset.addEventListener("click", reset);
+
+/* Reset when scenario or population changes */
+selScenario.addEventListener("change", reset);
+slPop.addEventListener("change", reset);
+
+/* ── Load and start ── */
+loadData(function() {
+  initAgents();
+});
+
+})();
+</script>
+
+</body>
+</html>
