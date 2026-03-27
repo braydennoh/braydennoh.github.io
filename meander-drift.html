@@ -42,7 +42,7 @@
     </div>
 
     <div id="sim-info" style="font-family:monospace; font-size:13px; margin-bottom:0.4em;">
-      Domain: <span id="info-domain">10.0 km &times; 2.0 km</span> &nbsp;&bull;&nbsp;
+      Grid: <span id="info-res">500 &times; 100</span> &nbsp;&bull;&nbsp;
       Frame: <span id="info-frame">0</span> / <span id="info-total">0</span> &nbsp;&bull;&nbsp;
       Time: <span id="info-years">0</span> yr &nbsp;&bull;&nbsp;
       Mean drift: <span id="info-drift">0</span> m &nbsp;&bull;&nbsp;
@@ -100,11 +100,16 @@
 (function() {
 "use strict";
 
-/* ── Grid params (must match prep script) ── */
-var COLS = 500, ROWS = 100;
+/* ── Source grid (fixed, matches prep script) ── */
+var SRC_COLS = 500, SRC_ROWS = 100, SRC_CELL = 20;
+var DOMAIN_W = SRC_COLS * SRC_CELL; // 10000 m
+var DOMAIN_H = SRC_ROWS * SRC_CELL; // 2000 m
+
+/* ── Active grid (changes with cell size slider) ── */
 var CELL_SIZE = 20;
+var COLS = Math.floor(DOMAIN_W / CELL_SIZE);
+var ROWS = Math.floor(DOMAIN_H / CELL_SIZE);
 var N = ROWS * COLS;
-/* no kl combos -- user controls effective speed via frame skip */
 
 /* ── Colors ── */
 var COL_FLOOD = [0, 0, 0];
@@ -117,7 +122,7 @@ var DC = [-1, 0, 1,-1, 1,-1, 0, 1];
 
 /* ── State ── */
 var meta = null;
-var allRiverCells = null;  // array of Int32Arrays (sparse river indices per tile)
+var allRiverCells = null;
 var agentR = null, agentC = null, initC = null;
 var occupied = null;
 var playing = false;
@@ -128,8 +133,6 @@ var lastTime = 0;
 /* ── DOM ── */
 var canvas = document.getElementById("sim-canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = COLS;
-canvas.height = ROWS;
 
 var btnPlay  = document.getElementById("btn-play");
 var btnPause = document.getElementById("btn-pause");
@@ -151,20 +154,46 @@ var infoFrame = document.getElementById("info-frame");
 var infoTotal = document.getElementById("info-total");
 var infoYears = document.getElementById("info-years");
 var infoDrift = document.getElementById("info-drift");
-var infoPct    = document.getElementById("info-pct");
-var infoPop    = document.getElementById("info-pop");
-var infoDomain = document.getElementById("info-domain");
+var infoPct   = document.getElementById("info-pct");
+var infoPop   = document.getElementById("info-pop");
+var infoRes   = document.getElementById("info-res");
 
-function updateDomain() {
-  var w = (COLS * CELL_SIZE / 1000).toFixed(1);
-  var h = (ROWS * CELL_SIZE / 1000).toFixed(1);
-  infoDomain.textContent = w + " km \u00d7 " + h + " km";
+/* ── Source river buffer (always 500×100) ── */
+var srcRiver = new Uint8Array(SRC_COLS * SRC_ROWS);
+
+/* ── Resizable buffers ── */
+var cachedRiver, cachedDistArr, edtF, edtColBuf, edtV, edtZ, edtRowD, rdResult, imgData;
+var cacheKey = -1;
+
+function allocateBuffers() {
+  COLS = Math.floor(DOMAIN_W / CELL_SIZE);
+  ROWS = Math.floor(DOMAIN_H / CELL_SIZE);
+  N = ROWS * COLS;
+  cachedRiver = new Uint8Array(N);
+  cachedDistArr = new Float32Array(N);
+  edtF = new Float32Array(N);
+  edtColBuf = new Float32Array(ROWS);
+  edtV = new Int32Array(COLS);
+  edtZ = new Float32Array(COLS + 1);
+  edtRowD = new Float32Array(COLS);
+  rdResult = { river: cachedRiver, dist: cachedDistArr };
+  canvas.width = COLS;
+  canvas.height = ROWS;
+  imgData = ctx.createImageData(COLS, ROWS);
+  cacheKey = -1;
+  infoRes.textContent = COLS + " \u00d7 " + ROWS;
 }
+allocateBuffers();
 
 /* ── Slider labels ── */
 slPop.addEventListener("input", function() { valPop.textContent = this.value; });
 slSkip.addEventListener("input", function() { valSkip.textContent = this.value + "x"; });
-slCell.addEventListener("input", function() { valCell.textContent = this.value + " m"; CELL_SIZE = +this.value; updateDomain(); updateInfo(); });
+slCell.addEventListener("input", function() { valCell.textContent = this.value + " m"; });
+slCell.addEventListener("change", function() {
+  CELL_SIZE = +this.value;
+  allocateBuffers();
+  reset();
+});
 slScrub.addEventListener("input", function() {
   valScrub.textContent = this.value;
   scrubTo(+this.value);
@@ -223,26 +252,31 @@ function loadData(cb) {
   }
 }
 
-/* ── Pre-allocated buffers (zero allocation during animation) ── */
-var cachedRiver = new Uint8Array(N);
-var cachedDistArr = new Float32Array(N);
-var cacheKey = -1;
-var edtF = new Float32Array(N);
-var edtColBuf = new Float32Array(ROWS);
-var edtV = new Int32Array(COLS);
-var edtZ = new Float32Array(COLS + 1);
-var edtRowD = new Float32Array(COLS);
-var rdResult = { river: cachedRiver, dist: cachedDistArr };
-
 function getRiverAndDist(scenIdx, frameIdx) {
-  var key = scenIdx * 1000000 + frameIdx;
+  var key = CELL_SIZE * 10000000 + scenIdx * 1000000 + frameIdx;
   if (key === cacheKey) return rdResult;
 
-  // Rebuild river mask from pre-extracted sparse indices (no canvas ops)
+  // Build source mask (500×100) from sparse indices
   var globalIdx = scenIdx * meta.frames_per_combo + frameIdx;
   var cells = allRiverCells[globalIdx];
+  srcRiver.fill(0);
+  for (var j = 0; j < cells.length; j++) srcRiver[cells[j]] = 1;
+
+  // Resample source → current resolution
   cachedRiver.fill(0);
-  for (var j = 0; j < cells.length; j++) cachedRiver[cells[j]] = 1;
+  for (var r = 0; r < ROWS; r++) {
+    var sr0 = Math.floor(r * CELL_SIZE / SRC_CELL);
+    var sr1 = Math.min(Math.ceil((r + 1) * CELL_SIZE / SRC_CELL), SRC_ROWS);
+    for (var c = 0; c < COLS; c++) {
+      var sc0 = Math.floor(c * CELL_SIZE / SRC_CELL);
+      var sc1 = Math.min(Math.ceil((c + 1) * CELL_SIZE / SRC_CELL), SRC_COLS);
+      var found = 0;
+      for (var sr = sr0; sr < sr1 && !found; sr++)
+        for (var sc = sc0; sc < sc1 && !found; sc++)
+          if (srcRiver[sr * SRC_COLS + sc]) found = 1;
+      cachedRiver[r * COLS + c] = found;
+    }
+  }
 
   // EDT using pre-allocated buffers
   var INF = 1e10;
@@ -360,8 +394,6 @@ function stepAgents(river, dist) {
 }
 
 /* ── Render ── */
-var imgData = ctx.createImageData(COLS, ROWS);
-
 function render(river) {
   var px = imgData.data;
   // Clear
