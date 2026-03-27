@@ -162,69 +162,56 @@ slScrub.addEventListener("input", function() {
   scrubTo(+this.value);
 });
 
-/* ── Data loading: pre-extract ALL tiles at startup ── */
+/* ── Data loading: binary format (works on all browsers) ── */
 function loadData(cb) {
-  var metaDone = false, imgDone = false;
-  var metaObj, spriteImg;
+  var metaDone = false, binDone = false;
+  var metaObj, binBuf;
 
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "assets/meander_drift_meta.json");
-  xhr.onload = function() {
-    metaObj = JSON.parse(xhr.responseText);
+  var xhr1 = new XMLHttpRequest();
+  xhr1.open("GET", "assets/meander_drift_meta.json");
+  xhr1.onload = function() {
+    metaObj = JSON.parse(xhr1.responseText);
     metaDone = true;
-    if (imgDone) finish();
+    if (binDone) finish();
   };
-  xhr.send();
+  xhr1.send();
 
-  spriteImg = new Image();
-  spriteImg.crossOrigin = "anonymous";
-  spriteImg.onload = function() { imgDone = true; if (metaDone) finish(); };
-  spriteImg.src = "assets/meander_drift_masks.png";
+  var xhr2 = new XMLHttpRequest();
+  xhr2.open("GET", "assets/meander_drift_masks.bin");
+  xhr2.responseType = "arraybuffer";
+  xhr2.onprogress = function(e) {
+    if (e.lengthComputable) {
+      loadMsg.textContent = "Loading river data... " + Math.round(e.loaded/e.total*100) + "%";
+    }
+  };
+  xhr2.onload = function() {
+    binBuf = xhr2.response;
+    binDone = true;
+    if (metaDone) finish();
+  };
+  xhr2.send();
 
   function finish() {
     meta = metaObj;
-    var tw = meta.tile_width, th = meta.tile_height;
-    var tpr = meta.tiles_per_row;
-    var totalTiles = meta.scenarios.length * meta.frames_per_combo;
+    var totalFrames = meta.scenarios.length * meta.frames_per_combo;
+    allRiverCells = new Array(totalFrames);
 
-    // Small canvas for extracting one tile at a time
-    var tc = document.createElement("canvas");
-    tc.width = tw; tc.height = th;
-    var tcx = tc.getContext("2d");
-
-    // Pre-extract all tiles: store only river cell indices (sparse, ~500 per frame)
-    loadMsg.textContent = "Extracting river masks...";
-    allRiverCells = new Array(totalTiles);
-
-    // Process in batches to avoid blocking UI
-    var batchSize = 100;
-    var t = 0;
-    function extractBatch() {
-      var end = Math.min(t + batchSize, totalTiles);
-      for (; t < end; t++) {
-        var tileRow = (t / tpr) | 0;
-        var tileCol = t % tpr;
-        var sx = tileCol * tw;
-        var sy = tileRow * th;
-        tcx.drawImage(spriteImg, sx, sy, tw, th, 0, 0, tw, th);
-        var px = tcx.getImageData(0, 0, tw, th).data;
-        var cells = [];
-        for (var i = 0; i < N; i++) {
-          if (px[i * 4] > 128) cells.push(i);
-        }
-        allRiverCells[t] = new Int32Array(cells);
+    // Parse binary: each frame = uint16 count + count × uint16 indices
+    var view = new DataView(binBuf);
+    var offset = 0;
+    for (var t = 0; t < totalFrames; t++) {
+      var n = view.getUint16(offset, true); offset += 2;
+      var cells = new Uint16Array(n);
+      for (var j = 0; j < n; j++) {
+        cells[j] = view.getUint16(offset, true); offset += 2;
       }
-      if (t < totalTiles) {
-        loadMsg.textContent = "Extracting river masks... " + Math.round(t/totalTiles*100) + "%";
-        setTimeout(extractBatch, 0);
-      } else {
-        infoTotal.textContent = meta.frames_per_combo - 1;
-        slScrub.max = meta.frames_per_combo - 1;
-        loadMsg.style.display = "none";
-        cb();
-      }
+      allRiverCells[t] = cells;
     }
-    extractBatch();
+
+    infoTotal.textContent = meta.frames_per_combo - 1;
+    slScrub.max = meta.frames_per_combo - 1;
+    loadMsg.style.display = "none";
+    cb();
   }
 }
 

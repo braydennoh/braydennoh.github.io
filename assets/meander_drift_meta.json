@@ -1,7 +1,4 @@
 {
-  "tile_width": 500,
-  "tile_height": 100,
-  "tiles_per_row": 10,
   "frames_per_combo": 2000,
   "scenarios": [
     "upstream_lag",
