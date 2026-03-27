@@ -70,16 +70,16 @@
         <span></span>
 
         <label for="sl-pop">Agents</label>
-        <input id="sl-pop" type="range" min="50" max="5000" step="50" value="1000">
+        <input id="sl-pop" type="range" min="50" max="10000" step="50" value="1000">
         <span id="val-pop">1000</span>
 
         <label for="sl-skip">Migration rate</label>
         <input id="sl-skip" type="range" min="1" max="20" step="1" value="1">
         <span id="val-skip">1x</span>
 
-        <label for="sl-speed">Frame delay</label>
-        <input id="sl-speed" type="range" min="0" max="300" step="10" value="50">
-        <span id="val-speed">50 ms</span>
+        <label for="sl-cell">Grid cell</label>
+        <input id="sl-cell" type="range" min="10" max="100" step="10" value="20">
+        <span id="val-cell">20 m</span>
 
         <label for="sl-scrub">Timeline</label>
         <input id="sl-scrub" type="range" min="0" max="1999" step="1" value="0" style="width:100%;">
@@ -138,12 +138,12 @@ var loadMsg  = document.getElementById("loading-msg");
 var selScenario = document.getElementById("sl-scenario");
 var slPop   = document.getElementById("sl-pop");
 var slSkip  = document.getElementById("sl-skip");
-var slSpeed = document.getElementById("sl-speed");
+var slCell  = document.getElementById("sl-cell");
 var slScrub = document.getElementById("sl-scrub");
 
 var valPop   = document.getElementById("val-pop");
 var valSkip  = document.getElementById("val-skip");
-var valSpeed = document.getElementById("val-speed");
+var valCell  = document.getElementById("val-cell");
 var valScrub = document.getElementById("val-scrub");
 
 var infoFrame = document.getElementById("info-frame");
@@ -156,7 +156,7 @@ var infoPop   = document.getElementById("info-pop");
 /* ── Slider labels ── */
 slPop.addEventListener("input", function() { valPop.textContent = this.value; });
 slSkip.addEventListener("input", function() { valSkip.textContent = this.value + "x"; });
-slSpeed.addEventListener("input", function() { valSpeed.textContent = this.value + " ms"; });
+slCell.addEventListener("input", function() { valCell.textContent = this.value + " m"; CELL_SIZE = +this.value; updateInfo(); });
 slScrub.addEventListener("input", function() {
   valScrub.textContent = this.value;
   scrubTo(+this.value);
@@ -444,7 +444,7 @@ function scrubTo(targetFrame) {
 /* ── Play / Pause / Reset ── */
 function animate(timestamp) {
   if (!playing) return;
-  var delay = +slSpeed.value;
+  var delay = 50;
   if (timestamp - lastTime >= delay) {
     lastTime = timestamp;
     simStep();
