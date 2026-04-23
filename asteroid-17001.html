@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>17001 Braydennoh — Orbit Viewer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #000; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif; color: #fff; }
+  canvas { display: block; }
+
+  .overlay {
+    position: absolute;
+    font-size: 13px;
+    line-height: 1.5;
+    user-select: none;
+    color: #fff;
+  }
+
+  #info { top: 18px; left: 18px; max-width: 320px; }
+  #info h1 { margin: 0 0 4px 0; font-size: 18px; font-weight: 600; letter-spacing: 0.2px; }
+  #info .sub { font-size: 11px; margin-bottom: 10px; letter-spacing: 0.3px; opacity: 0.85; }
+  #info .stat { display: flex; justify-content: space-between; gap: 12px; margin: 3px 0; }
+  #info .stat .v { font-variant-numeric: tabular-nums; font-weight: 500; }
+  #info hr { border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 8px 0; }
+
+  #legend { top: 18px; right: 18px; font-size: 12px; text-align: right; }
+  #legend .item { display: flex; align-items: center; gap: 8px; margin: 3px 0; justify-content: flex-end; }
+  #legend .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  #controls { bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; font-size: 12px; }
+  #controls button {
+    background: transparent; color: #fff;
+    border: none;
+    padding: 6px 10px; cursor: pointer; font-size: 12px;
+    font-family: inherit;
+  }
+  #controls button:hover { opacity: 0.7; }
+  #controls input[type=range] { accent-color: #fff; width: 140px; }
+  #controls .speedLabel { min-width: 90px; text-align: center; opacity: 0.85; }
+
+  #credit { position: absolute; bottom: 10px; right: 14px; font-size: 10px; color: #fff; opacity: 0.55; }
+  #credit a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
+</style>
+</head>
+<body>
+<div id="info" class="overlay">
+  <h1>17001 Braydennoh</h1>
+  <div class="sub">MAIN-BELT ASTEROID · 1999 CT54</div>
+  <div class="stat"><span class="k">Simulated date</span><span class="v" id="date">—</span></div>
+  <div class="stat"><span class="k">Distance from Sun</span><span class="v" id="distance">—</span></div>
+  <hr>
+  <div class="stat"><span class="k">Semi-major axis</span><span class="v">2.474 au</span></div>
+  <div class="stat"><span class="k">Eccentricity</span><span class="v">0.069</span></div>
+  <div class="stat"><span class="k">Inclination</span><span class="v">6.09°</span></div>
+  <div class="stat"><span class="k">Orbital period</span><span class="v">3.89 yr</span></div>
+  <div class="stat"><span class="k">Next perihelion</span><span class="v" id="perihelion">—</span></div>
+</div>
+
+<div id="legend" class="overlay">
+  <div class="item"><div class="dot" style="color:#ffcc33;background:#ffcc33"></div>Sun</div>
+  <div class="item"><div class="dot" style="color:#b0a296;background:#b0a296"></div>Mercury</div>
+  <div class="item"><div class="dot" style="color:#e8a87c;background:#e8a87c"></div>Venus</div>
+  <div class="item"><div class="dot" style="color:#6ea8ff;background:#6ea8ff"></div>Earth</div>
+  <div class="item"><div class="dot" style="color:#d87050;background:#d87050"></div>Mars</div>
+  <div class="item"><div class="dot" style="color:#d4a574;background:#d4a574"></div>Jupiter</div>
+  <div class="item"><div class="dot" style="color:#e5c880;background:#e5c880"></div>Saturn</div>
+  <div class="item highlight"><div class="dot" style="color:#00ffcc;background:#00ffcc"></div>17001 Braydennoh</div>
+</div>
+
+<div id="controls" class="overlay">
+  <button id="play">⏸ Pause</button>
+  <button id="now">Today</button>
+  <button id="reset">Reset view</button>
+  <input type="range" id="speed" min="0" max="5" step="1" value="2">
+  <span class="speedLabel" id="speedVal">10 days / s</span>
+</div>
+
+<div id="credit">Data · <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=17001" target="_blank">NASA JPL SBDB</a></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ===== Orbital elements (JPL SBDB, epoch JD 2461000.5 TDB) =====
+const asteroid = {
+  name: "17001 Braydennoh",
+  a: 2.473810448844059, e: 0.06857120605416137, i: 6.085259568281586,
+  om: 353.8914980524194, w: 206.1796058640083, M0: 280.3791199163915,
+  epoch: 2461000.5, period: 1421.176626462845, tp: 2461314.820371536737
+};
+
+// Standish approximate elements (J2000 with secular rates per Julian century)
+const planets = [
+  { name:"Mercury", tex:"mercurymap.jpg",   color:0xb0a296, size:0.032, axialTilt:0.03, rotPeriod: 58.6,
+    a:0.38709927, da:0.00000037, e:0.20563593, de:0.00001906,
+    I:7.00497902, dI:-0.00594749, L:252.25032350, dL:149472.67411175,
+    wbar:77.45779628, dwbar:0.16047689, Om:48.33076593, dOm:-0.12534081 },
+  { name:"Venus", tex:"venusmap.jpg", color:0xe8a87c, size:0.050, axialTilt:3.09, rotPeriod:-243,
+    a:0.72333566, da:0.00000390, e:0.00677672, de:-0.00004107,
+    I:3.39467605, dI:-0.00078890, L:181.97909950, dL:58517.81538729,
+    wbar:131.60246718, dwbar:0.00268329, Om:76.67984255, dOm:-0.27769418 },
+  { name:"Earth", tex:"earthmap1k.jpg", color:0x6ea8ff, size:0.052, axialTilt:23.44, rotPeriod:1,
+    a:1.00000261, da:0.00000562, e:0.01671123, de:-0.00004392,
+    I:-0.00001531, dI:-0.01294668, L:100.46457166, dL:35999.37244981,
+    wbar:102.93768193, dwbar:0.32327364, Om:0.0, dOm:0.0,
+    clouds:"earthcloudmap.jpg" },
+  { name:"Mars", tex:"marsmap1k.jpg", color:0xd87050, size:0.040, axialTilt:25.19, rotPeriod:1.03,
+    a:1.52371034, da:0.00001847, e:0.09339410, de:0.00007882,
+    I:1.84969142, dI:-0.00813131, L:-4.55343205, dL:19140.30268499,
+    wbar:-23.94362959, dwbar:0.44441088, Om:49.55953891, dOm:-0.29257343 },
+  { name:"Jupiter", tex:"jupitermap.jpg", color:0xd4a574, size:0.14, axialTilt:3.13, rotPeriod:0.41,
+    a:5.20288700, da:-0.00011607, e:0.04838624, de:-0.00013253,
+    I:1.30439695, dI:-0.00183714, L:34.39644051, dL:3034.74612775,
+    wbar:14.72847983, dwbar:0.21252668, Om:100.47390909, dOm:0.20469106 },
+  { name:"Saturn", tex:"saturnmap.jpg", color:0xe5c880, size:0.12, axialTilt:26.73, rotPeriod:0.44,
+    a:9.53667594, da:-0.00125060, e:0.05386179, de:-0.00050991,
+    I:2.48599187, dI:0.00193609, L:49.95424423, dL:1222.49362201,
+    wbar:92.59887831, dwbar:-0.41897216, Om:113.66242448, dOm:-0.28867794,
+    rings: { inner: 0.17, outer: 0.28 } }
+];
+
+// ===== Keplerian math =====
+const DEG = Math.PI / 180;
+
+function solveKepler(M, e) {
+  let E = M + e * Math.sin(M);
+  for (let k = 0; k < 50; k++) {
+    const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    E -= dE;
+    if (Math.abs(dE) < 1e-12) break;
+  }
+  return E;
+}
+
+function keplerianPosition(a, e, iDeg, omDeg, wDeg, MDeg) {
+  const M = ((MDeg % 360) + 360) % 360 * DEG;
+  const E = solveKepler(M, e);
+  const nu = 2 * Math.atan2(Math.sqrt(1+e)*Math.sin(E/2), Math.sqrt(1-e)*Math.cos(E/2));
+  const r = a * (1 - e * Math.cos(E));
+  const xo = r * Math.cos(nu);
+  const yo = r * Math.sin(nu);
+  const cw = Math.cos(wDeg*DEG), sw = Math.sin(wDeg*DEG);
+  const cO = Math.cos(omDeg*DEG), sO = Math.sin(omDeg*DEG);
+  const cI = Math.cos(iDeg*DEG), sI = Math.sin(iDeg*DEG);
+  const x = (cw*cO - sw*sO*cI)*xo + (-sw*cO - cw*sO*cI)*yo;
+  const y = (cw*sO + sw*cO*cI)*xo + (-sw*sO + cw*cO*cI)*yo;
+  const z = (sw*sI)*xo + (cw*sI)*yo;
+  return { x, y, z, r };
+}
+
+function planetPosition(p, JD) {
+  const T = (JD - 2451545.0) / 36525.0;
+  const a = p.a + p.da*T, e = p.e + p.de*T, I = p.I + p.dI*T;
+  const L = p.L + p.dL*T, wbar = p.wbar + p.dwbar*T, Om = p.Om + p.dOm*T;
+  return keplerianPosition(a, e, I, Om, wbar - Om, L - wbar);
+}
+
+function asteroidPosition(JD) {
+  const n = 360 / asteroid.period;
+  return keplerianPosition(asteroid.a, asteroid.e, asteroid.i, asteroid.om, asteroid.w,
+                           asteroid.M0 + n * (JD - asteroid.epoch));
+}
+
+const nowJD = () => Date.now() / 86400000 + 2440587.5;
+const jdToDate = jd => new Date((jd - 2440587.5) * 86400000);
+const formatDate = d => d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+const ecl2three = p => new THREE.Vector3(p.x, p.z, -p.y);
+
+// ===== Three.js scene =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000006);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.01, 5000);
+const DEFAULT_CAM = new THREE.Vector3(0, 2.6, 5.8);
+camera.position.copy(DEFAULT_CAM);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 0.3;
+controls.maxDistance = 80;
+
+// (Bloom post-processing removed — no glow on sun/asteroid/label)
+
+// ===== Texture loader w/ fallback =====
+const loader = new THREE.TextureLoader();
+loader.setCrossOrigin('anonymous');
+const TEXTURE_BASE = "https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/";
+
+function loadTexture(filename, onReady) {
+  loader.load(TEXTURE_BASE + filename,
+    tex => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      onReady?.(tex);
+    },
+    undefined,
+    err => console.warn("Texture failed:", filename, err)
+  );
+}
+
+// ===== Starfield (dense, varied) =====
+{
+  const N = 9000;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
+  const siz = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const r = 500 + Math.random() * 600;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    pos[i*3+0] = r * Math.sin(phi) * Math.cos(theta);
+    pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    pos[i*3+2] = r * Math.cos(phi);
+    const bright = 0.3 + Math.pow(Math.random(), 3) * 0.9;
+    const tint = Math.random();
+    if (tint < 0.1) { col[i*3+0] = bright; col[i*3+1] = bright*0.85; col[i*3+2] = bright*0.7; }
+    else if (tint < 0.2) { col[i*3+0] = bright*0.75; col[i*3+1] = bright*0.85; col[i*3+2] = bright; }
+    else { col[i*3+0] = bright; col[i*3+1] = bright; col[i*3+2] = bright; }
+    siz[i] = Math.random() < 0.95 ? 1.0 : 2.5;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+  const mat = new THREE.PointsMaterial({ size: 1.2, sizeAttenuation: false, transparent: true, opacity: 0.95, vertexColors: true });
+  scene.add(new THREE.Points(geo, mat));
+}
+
+// ===== Sun =====
+const SUN_RADIUS = 0.18;
+const sun = new THREE.Mesh(
+  new THREE.SphereGeometry(SUN_RADIUS, 48, 48),
+  new THREE.MeshBasicMaterial({ color: 0xfff1b0 })
+);
+scene.add(sun);
+loadTexture("sunmap.jpg", tex => {
+  sun.material.map = tex;
+  sun.material.needsUpdate = true;
+});
+
+// Subtle sun halo (no bloom, just a soft sprite)
+{
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0.00, 'rgba(255,240,180,0.75)');
+  g.addColorStop(0.20, 'rgba(255,210,130,0.45)');
+  g.addColorStop(0.50, 'rgba(255,170,80,0.18)');
+  g.addColorStop(1.00, 'rgba(255,140,40,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(c);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  halo.scale.set(1.8, 1.8, 1);
+  scene.add(halo);
+}
+
+const sunLight = new THREE.PointLight(0xfff0d0, 3.2, 0, 0); // no decay so outer planets still lit
+scene.add(sunLight);
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+// ===== Orbit curves =====
+function orbitCurve(a, e, i, om, w, color, segments = 360, opacity = 0.35) {
+  const pts = [];
+  for (let k = 0; k <= segments; k++) {
+    pts.push(ecl2three(keplerianPosition(a, e, i, om, w, (k/segments)*360)));
+  }
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity })
+  );
+}
+
+// ===== Saturn rings (procedural, banded) =====
+function makeSaturnRings(innerR, outerR) {
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 8;
+  const ctx = c.getContext('2d');
+  for (let x = 0; x < c.width; x++) {
+    const t = x / c.width;
+    const base = 0.55 + 0.4 * (1 - Math.abs(t - 0.45) * 1.8);
+    const band = Math.sin(x * 0.09) * 0.12 + Math.sin(x * 0.035) * 0.18 + Math.sin(x * 0.25) * 0.06;
+    const lum = Math.max(0.05, Math.min(1, base + band));
+    const r = Math.floor(230 * lum);
+    const g = Math.floor(205 * lum);
+    const b = Math.floor(150 * lum);
+    // Thin dark gap around Cassini-like division
+    const gap = (t > 0.62 && t < 0.66) ? 0.1 : 1.0;
+    const alpha = Math.min(1, 0.85 * lum) * gap;
+    ctx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+    ctx.fillRect(x, 0, 1, c.height);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+
+  const geo = new THREE.RingGeometry(innerR, outerR, 128, 1);
+  // Remap UVs so u goes 0→1 from inner edge to outer edge radially
+  const posAttr = geo.attributes.position;
+  const uvAttr = geo.attributes.uv;
+  for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i), y = posAttr.getY(i);
+    const r = Math.sqrt(x*x + y*y);
+    uvAttr.setXY(i, (r - innerR) / (outerR - innerR), 0.5);
+  }
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false
+  });
+  const ring = new THREE.Mesh(geo, mat);
+  ring.rotation.x = Math.PI / 2;  // RingGeometry is in XY plane; tilt into ecliptic
+  return ring;
+}
+
+// ===== Planets (orbits, meshes, rotation, optional clouds/rings) =====
+const planetMeshes = [];
+for (const p of planets) {
+  const w = p.wbar - p.Om;
+  scene.add(orbitCurve(p.a, p.e, p.I, p.Om, w, p.color, 256, 0.28));
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: p.color, roughness: 0.95, metalness: 0.0, emissive: 0x000000
+  });
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.size, 40, 40), mat);
+
+  // Carrier group so axial tilt + self-rotation compose cleanly
+  const carrier = new THREE.Group();
+  carrier.rotation.z = p.axialTilt * DEG;
+  carrier.add(mesh);
+  scene.add(carrier);
+
+  let clouds = null;
+  if (p.clouds) {
+    const cloudMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.45, depthWrite: false
+    });
+    clouds = new THREE.Mesh(new THREE.SphereGeometry(p.size * 1.015, 40, 40), cloudMat);
+    carrier.add(clouds);
+    loadTexture(p.clouds, tex => {
+      cloudMat.map = tex;
+      cloudMat.alphaMap = tex;
+      cloudMat.needsUpdate = true;
+    });
+  }
+
+  let rings = null;
+  if (p.rings) {
+    rings = makeSaturnRings(p.size + p.rings.inner, p.size + p.rings.outer);
+    carrier.add(rings);
+  }
+
+  loadTexture(p.tex, tex => {
+    mat.map = tex;
+    mat.color.set(0xffffff);
+    mat.needsUpdate = true;
+  });
+
+  planetMeshes.push({ p, carrier, mesh, clouds, rings });
+}
+
+// ===== Asteroid: lumpy icosahedron =====
+function makeAsteroidGeometry(baseR, detail) {
+  const geo = new THREE.IcosahedronGeometry(baseR, detail);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const n =
+      0.78 +
+      Math.sin(x * 9 + 1) * Math.cos(y * 7 + 2) * 0.10 +
+      Math.sin(y * 11) * Math.cos(z * 6) * 0.08 +
+      Math.sin(z * 13 + 3) * 0.06 +
+      (Math.random() - 0.5) * 0.04;
+    pos.setXYZ(i, x * n / baseR * baseR, y * n / baseR * baseR, z * n / baseR * baseR);
+    // Equivalent but simpler: scale each vertex
+    pos.setXYZ(i, x * n, y * n, z * n);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+const AST_R = 0.055;
+const astMesh = new THREE.Mesh(
+  makeAsteroidGeometry(AST_R, 2),
+  new THREE.MeshStandardMaterial({ color: 0x9a9288, roughness: 1.0, metalness: 0.0 })
+);
+scene.add(astMesh);
+
+// Asteroid orbit (bright cyan)
+const astOrbit = orbitCurve(asteroid.a, asteroid.e, asteroid.i, asteroid.om, asteroid.w,
+                            0x00ffcc, 512, 0.9);
+scene.add(astOrbit);
+
+// Label
+function makeLabelSprite(text) {
+  const c = document.createElement('canvas');
+  c.width = 720; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.font = '500 42px -apple-system, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, c.width/2, c.height/2);
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, depthTest: false, depthWrite: false
+  }));
+  sp.scale.set(1.6, 0.3, 1);
+  sp.renderOrder = 999;
+  return sp;
+}
+const astLabel = makeLabelSprite('17001 Braydennoh');
+scene.add(astLabel);
+
+// ===== Time / UI =====
+let simJD = nowJD();
+let playing = true;
+const speedLevels = [0, 1, 10, 60, 365, 1825];
+const speedLabels = ['paused', '1 day / s', '10 days / s', '2 mo / s', '1 yr / s', '5 yr / s'];
+let speedIdx = 2;
+
+const $play  = document.getElementById('play');
+const $now   = document.getElementById('now');
+const $reset = document.getElementById('reset');
+const $speed = document.getElementById('speed');
+const $speedVal = document.getElementById('speedVal');
+const $date = document.getElementById('date');
+const $distance = document.getElementById('distance');
+const $peri = document.getElementById('perihelion');
+
+$play.addEventListener('click', () => {
+  playing = !playing;
+  $play.textContent = playing ? '⏸ Pause' : '▶ Play';
+});
+$now.addEventListener('click', () => { simJD = nowJD(); });
+$reset.addEventListener('click', () => {
+  camera.position.copy(DEFAULT_CAM);
+  controls.target.set(0, 0, 0);
+});
+$speed.addEventListener('input', e => {
+  speedIdx = parseInt(e.target.value);
+  $speedVal.textContent = speedLabels[speedIdx];
+  if (speedIdx === 0 && playing) { playing = false; $play.textContent = '▶ Play'; }
+  else if (speedIdx !== 0 && !playing) { playing = true; $play.textContent = '⏸ Pause'; }
+});
+$speedVal.textContent = speedLabels[speedIdx];
+
+// ===== Animation loop =====
+let lastT = performance.now();
+function update(tNow) {
+  const dt = (tNow - lastT) / 1000;
+  lastT = tNow;
+  if (playing) simJD += speedLevels[speedIdx] * dt;
+
+  // Planet orbital + self-rotation
+  for (const { p, carrier, mesh, clouds } of planetMeshes) {
+    carrier.position.copy(ecl2three(planetPosition(p, simJD)));
+    const spin = (simJD / p.rotPeriod) * Math.PI * 2;
+    mesh.rotation.y = spin;
+    if (clouds) clouds.rotation.y = spin * 1.1;
+  }
+
+  // Sun slow rotation
+  sun.rotation.y = tNow * 0.00008;
+
+  // Asteroid
+  const aPos = asteroidPosition(simJD);
+  const v = ecl2three(aPos);
+  astMesh.position.copy(v);
+  astLabel.position.set(v.x, v.y + 0.22, v.z);
+  astMesh.rotation.x = tNow * 0.0006;
+  astMesh.rotation.y = tNow * 0.0009;
+
+  // UI
+  $date.textContent = formatDate(jdToDate(simJD));
+  $distance.textContent = aPos.r.toFixed(3) + ' au';
+  let peri = asteroid.tp;
+  while (peri < simJD) peri += asteroid.period;
+  $peri.textContent = formatDate(jdToDate(peri));
+
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(update);
+}
+requestAnimationFrame(update);
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
