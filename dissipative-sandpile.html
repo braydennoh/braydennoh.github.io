@@ -88,8 +88,8 @@
         <span id="erodeVal">1</span>
 
         <label for="speedSlider">grains / frame</label>
-        <input id="speedSlider" type="range" min="1" max="100000" step="1" value="100000">
-        <span id="speedVal">100000</span>
+        <input id="speedSlider" type="range" min="1" max="100000" step="1" value="10000">
+        <span id="speedVal">10000</span>
       </div>
 
       <div style="margin-top: 0.5em; font-size: 85%;">
@@ -138,7 +138,7 @@ let mainMask, ccVisited, ccStack;
 
 let totalGrains = 0, totalTopples = 0;
 let paused = false;
-let grainsPerFrame = 100000;
+let grainsPerFrame = 10000;
 let showContours = false;
 
 const NB8 = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
