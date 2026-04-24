@@ -76,8 +76,8 @@
 
       <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 420px; font-size: 85%;">
         <label for="nSlider">\(N\)</label>
-        <input id="nSlider" type="range" min="100" max="500" step="10" value="200">
-        <span id="nVal">200</span>
+        <input id="nSlider" type="range" min="50" max="200" step="10" value="100">
+        <span id="nVal">100</span>
 
         <label for="slopeSlider">\(S_c\)</label>
         <input id="slopeSlider" type="range" min="1" max="16" step="1" value="10">
@@ -110,7 +110,7 @@
 <script>
 // Dissipative sandpile + side-by-side D8 flow accumulation (SFD, sort-by-elevation).
 
-let N = 200;
+let N = 100;
 let NN = N * N;
 let SLOPE = 10;
 let ERODE = 1;
