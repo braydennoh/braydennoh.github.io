@@ -56,6 +56,14 @@
 
     <p>Some rivers run to the sea; others sink into the sand and never arrive. This demo treats that simple fact as a percolation problem on a model drainage basin: drag the sliders below and watch a river appear or die.</p>
 
+    <p>The whole model is one rule &mdash; a cell's runoff is the rain that lands on it plus the runoff it receives from upstream, minus what the ground can store:</p>
+
+    \[
+    \rho(\mathbf{x}) \;=\; \max\!\Bigl(0,\;\; r(\mathbf{x}) \;+\!\! \sum_{\mathbf{x}'\,\to\,\mathbf{x}} \rho(\mathbf{x}') \;-\; C \Bigr),
+    \]
+
+    <p>where the rainfall \(r(\mathbf{x})\in\{0,1\}\) is present with probability \(p\), the sum runs over the upstream cells that drain into \(\mathbf{x}\), and \(C\) is the storage capacity. A river exists wherever cells with \(\rho>0\) connect the top of the basin to the bottom &mdash; and whether they do undergoes a percolation transition along a critical curve \(p_c(C)\).</p>
+
     <!-- Interactive demo (placed first, so it is visible immediately) -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
       <div id="labels" style="font-family:monospace; font-size:12px; color:#767676; margin-bottom:4px;">
@@ -100,13 +108,7 @@
 
     <p>The terrain is a <b>Scheidegger lattice</b>, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it &mdash; down-left or down-right &mdash; picked once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage basins.</p>
 
-    <p>Two knobs add the hydrology. The rainfall rate \(p\) is the chance that any given cell receives a unit of rain. The storage capacity \(C\) is how much water a cell keeps before the rest spills over, so a cell's runoff is</p>
-
-    \[
-    \mathrm{runoff} \;=\; \max\!\bigl(0,\; \text{inflow} - C\bigr),
-    \]
-
-    <p>and crucially the runoff <b>accumulates downstream</b>: two trickles that are each too small to overflow on their own can merge at a confluence and break through together. That is why a river can persist on far less rain than any single cell would need.</p>
+    <p>Two knobs add the hydrology. The rainfall rate \(p\) is the chance that any given cell receives a unit of rain, and the storage capacity \(C\) is how much water a cell keeps before the rest spills over. Crucially the runoff <b>accumulates downstream</b>: two trickles that are each too small to overflow on their own can merge at a confluence and break through together, which is why a river can persist on far less rain than any single cell would need.</p>
 
     <p>A cell &ldquo;carries a river&rdquo; when its runoff is positive. The question is whether those wet cells connect all the way from the top row (the headwaters) to the bottom row (the sea). When they do, the basin <b>spans</b> &mdash; a river reaches the ocean. Sweep \(p\) and \(C\) and the basin flips from <i>no river</i> to <i>river</i> across a sharp critical curve \(p_c(C)\). Right at that edge, a small nudge in rainfall or storage can switch the river on or off &mdash; which is exactly where the world's marginal rivers live.</p>
 
