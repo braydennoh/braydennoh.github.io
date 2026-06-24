@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A percolation transition for Scheidegger river networks - Brayden Noh</title>
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .main { min-width: 0; }
+    /* Keep the left column visible while the page scrolls (sticky, so the
+       exact two-column layout and typography are preserved). */
+    .project-page .sidebar {
+      position: sticky;
+      top: 30px;
+      align-self: flex-start;
+      max-height: calc(100vh - 60px);
+      overflow: auto;
+    }
+    @media (max-width: 700px) {
+      .project-page .sidebar { position: static; max-height: none; overflow: visible; }
+    }
+    /* demo styling, matched to the site's monospace/figure conventions */
+    #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
+    #stats b.yes { color: #197a3a; }
+    #stats b.no  { color: #b3261e; }
+    .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
+    #sim-controls input[type=range] { accent-color: #003399; }
+  </style>
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>A percolation transition for Scheidegger river networks</h1>
+
+    <p>Rain falls on a randomly tilted landscape; every patch of ground soaks up a little water and passes the overflow downhill. Tune the rainfall \(p\) and the storage \(C\) and watch whether the overflow links into a single river reaching from the headwaters to the sea &mdash; a percolation transition along a critical curve \(p_c(C)\).</p>
+
+    <hr class="separator">
+
+    <p>By Brayden Noh.</p>
+  </div>
+
+  <div class="main">
+
+    <p>Some rivers run to the sea; others sink into the sand and never arrive. This demo treats that simple fact as a percolation problem on a model drainage basin: drag the sliders below and watch a river appear or die.</p>
+
+    <!-- Interactive demo (placed first, so it is visible immediately) -->
+    <div id="sim-container" style="margin: 0.6em 0 0.6em;">
+      <div id="labels" style="font-family:monospace; font-size:12px; color:#767676; margin-bottom:4px;">
+        Active drainage on an \(L\times L\) Scheidegger basin
+      </div>
+      <div id="canvasWrap" style="line-height:0;"><canvas id="canvas"></canvas></div>
+    </div>
+
+    <div id="stats" style="font-family:monospace; font-size:13px; color:#222; margin-bottom:0.5em;">&mdash;</div>
+
+    <div id="sim-controls" style="margin-bottom: 0.6em;">
+      <div style="margin-bottom: 0.5em;">
+        <button id="resample" type="button" style="padding:0.2em 0.8em; cursor:pointer;">resample rain</button>
+        <button id="newdir" type="button" style="padding:0.2em 0.8em; cursor:pointer;">new landscape</button>
+      </div>
+      <div style="display:grid; grid-template-columns:auto 1fr auto; gap:4px 10px; align-items:center; max-width:420px; font-size:85%;">
+        <label for="L">\(L\)</label>
+        <input id="L" type="range" min="50" max="1000" step="10" value="200">
+        <span id="Lv">200</span>
+
+        <label for="p">\(p\)</label>
+        <input id="p" type="range" min="0" max="1" step="0.005" value="0.40">
+        <span id="pv">0.40</span>
+
+        <label for="C">\(C\)</label>
+        <input id="C" type="range" min="0" max="1" step="0.01" value="0.50">
+        <span id="Cv">0.50</span>
+
+        <label for="seed">rain seed</label>
+        <input id="seed" type="number" value="1" style="width:70px;">
+        <span></span>
+      </div>
+    </div>
+
+    <p style="font-size: 85%; color: #767676;">
+    Figure 1. Active drainage on an \(L\times L\) Scheidegger basin at rainfall rate \(p\) and storage capacity \(C\).
+    <span class="sw" style="background:#f00;"></span> spanning river (top&rarr;bottom),
+    <span class="sw" style="background:#00f;"></span> river (runoff \(>0\)),
+    <span class="sw" style="background:#000;"></span> dry.
+    <b>Resample rain</b> redraws the Bernoulli rainfall at the same \((p,C)\); <b>new landscape</b> redraws the random flow directions.
+    </p>
+
+    <p>The terrain is a <b>Scheidegger lattice</b>, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it &mdash; down-left or down-right &mdash; picked once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage basins.</p>
+
+    <p>Two knobs add the hydrology. The rainfall rate \(p\) is the chance that any given cell receives a unit of rain. The storage capacity \(C\) is how much water a cell keeps before the rest spills over, so a cell's runoff is</p>
+
+    \[
+    \mathrm{runoff} \;=\; \max\!\bigl(0,\; \text{inflow} - C\bigr),
+    \]
+
+    <p>and crucially the runoff <b>accumulates downstream</b>: two trickles that are each too small to overflow on their own can merge at a confluence and break through together. That is why a river can persist on far less rain than any single cell would need.</p>
+
+    <p>A cell &ldquo;carries a river&rdquo; when its runoff is positive. The question is whether those wet cells connect all the way from the top row (the headwaters) to the bottom row (the sea). When they do, the basin <b>spans</b> &mdash; a river reaches the ocean. Sweep \(p\) and \(C\) and the basin flips from <i>no river</i> to <i>river</i> across a sharp critical curve \(p_c(C)\). Right at that edge, a small nudge in rainfall or storage can switch the river on or off &mdash; which is exactly where the world's marginal rivers live.</p>
+
+    <p>A few things to try: start near \(p \approx 0.4\), \(C \approx 0.5\) and raise \(p\) slowly until a red spanning river snaps into place; then raise \(C\) (a drier, thirstier basin) and watch it break apart again. Sit right at the edge and press <b>resample rain</b> &mdash; near the transition the same \((p,C)\) sometimes spans and sometimes doesn't, the finite-size fuzz of a critical point.</p>
+
+    <p>This is a companion to the paper of the same title, where repeating this sweep over many random landscapes turns the on/off behavior into a full phase diagram and a measured critical exponent.</p>
+
+  </div>
+
+</div>
+
+<script>
+(() => {
+  const cv = document.getElementById('canvas');
+  const ctx = cv.getContext('2d');
+  const S = id => document.getElementById(id);
+  const stats = S('stats');
+  const sliders = { L: S('L'), p: S('p'), C: S('C') };
+  const Lval = S('Lv'), pval = S('pv'), Cval = S('Cv');
+  const seedInp = S('seed');
+
+  // mulberry32 seeded RNG
+  function rngFrom(seed) {
+    let a = (seed >>> 0) || 1;
+    return function() {
+      a = (a + 0x6D2B79F7) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  let dirArr = null, dirL = 0, dirSeed = 1;
+
+  function genDirections(L, seed) {
+    const r = rngFrom(seed * 2654435761);
+    const d = new Uint8Array(L * L);
+    for (let i = 0; i < L * L; i++) d[i] = r() < 0.5 ? 0 : 1;
+    return d;
+  }
+
+  // Scheidegger + bucket storage:
+  //   direction ∈ {0,1}; 0 → (y+1,(x−1) mod L), 1 → (y+1,(x+1) mod L)
+  //   rain = 1 w.p. p; water = rain + upstream runoff; runoff = max(0, water − C)
+  function simulate(L, p, C, dir, rainSeed) {
+    const r = rngFrom(rainSeed * 16807 + 1);
+    const N = L * L;
+    const rain = new Float32Array(N);
+    for (let i = 0; i < N; i++) rain[i] = r() < p ? 1.0 : 0.0;
+
+    const water  = new Float32Array(N);
+    const runoff = new Float32Array(N);
+    for (let x = 0; x < L; x++) water[x] = rain[x];
+
+    const dnx = (x, d) => d === 0 ? (x - 1 + L) % L : (x + 1) % L;
+
+    for (let y = 0; y < L - 1; y++) {
+      const b = y * L, nb = b + L;
+      for (let x = 0; x < L; x++) { const w = water[b + x]; runoff[b + x] = w > C ? w - C : 0; }
+      for (let x = 0; x < L; x++) water[nb + x] = rain[nb + x];
+      for (let x = 0; x < L; x++) { const ro = runoff[b + x]; if (ro > 0) water[nb + dnx(x, dir[b + x])] += ro; }
+    }
+    const lb = (L - 1) * L;
+    for (let x = 0; x < L; x++) { const w = water[lb + x]; runoff[lb + x] = w > C ? w - C : 0; }
+
+    // top-reach
+    const topR = new Uint8Array(N);
+    for (let x = 0; x < L; x++) topR[x] = runoff[x] > 0 ? 1 : 0;
+    for (let y = 1; y < L; y++) {
+      const b = y * L, ub = b - L;
+      for (let x = 0; x < L; x++) {
+        if (runoff[b + x] <= 0) continue;
+        const xp = (x + 1) % L, xm = (x - 1 + L) % L;
+        if ((dir[ub + xp] === 0 && topR[ub + xp]) || (dir[ub + xm] === 1 && topR[ub + xm])) topR[b + x] = 1;
+      }
+    }
+
+    // bottom-reach
+    const botR = new Uint8Array(N);
+    for (let x = 0; x < L; x++) botR[lb + x] = runoff[lb + x] > 0 ? 1 : 0;
+    for (let y = L - 2; y >= 0; y--) {
+      const b = y * L, db = b + L;
+      for (let x = 0; x < L; x++) {
+        if (runoff[b + x] <= 0) continue;
+        if (botR[db + dnx(x, dir[b + x])]) botR[b + x] = 1;
+      }
+    }
+
+    const spanning = new Uint8Array(N);
+    let active = 0, span = 0, bottomSpan = 0;
+    for (let i = 0; i < N; i++) {
+      if (runoff[i] > 0) active++;
+      if (topR[i] && botR[i]) { spanning[i] = 1; span++; }
+    }
+    for (let x = 0; x < L; x++) if (topR[lb + x]) bottomSpan++;
+
+    return { runoff, spanning, active, span, bottomSpan };
+  }
+
+  function fitDisplay() {
+    const m = document.querySelector('.main');
+    const w = (m && m.clientWidth > 0) ? m.clientWidth : 520;
+    return Math.max(280, Math.min(540, Math.floor(w)));
+  }
+  let DISPLAY = fitDisplay();
+  cv.width = DISPLAY; cv.height = DISPLAY;
+
+  function draw(L, runoff, spanning) {
+    const img = ctx.createImageData(L, L);
+    const d = img.data;
+    for (let i = 0, j = 0; i < L * L; i++, j += 4) {
+      if (spanning[i])        { d[j]=255; d[j+1]=0;   d[j+2]=0;   }
+      else if (runoff[i] > 0) { d[j]=0;   d[j+1]=0;   d[j+2]=255; }
+      else                    { d[j]=0;   d[j+1]=0;   d[j+2]=0;   }
+      d[j+3] = 255;
+    }
+    const off = document.createElement('canvas');
+    off.width = L; off.height = L;
+    off.getContext('2d').putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, DISPLAY, DISPLAY);
+    ctx.drawImage(off, 0, 0, DISPLAY, DISPLAY);
+  }
+
+  function update(forceNewDirs = false) {
+    const Lv = parseInt(sliders.L.value);
+    const pv = parseFloat(sliders.p.value);
+    const Cv = parseFloat(sliders.C.value);
+    Lval.textContent = Lv;
+    pval.textContent = pv.toFixed(2);
+    Cval.textContent = Cv.toFixed(2);
+
+    if (forceNewDirs || !dirArr || dirL !== Lv) { dirArr = genDirections(Lv, dirSeed); dirL = Lv; }
+    const seed = parseInt(seedInp.value) || 1;
+    const t0 = performance.now();
+    const out = simulate(Lv, pv, Cv, dirArr, seed);
+    const t1 = performance.now();
+    draw(Lv, out.runoff, out.spanning);
+
+    const total = Lv * Lv;
+    const percYes = out.bottomSpan > 0;
+    stats.innerHTML =
+      `active: ${(out.active / total).toFixed(3)} &bull; ` +
+      `spanning sites: ${(out.span / total).toFixed(3)} &bull; ` +
+      `top&rarr;bottom: ${out.bottomSpan}/${Lv} &bull; ` +
+      `reaches the sea? <b class="${percYes ? 'yes' : 'no'}">${percYes ? 'YES' : 'no'}</b> ` +
+      `<span style="color:#999;">(${(t1 - t0).toFixed(1)} ms)</span>`;
+  }
+
+  for (const k of ['L', 'p', 'C']) sliders[k].addEventListener('input', () => update(k === 'L'));
+  seedInp.addEventListener('input', () => update());
+  S('resample').addEventListener('click', () => { seedInp.value = (parseInt(seedInp.value) || 1) + 1; update(); });
+  S('newdir').addEventListener('click', () => { dirSeed = (dirSeed + 1) | 0; update(true); });
+
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      const nd = fitDisplay();
+      if (nd !== DISPLAY) { DISPLAY = nd; cv.width = DISPLAY; cv.height = DISPLAY; update(); }
+    }, 150);
+  });
+
+  update(true);
+})();
+</script>
+
+</body>
+</html>
