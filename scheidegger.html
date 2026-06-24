@@ -25,8 +25,8 @@
     }
     /* demo styling, matched to the site's monospace/figure conventions */
     #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
-    #stats b.yes { color: #197a3a; }
-    #stats b.no  { color: #b3261e; }
+    #stats .yes { color: #197a3a; }
+    #stats .no  { color: #b3261e; }
     .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
     #sim-controls input[type=range] { accent-color: #003399; }
   </style>
@@ -45,7 +45,7 @@
   <div class="sidebar">
     <h1>A percolation transition for Scheidegger river networks</h1>
 
-    <p>Rain falls on a randomly tilted landscape; every patch of ground soaks up a little water and passes the overflow downhill. Tune the rainfall \(p\) and the storage \(C\) and watch whether the overflow links into a single river reaching from the headwaters to the sea &mdash; a percolation transition along a critical curve \(p_c(C)\).</p>
+    <p>Rain falls on a randomly tilted landscape, and every patch of ground soaks up a little water and passes the overflow downhill. Tune the rainfall \(p\) and the storage \(C\) and watch whether the overflow links into a single river reaching from the headwaters to the sea, a percolation transition along a critical curve \(p_c(C)\).</p>
 
     <hr class="separator">
 
@@ -54,25 +54,22 @@
 
   <div class="main">
 
-    <p>Some rivers run to the sea; others sink into the sand and never arrive. This demo treats that simple fact as a percolation problem on a model drainage basin: drag the sliders below and watch a river appear or die.</p>
+    <p>Some rivers run to the sea, others do not. Whether a river makes it is really a question about connection. Rain falls across a landscape, trickles downhill, and is soaked up by the ground along the way. A continuous river exists only when the flowing water joins into an unbroken path that reaches from the headwaters all the way to the coast. Asking when that connected path first appears is a percolation problem, the same question physicists ask about when water first finds its way through a porous rock.</p>
 
-    <p>The whole model is one rule &mdash; a cell's runoff is the rain that lands on it plus the runoff it receives from upstream, minus what the ground can store:</p>
+    <p>What counts as a river is decided cell by cell, through runoff. Each cell collects the rain that lands on it plus whatever water arrives from the cells upstream, holds back a fixed amount in storage, and sends the rest downhill. A cell carries a river only when that runoff is positive, meaning water genuinely leaves it. The whole model is this one balance, written for a cell at position \(\mathbf{x}\),</p>
 
     \[
-    \rho(\mathbf{x}) \;=\; \max\!\Bigl(0,\;\; r(\mathbf{x}) \;+\!\! \sum_{\mathbf{x}'\,\to\,\mathbf{x}} \rho(\mathbf{x}') \;-\; C \Bigr),
+    \rho(\mathbf{x}) \;=\; \max\!\Bigl(0,\;\; r(\mathbf{x}) \;+\!\! \sum_{\mathbf{x}'\,\to\,\mathbf{x}} \rho(\mathbf{x}') \;-\; C \Bigr).
     \]
 
-    <p>where the rainfall \(r(\mathbf{x})\in\{0,1\}\) is present with probability \(p\), the sum runs over the upstream cells that drain into \(\mathbf{x}\), and \(C\) is the storage capacity. A river exists wherever cells with \(\rho>0\) connect the top of the basin to the bottom &mdash; and whether they do undergoes a percolation transition along a critical curve \(p_c(C)\).</p>
+    <p>Here \(\rho\) is the runoff, the rainfall \(r\) equals 1 with probability \(p\) and 0 otherwise, the sum collects the runoff from every upstream cell that drains into \(\mathbf{x}\), and \(C\) is the storage capacity. In words, runoff is water in minus water stored, and never less than zero. Two numbers then control everything you see below. The rainfall \(p\) sets how often a cell gets rain, and the storage \(C\) sets how thirsty the ground is.</p>
 
     <!-- Interactive demo (placed first, so it is visible immediately) -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
-      <div id="labels" style="font-family:monospace; font-size:12px; color:#767676; margin-bottom:4px;">
-        Active drainage on an \(L\times L\) Scheidegger basin
-      </div>
       <div id="canvasWrap" style="line-height:0;"><canvas id="canvas"></canvas></div>
     </div>
 
-    <div id="stats" style="font-family:monospace; font-size:13px; color:#222; margin-bottom:0.5em;">&mdash;</div>
+    <div id="stats" style="font-family:monospace; font-size:13px; color:#222; margin-bottom:0.5em;"></div>
 
     <div id="sim-controls" style="margin-bottom: 0.6em;">
       <div style="margin-bottom: 0.5em;">
@@ -99,22 +96,24 @@
     </div>
 
     <p style="font-size: 85%; color: #767676;">
-    Figure 1. Active drainage on an \(L\times L\) Scheidegger basin at rainfall rate \(p\) and storage capacity \(C\).
-    <span class="sw" style="background:#f00;"></span> spanning river (top&rarr;bottom),
-    <span class="sw" style="background:#00f;"></span> river (runoff \(>0\)),
+    Figure 1. Overflow on an \(L\times L\) Scheidegger basin at rainfall \(p\) and storage \(C\).
+    <span class="sw" style="background:#f00;"></span> spanning river, a connected overflow path from top to bottom.
+    <span class="sw" style="background:#00f;"></span> overflowing cell with runoff \(>0\) that is not part of a spanning path.
     <span class="sw" style="background:#000;"></span> dry.
-    <b>Resample rain</b> redraws the Bernoulli rainfall at the same \((p,C)\); <b>new landscape</b> redraws the random flow directions.
+    Resample rain redraws the rainfall at the same \((p, C)\), and new landscape redraws the random flow directions.
     </p>
 
-    <p>The terrain is a <b>Scheidegger lattice</b>, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it &mdash; down-left or down-right &mdash; picked once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage basins.</p>
+    <p>One thing to notice in the picture. The river is made of overflow, not of cells merely touching. A cell joins the network only when its runoff is positive, so that water is genuinely passing through it, and the basin counts as spanning only when these overflowing cells form an unbroken chain of flow from the top row down to the bottom. The red cells are exactly that spanning chain of overflow. The blue cells overflow too, but their flow does not reach all the way down, and the black cells are dry.</p>
 
-    <p>Two knobs add the hydrology. The rainfall rate \(p\) is the chance that any given cell receives a unit of rain, and the storage capacity \(C\) is how much water a cell keeps before the rest spills over. Crucially the runoff <b>accumulates downstream</b>: two trickles that are each too small to overflow on their own can merge at a confluence and break through together, which is why a river can persist on far less rain than any single cell would need.</p>
+    <p>The terrain is a Scheidegger lattice, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it, down-left or down-right, chosen once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage networks.</p>
 
-    <p>A cell &ldquo;carries a river&rdquo; when its runoff is positive. The question is whether those wet cells connect all the way from the top row (the headwaters) to the bottom row (the sea). When they do, the basin <b>spans</b> &mdash; a river reaches the ocean. Sweep \(p\) and \(C\) and the basin flips from <i>no river</i> to <i>river</i> across a sharp critical curve \(p_c(C)\). Right at that edge, a small nudge in rainfall or storage can switch the river on or off &mdash; which is exactly where the world's marginal rivers live.</p>
+    <p>The reason a river can survive on little rain is that runoff accumulates downstream. Two trickles that are each too small to overflow on their own can meet at a confluence and break through together. A cell can run with a river even when no rain fell on it, fed entirely from upstream.</p>
 
-    <p>A few things to try: start near \(p \approx 0.4\), \(C \approx 0.5\) and raise \(p\) slowly until a red spanning river snaps into place; then raise \(C\) (a drier, thirstier basin) and watch it break apart again. Sit right at the edge and press <b>resample rain</b> &mdash; near the transition the same \((p,C)\) sometimes spans and sometimes doesn't, the finite-size fuzz of a critical point.</p>
+    <p>Sweep \(p\) and \(C\) and the basin flips from no river to river across a sharp critical curve \(p_c(C)\). Right at that edge a small nudge in rainfall or storage can switch the river on or off, which is exactly where the world's marginal rivers live.</p>
 
-    <p>This is a companion to the paper of the same title, where repeating this sweep over many random landscapes turns the on/off behavior into a full phase diagram and a measured critical exponent.</p>
+    <p>A few things to try. Start near \(p \approx 0.4\) and \(C \approx 0.5\), then raise \(p\) slowly until a red spanning river snaps into place. Now raise \(C\), a drier and thirstier basin, and watch it break apart again. Sit right at the edge and press resample rain. Near the transition the same \((p, C)\) sometimes spans and sometimes does not, the finite-size fuzz of a critical point.</p>
+
+    <p>This page is a companion to the paper of the same title, where repeating this sweep over many random landscapes turns the on and off behavior into a full phase diagram and a measured critical exponent.</p>
 
   </div>
 
@@ -255,7 +254,7 @@
       `active: ${(out.active / total).toFixed(3)} &bull; ` +
       `spanning sites: ${(out.span / total).toFixed(3)} &bull; ` +
       `top&rarr;bottom: ${out.bottomSpan}/${Lv} &bull; ` +
-      `reaches the sea? <b class="${percYes ? 'yes' : 'no'}">${percYes ? 'YES' : 'no'}</b> ` +
+      `reaches the sea? <span class="${percYes ? 'yes' : 'no'}">${percYes ? 'YES' : 'no'}</span> ` +
       `<span style="color:#999;">(${(t1 - t0).toFixed(1)} ms)</span>`;
   }
 
