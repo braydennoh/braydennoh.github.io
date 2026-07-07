@@ -119,13 +119,12 @@
 (function() {
 "use strict";
 
-var CELL_SIZE = 25;
+var CELL_SIZE = 50;          // 50 m cells -> 160 x 80 grid, matching the 7.7 experiment
 var XMIN = 1000, XMAX = 9000;
 var YMIN = -2000, YMAX = 2000;
-var COLS = Math.round((XMAX - XMIN) / CELL_SIZE);
-var ROWS = Math.round((YMAX - YMIN) / CELL_SIZE);
+var COLS = Math.round((XMAX - XMIN) / CELL_SIZE);   // 160
+var ROWS = Math.round((YMAX - YMIN) / CELL_SIZE);   //  80
 var N = ROWS * COLS;
-var RIVER_RADIUS = (50.0 / 2.0) / CELL_SIZE;
 var MAX_SWAPS = 4000;   // internal cap on voluntary relaxation per step (not a model parameter)
 
 var OFFSETS_DR = [-1,-1,-1, 0, 0, 1, 1, 1];
@@ -179,8 +178,9 @@ function loadRiverData(cb) {
   xhr.send();
 }
 
+// rasterize the centerline to a 1-cell-wide river (no width dilation), matching 7.7
 function rasterizeChannel(flatCoords) {
-  var centerline = new Uint8Array(N);
+  var grid = new Uint8Array(N);
   var nPts = flatCoords.length / 2;
   for (var i = 0; i < nPts - 1; i++) {
     var x0 = flatCoords[i*2], y0 = flatCoords[i*2+1];
@@ -193,16 +193,13 @@ function rasterizeChannel(flatCoords) {
     var sc = c0<c1?1:-1, sr = r0<r1?1:-1;
     var err = dc - dr;
     while (true) {
-      if (r0>=0 && r0<ROWS && c0>=0 && c0<COLS) centerline[r0*COLS+c0]=1;
+      if (r0>=0 && r0<ROWS && c0>=0 && c0<COLS) grid[r0*COLS+c0]=1;
       if (r0===r1 && c0===c1) break;
       var e2 = 2*err;
       if (e2 > -dr) { err -= dr; c0 += sc; }
       if (e2 < dc) { err += dc; r0 += sr; }
     }
   }
-  var d = distanceTransform(centerline);
-  var grid = new Uint8Array(N);
-  for (var j = 0; j < N; j++) { if (d[j] <= RIVER_RADIUS) grid[j] = 1; }
   return grid;
 }
 
