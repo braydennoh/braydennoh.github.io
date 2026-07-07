@@ -24,7 +24,9 @@
   <div class="sidebar">
     <h1>Human-River Geomorphic Coupling</h1>
 
-    <p>Rivers draw people in because they provide food, water, and transport, but they also erode what is built beside them. This model turns that tension into a cellular automaton: settlements cluster near a meandering river for economic benefit, group together to share infrastructure, and resist moving unless the pressure to relocate becomes strong enough.</p>
+    <p>Rivers draw people in &mdash; they provide water, food, and transport &mdash; but they also wander, eroding what is built beside them. This model turns that tension into a cellular automaton: a fixed population settles as close to a migrating river as it can, is forced to rebuild when the channel erodes its land, and moves voluntarily only when a distinctly better spot opens up.</p>
+
+    <p>The whole model has just <b>three knobs</b>: how fast the river migrates, how many people there are, and how reluctant they are to move.</p>
 
     <hr class="separator">
 
@@ -33,15 +35,30 @@
 
   <div class="main">
 
-    <p>The grid has two cell types: <b style="color:#00f;">river cells</b> \(R(\mathbf{x},t)=1\) (blue) and <b>floodplain cells</b> \(R=0\) (black). Floodplain cells can host settlement cells \(V(\mathbf{x},t)=1\), colored by their status each timestep: <b style="color:#ff8000;">stable</b> (orange &mdash; persisted from the previous step), <b style="color:#1aff1a;">new settlement</b> (green &mdash; just placed), <b style="color:#aaa;">abandoned</b> (white &mdash; voluntarily vacated), and <b style="color:#ff1a1a;">drowned</b> (red &mdash; destroyed by the advancing river). Population is conserved: \(\sum V(\mathbf{x},t) = N\) for all \(t\).</p>
+    <p>The grid has two cell types: <b style="color:#00f;">river cells</b> \(R(\mathbf{x},t)=1\) (blue) and <b>floodplain cells</b> \(R=0\) (black). Floodplain cells can host settlement cells \(V(\mathbf{x},t)=1\), colored by their status each timestep: <b style="color:#ff8000;">stable</b> (orange &mdash; persisted from the previous step), <b style="color:#1aff1a;">new</b> (green &mdash; just built), <b style="color:#aaa;">abandoned</b> (white &mdash; voluntarily vacated), and <b style="color:#ff1a1a;">drowned</b> (red &mdash; destroyed by the advancing river). Population is conserved: \(\sum_{\mathbf{x}} V(\mathbf{x},t) = N\) for all \(t\).</p>
 
-    <p>Each floodplain cell has a utility</p>
+    <p>Every household wants one thing: to be as close to the river as possible. So each floodplain cell has utility</p>
 
     \[
-    U(\mathbf{x}, t) \;=\; -\,w_d \, \mathcal{D}(\mathbf{x}, t) \;+\; w_c \, \mathcal{C}(\mathbf{x}, t)
+    U(\mathbf{x}, t) \;=\; -\,\mathcal{D}(\mathbf{x}, t),
+    \qquad
+    \mathcal{D}(\mathbf{x},t) \;=\; \min_{\mathbf{y}:\,R(\mathbf{y},t)=1} \|\mathbf{x}-\mathbf{y}\|,
     \]
 
-    <p>where \(\mathcal{D}(\mathbf{x},t) = \min_{\mathbf{y}:\,R(\mathbf{y},t)=1} \|\mathbf{x}-\mathbf{y}\|_2\) is the Euclidean distance to the nearest river cell and \(\mathcal{C}(\mathbf{x},t) = \sum_{\mathbf{y}\in\mathcal{N}_8(\mathbf{x})} V(\mathbf{y},t)\) counts the occupied Moore neighbors (8-connected). Higher \(w_d\) makes proximity to the river matter more, while higher \(w_c\) makes clustering with other settlements matter more. When the river erodes a settlement cell, that cell is automatically relocated to the highest-utility empty site. Voluntary migration is governed by the friction threshold \(\mu\): the worst cell swaps with the best empty cell only if the utility difference exceeds \(\mu\). Press <b>Play</b> and tune the sliders.</p>
+    <p>where \(\mathcal{D}\) is the distance (in cells) to the nearest river cell. There is no other term &mdash; no clustering bonus, no weights. Movement happens two ways:</p>
+
+    <ul>
+      <li><b>Forced migration.</b> When the river erodes a settlement cell, that household has no choice: it is relocated to the nearest open cell to the river.</li>
+      <li><b>Voluntary migration.</b> The worst-placed household relocates to the best open cell only if that cell is at least \(\mu\) cells closer to the river,
+        \[
+        \mathcal{D}_{\text{worst}} - \mathcal{D}_{\text{best}} \;>\; \mu ,
+        \]
+        repeated until no such move remains. Here \(\mu\) is <b>friction</b> &mdash; reluctance to move.</li>
+    </ul>
+
+    <p>Friction is the single behavioral parameter. At \(\mu = 0\) the rule is purely <b>greedy</b>: households relocate for <em>any</em> improvement, so the settlement always occupies the \(N\) cells closest to the river &mdash; a parameter-free model. Larger \(\mu\) makes the settlement sticky, so it lags behind the migrating channel and relocates in rarer, larger jumps.</p>
+
+    <p>The <b>migration rate</b> is simply the timestep: how many river frames the channel advances each step. A larger migration rate moves the river farther per step, so it drowns more land and forces more relocation. Together with the <b>population</b> \(N\) and the <b>friction</b> \(\mu\), that is the entire model. Press <b>Play</b> and tune the three sliders.</p>
 
     <!-- Simulator -->
     <div id="sim-container" style="margin: 1em 0;">
@@ -51,7 +68,8 @@
     <div id="sim-info" style="font-family: monospace; font-size: 13px; margin-bottom: 0.4em;">
       Timestep: <span id="info-timestep">0</span> / <span id="info-total">1001</span> &nbsp;&bull;&nbsp;
       Population: <span id="info-pop">0</span> &nbsp;&bull;&nbsp;
-      Clusters: <span id="info-clusters">0</span>
+      Forced: <span id="info-forced">0</span> &nbsp;&bull;&nbsp;
+      Voluntary: <span id="info-voluntary">0</span>
     </div>
     <div id="sim-legend" style="font-family: monospace; font-size: 12px; margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px;">
       <span><span style="display:inline-block;width:10px;height:10px;background:#00f;vertical-align:middle;margin-right:3px;"></span>River</span>
@@ -68,30 +86,26 @@
         <button id="btn-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
       </div>
 
-      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 420px; font-size: 85%;">
-        <label for="sl-wdist">\(w_d\)</label>
-        <input id="sl-wdist" type="range" min="0" max="10" step="0.1" value="2.0">
-        <span id="val-wdist">2.0</span>
+      <!-- the three model parameters -->
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 460px; font-size: 85%;">
+        <label for="sl-migrate">Migration rate \(\;\)(river / step)</label>
+        <input id="sl-migrate" type="range" min="1" max="12" step="1" value="2">
+        <span id="val-migrate">2</span>
 
-        <label for="sl-wcoh">\(w_c\)</label>
-        <input id="sl-wcoh" type="range" min="0" max="10" step="0.1" value="4.0">
-        <span id="val-wcoh">4.0</span>
-
-        <label for="sl-friction">\(\mu\)</label>
-        <input id="sl-friction" type="range" min="0" max="100" step="0.5" value="5">
-        <span id="val-friction">5</span>
-
-        <label for="sl-pop">Population</label>
-        <input id="sl-pop" type="range" min="100" max="5000" step="50" value="1000">
+        <label for="sl-pop">Population \(N\)</label>
+        <input id="sl-pop" type="range" min="10" max="5000" step="10" value="1000">
         <span id="val-pop">1000</span>
 
-        <label for="sl-crawl">Swaps/step</label>
-        <input id="sl-crawl" type="range" min="1" max="200" step="1" value="20">
-        <span id="val-crawl">20</span>
+        <label for="sl-friction">Friction \(\mu\)</label>
+        <input id="sl-friction" type="range" min="0" max="12" step="0.5" value="3">
+        <span id="val-friction">3</span>
+      </div>
 
-        <label for="sl-speed">Frame delay</label>
-        <input id="sl-speed" type="range" min="0" max="500" step="10" value="50">
-        <span id="val-speed">50 ms</span>
+      <!-- visual-only control, not part of the model -->
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 460px; font-size: 80%; margin-top: 0.5em; color:#767676;">
+        <label for="sl-speed">Animation delay (visual only)</label>
+        <input id="sl-speed" type="range" min="0" max="300" step="10" value="40">
+        <span id="val-speed">40 ms</span>
       </div>
     </div>
 
@@ -112,6 +126,7 @@ var COLS = Math.round((XMAX - XMIN) / CELL_SIZE);
 var ROWS = Math.round((YMAX - YMIN) / CELL_SIZE);
 var N = ROWS * COLS;
 var RIVER_RADIUS = (50.0 / 2.0) / CELL_SIZE;
+var MAX_SWAPS = 4000;   // internal cap on voluntary relaxation per step (not a model parameter)
 
 var OFFSETS_DR = [-1,-1,-1, 0, 0, 1, 1, 1];
 var OFFSETS_DC = [-1, 0, 1,-1, 1,-1, 0, 1];
@@ -122,6 +137,7 @@ var playing = false;
 var currentStep = 0;
 var animFrameId = null;
 var lastFrameTime = 0;
+var lastForced = 0, lastVoluntary = 0;
 
 var canvas = document.getElementById("sim-canvas");
 var ctx = canvas.getContext("2d");
@@ -131,18 +147,17 @@ canvas.height = ROWS;
 var infoStep = document.getElementById("info-timestep");
 var infoTotal = document.getElementById("info-total");
 var infoPop = document.getElementById("info-pop");
-var infoClusters = document.getElementById("info-clusters");
+var infoForced = document.getElementById("info-forced");
+var infoVoluntary = document.getElementById("info-voluntary");
 var loadingMsg = document.getElementById("loading-msg");
 var btnPlay = document.getElementById("btn-play");
 var btnPause = document.getElementById("btn-pause");
 var btnReset = document.getElementById("btn-reset");
 
 var sliders = {
-  wdist:    { el: document.getElementById("sl-wdist"),    valEl: document.getElementById("val-wdist"),    fmt: function(v){return v;} },
-  wcoh:     { el: document.getElementById("sl-wcoh"),     valEl: document.getElementById("val-wcoh"),     fmt: function(v){return v;} },
-  friction: { el: document.getElementById("sl-friction"), valEl: document.getElementById("val-friction"), fmt: function(v){return v;} },
+  migrate:  { el: document.getElementById("sl-migrate"),  valEl: document.getElementById("val-migrate"),  fmt: function(v){return v;} },
   pop:      { el: document.getElementById("sl-pop"),      valEl: document.getElementById("val-pop"),      fmt: function(v){return v;} },
-  crawl:    { el: document.getElementById("sl-crawl"),    valEl: document.getElementById("val-crawl"),    fmt: function(v){return v;} },
+  friction: { el: document.getElementById("sl-friction"), valEl: document.getElementById("val-friction"), fmt: function(v){return v;} },
   speed:    { el: document.getElementById("sl-speed"),    valEl: document.getElementById("val-speed"),    fmt: function(v){return v+" ms";} }
 };
 function getParam(name) { return parseFloat(sliders[name].el.value); }
@@ -231,40 +246,43 @@ function updateNeighbors(r, c, delta) {
   }
 }
 
-function computeBaseU(distGrid, riverGrid, wDist) {
+// utility = -distance to river (no cohesion, no weights); river cells forbidden
+function computeBaseU(distGrid, riverGrid) {
   var baseU = new Float32Array(N);
-  for (var i = 0; i < N; i++) baseU[i] = riverGrid[i] ? -1e20 : -(distGrid[i]*wDist);
+  for (var i = 0; i < N; i++) baseU[i] = riverGrid[i] ? -1e20 : -distGrid[i];
   return baseU;
 }
 
-function getBestPerimeter(baseU, wCoh) {
+// best open cell = closest to the river; prefer the settlement perimeter so it stays contiguous
+function getBestPerimeter(baseU) {
   var bestScore = -Infinity, bestIdx = -1;
   for (var i = 0; i < N; i++) {
     if (village[i] || river[i] || neighbors[i]===0) continue;
-    var score = baseU[i] + neighbors[i]*wCoh;
-    if (score > bestScore) { bestScore = score; bestIdx = i; }
+    if (baseU[i] > bestScore) { bestScore = baseU[i]; bestIdx = i; }
   }
   if (bestIdx === -1) {
     for (var j = 0; j < N; j++) {
       if (village[j] || river[j]) continue;
-      var sc = baseU[j] + neighbors[j]*wCoh;
-      if (sc > bestScore) { bestScore = sc; bestIdx = j; }
+      if (baseU[j] > bestScore) { bestScore = baseU[j]; bestIdx = j; }
     }
   }
   return { idx: bestIdx, score: bestScore };
 }
 
-function getWorstVillage(baseU, wCoh) {
+// worst occupied cell = farthest from the river
+function getWorstVillage(baseU) {
   var worstScore = Infinity, worstIdx = -1;
   for (var i = 0; i < N; i++) {
     if (!village[i]) continue;
-    var score = baseU[i] + neighbors[i]*wCoh;
-    if (score < worstScore) { worstScore = score; worstIdx = i; }
+    if (baseU[i] < worstScore) { worstScore = baseU[i]; worstIdx = i; }
   }
   return { idx: worstIdx, score: worstScore };
 }
 
-function caStep(baseU, wCoh, friction, crawlSpeed) {
+// one timestep: forced relocation (drowning) then greedy voluntary relaxation.
+// friction mu = 0 -> pure greedy (any improvement); returns [forced, voluntary] counts.
+function caStep(baseU, friction) {
+  var forced = 0, voluntary = 0;
   var drowned = [];
   for (var i = 0; i < N; i++) { if (village[i] && river[i]) drowned.push(i); }
   for (var d2 = 0; d2 < drowned.length; d2++) {
@@ -273,17 +291,18 @@ function caStep(baseU, wCoh, friction, crawlSpeed) {
     village[idx] = 0; updateNeighbors(r, c, -1);
   }
   for (var d3 = 0; d3 < drowned.length; d3++) {
-    var best = getBestPerimeter(baseU, wCoh);
+    var best = getBestPerimeter(baseU);
     if (best.idx >= 0) {
       village[best.idx] = 1;
       var br = (best.idx/COLS)|0, bc = best.idx%COLS;
       updateNeighbors(br, bc, 1);
+      forced++;
     }
   }
-  for (var s = 0; s < crawlSpeed; s++) {
-    var worst = getWorstVillage(baseU, wCoh);
+  for (var s = 0; s < MAX_SWAPS; s++) {
+    var worst = getWorstVillage(baseU);
     if (worst.idx < 0) break;
-    var best2 = getBestPerimeter(baseU, wCoh);
+    var best2 = getBestPerimeter(baseU);
     if (best2.idx < 0) break;
     if (best2.score > worst.score + friction) {
       var wr = (worst.idx/COLS)|0, wc2 = worst.idx%COLS;
@@ -291,38 +310,18 @@ function caStep(baseU, wCoh, friction, crawlSpeed) {
       village[best2.idx] = 1;
       var br2 = (best2.idx/COLS)|0, bc2 = best2.idx%COLS;
       updateNeighbors(br2, bc2, 1);
+      voluntary++;
     } else break;
   }
-}
-
-function countClusters() {
-  var visited = new Uint8Array(N);
-  var count = 0;
-  var queue = [];
-  for (var i = 0; i < N; i++) {
-    if (!village[i] || visited[i]) continue;
-    count++; queue.length = 0; queue.push(i); visited[i] = 1;
-    while (queue.length > 0) {
-      var idx = queue.pop();
-      var r = (idx/COLS)|0, c = idx%COLS;
-      for (var d = 0; d < 8; d++) {
-        var rr = r+OFFSETS_DR[d], cc = c+OFFSETS_DC[d];
-        if (rr>=0 && rr<ROWS && cc>=0 && cc<COLS) {
-          var ni = rr*COLS+cc;
-          if (village[ni] && !visited[ni]) { visited[ni]=1; queue.push(ni); }
-        }
-      }
-    }
-  }
-  return count;
+  return [forced, voluntary];
 }
 
 function initVillage() {
-  var wDist = getParam("wdist"), wCoh = getParam("wcoh"), friction = getParam("friction"), pop = getParam("pop");
+  var friction = getParam("friction"), pop = getParam("pop");
   currentStep = 0;
   river = rasterizeChannel(riverTimesteps[0]);
   dist = distanceTransform(river);
-  var baseU = computeBaseU(dist, river, wDist);
+  var baseU = computeBaseU(dist, river);
   village = new Uint8Array(N);
   neighbors = new Int16Array(N);
   var bestStartScore = -Infinity, bestStartIdx = 0;
@@ -338,14 +337,15 @@ function initVillage() {
   var sr = (bestStartIdx/COLS)|0, sc2 = bestStartIdx%COLS;
   updateNeighbors(sr, sc2, 1);
   for (var g = 1; g < pop; g++) {
-    var best = getBestPerimeter(baseU, wCoh);
+    var best = getBestPerimeter(baseU);
     if (best.idx >= 0) {
       village[best.idx] = 1;
       var r2 = (best.idx/COLS)|0, c2 = best.idx%COLS;
       updateNeighbors(r2, c2, 1);
     }
   }
-  for (var b = 0; b < 100; b++) caStep(baseU, wCoh, friction, 20);
+  for (var b = 0; b < 40; b++) caStep(baseU, friction);
+  lastForced = 0; lastVoluntary = 0;
   prevVillage = new Uint8Array(village);
   render(); updateInfoDisplay();
 }
@@ -390,7 +390,8 @@ function updateInfoDisplay() {
     else if (wasV && !nowV && !nowR) nAbandoned++;
   }
   infoPop.textContent = pop;
-  infoClusters.textContent = countClusters();
+  infoForced.textContent = lastForced;
+  infoVoluntary.textContent = lastVoluntary;
   infoStable.textContent = nStable;
   infoNew.textContent = nNew;
   infoAbandoned.textContent = nAbandoned;
@@ -399,13 +400,15 @@ function updateInfoDisplay() {
 
 function step() {
   if (currentStep >= riverTimesteps.length - 1) { pause(); return; }
-  currentStep++;
-  var wDist = getParam("wdist"), wCoh = getParam("wcoh"), friction = getParam("friction"), crawlSpeed = getParam("crawl");
+  var migRate = Math.round(getParam("migrate"));          // migration rate = timestep (frames/step)
+  currentStep = Math.min(currentStep + migRate, riverTimesteps.length - 1);
+  var friction = getParam("friction");
   prevVillage = new Uint8Array(village);
   river = rasterizeChannel(riverTimesteps[currentStep]);
   dist = distanceTransform(river);
-  var baseU = computeBaseU(dist, river, wDist);
-  caStep(baseU, wCoh, friction, crawlSpeed);
+  var baseU = computeBaseU(dist, river);
+  var fv = caStep(baseU, friction);
+  lastForced = fv[0]; lastVoluntary = fv[1];
   render(); updateInfoDisplay();
 }
 
@@ -428,18 +431,19 @@ btnPlay.addEventListener("click", play);
 btnPause.addEventListener("click", pause);
 btnReset.addEventListener("click", reset);
 
+// changing population rebuilds to the new N on the current river (greedy add/remove)
 sliders.pop.el.addEventListener("change", function() {
   if (!riverTimesteps) return;
-  var targetPop = getParam("pop"), wDist = getParam("wdist"), wCoh = getParam("wcoh");
-  var baseU = computeBaseU(dist, river, wDist);
+  var targetPop = getParam("pop");
+  var baseU = computeBaseU(dist, river);
   var currentPop = 0; for (var i = 0; i < N; i++) if (village[i]) currentPop++;
   while (currentPop < targetPop) {
-    var best = getBestPerimeter(baseU, wCoh);
+    var best = getBestPerimeter(baseU);
     if (best.idx < 0) break;
     village[best.idx] = 1; var r = (best.idx/COLS)|0, c = best.idx%COLS; updateNeighbors(r, c, 1); currentPop++;
   }
   while (currentPop > targetPop) {
-    var worst = getWorstVillage(baseU, wCoh);
+    var worst = getWorstVillage(baseU);
     if (worst.idx < 0) break;
     village[worst.idx] = 0; var wr = (worst.idx/COLS)|0, wc2 = worst.idx%COLS; updateNeighbors(wr, wc2, -1); currentPop--;
   }
