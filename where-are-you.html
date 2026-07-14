@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="A small demonstration of what a website can and cannot learn about where you are.">
+  <title>Where Are You? - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .geo-widget {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px dotted #ccc;
+    }
+    .geo-widget h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+    .geo-button {
+      font-family: inherit;
+      font-size: 15px;
+      color: #fff;
+      background: #003399;
+      border: none;
+      padding: 11px 18px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .geo-button:hover { background: #002266; }
+    .geo-button:disabled { background: #9aa2c0; cursor: default; }
+    .geo-result {
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .geo-result p { margin-bottom: 4px; }
+    .geo-result .coord {
+      font-variant-numeric: tabular-nums;
+      color: #003399;
+    }
+    .geo-result .note {
+      color: #777;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .geo-caption {
+      font-size: 13px;
+      color: #555;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>Where are you?</h1>
+
+    <p>A small demonstration of what a website can, and cannot, learn about where you are.</p>
+
+    <hr class="separator">
+
+    <p>Your browser decides. It will ask before sharing anything, and if you say no, this page learns nothing new.</p>
+  </div>
+
+  <div class="main">
+
+    <p>There are two very different kinds of location a website can work with.</p>
+
+    <p>The first is approximate. The moment you open any page, your device sends its IP address to the server so it knows where to send the page back. An IP address can be matched to a rough location, usually a city or region, sometimes only your internet provider. It is automatic, it needs no permission, and it is often wrong by many kilometers. This page does not do that, because it is a static site with nowhere to record it.</p>
+
+    <p>The second is precise. A browser can report your real position, sometimes to within a few meters, using GPS, nearby Wi-Fi, and cell towers. This is the kind that matters, and a website cannot take it quietly. Your browser has to ask you first, and you have to agree. That is the button below.</p>
+
+    <p>When you click it, your browser will show its own prompt, something like "braydennoh.github.io wants to know your location," with Allow and Block. Everything that comes back stays in this page, in your browser. It is not sent anywhere and it is not saved.</p>
+
+    <div class="geo-widget">
+      <h3>Try it</h3>
+      <button id="locate" class="geo-button">Allow this site to know your location</button>
+      <div id="result" class="geo-result" role="status" aria-live="polite"></div>
+      <p class="geo-caption">Nothing is transmitted or stored. Reload the page and it is gone.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('locate');
+    var out = document.getElementById('result');
+
+    function show(html) { out.innerHTML = html; }
+    function text(msg) { out.textContent = msg; }
+
+    btn.addEventListener('click', function () {
+      if (!('geolocation' in navigator)) {
+        text('Your browser does not support geolocation.');
+        return;
+      }
+      text('Waiting for your permission...');
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      });
+    });
+
+    function onSuccess(pos) {
+      btn.disabled = false;
+      var lat = pos.coords.latitude;
+      var lon = pos.coords.longitude;
+      var acc = Math.round(pos.coords.accuracy);
+      var mapUrl = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon +
+                   '#map=15/' + lat + '/' + lon;
+
+      show(
+        '<p>Latitude: <span class="coord">' + lat.toFixed(5) + '</span></p>' +
+        '<p>Longitude: <span class="coord">' + lon.toFixed(5) + '</span></p>' +
+        '<p>Accurate to about ' + acc + ' meters.</p>' +
+        '<p><a href="' + mapUrl + '" target="_blank" rel="noopener">See this point on a map</a></p>' +
+        '<p class="note">That is what you just chose to share. It went no further than your own screen.</p>'
+      );
+    }
+
+    function onError(err) {
+      btn.disabled = false;
+      var msg;
+      if (err.code === err.PERMISSION_DENIED) {
+        msg = 'You chose not to share your location, so nothing was read. That is exactly how it should work.';
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        msg = 'Your location could not be determined right now.';
+      } else if (err.code === err.TIMEOUT) {
+        msg = 'The request timed out. You can try again.';
+      } else {
+        msg = 'Something went wrong while reading your location.';
+      }
+      text(msg);
+    }
+  })();
+</script>
+
+</body>
+</html>
