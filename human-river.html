@@ -3,12 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Human-River Geomorphic Coupling - Brayden Noh</title>
-  <link rel="stylesheet" href="style.css">
-  <script>
-    window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] } };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <title>Meander Village - Brayden Noh</title>
+  <style>
+    /* Self-contained page style, matching braydennoh.github.io/style.css */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Aptos, Arial, Helvetica, sans-serif;
+      font-size: 15px; line-height: 1.5; color: #222;
+      background: #fff; padding: 30px 40px; max-width: 1184px;
+    }
+    a { color: #003399; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:visited { color: #003399; }
+    nav { font-size: 13px; margin-bottom: 20px; }
+    nav a { margin-right: 4px; }
+    nav .sep { margin-right: 4px; color: #999; }
+    h1 { font-size: 28px; font-weight: normal; margin-bottom: 20px; }
+    .columns { display: flex; gap: 40px; }
+    .sidebar { width: 280px; flex-shrink: 0; font-size: 14px; line-height: 1.6; }
+    .sidebar p { margin-bottom: 16px; }
+    .sidebar .separator { border: none; border-top: 1px dotted #ccc; margin: 16px 0; }
+    .main { flex: 1; min-width: 0; }
+    .main p { margin-bottom: 16px; line-height: 1.6; }
+    .btnrow { margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    var, .mvar { font-style: italic; font-family: Georgia, "Times New Roman", serif; }
+    .eq { text-align: center; font-family: Georgia, "Times New Roman", serif; font-style: italic;
+          margin: 14px 0 16px 0; font-size: 15.5px; }
+    button { padding: 0.2em 0.8em; cursor: pointer; font-family: inherit; font-size: 13px; }
+    button:disabled { cursor: default; }
+    .ctl-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 5px 10px;
+                align-items: center; font-size: 85%; }
+    .ctl-grid input[type=range] { width: 100%; }
+    .ctl-cols { display: flex; gap: 26px; }
+    .ctl-cols .ctl-grid { flex: 1 1 0; min-width: 0; }
+    details.adv { margin-top: 0.7em; font-size: 90%; }
+    details.adv summary { cursor: pointer; color: #555; font-size: 13px; }
+    details.adv .ctl-grid { margin-top: 0.5em; }
+    .chartbox { margin: 18px 0 6px 0; }
+    .chart-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 2px; }
+    .chart-legend { display: flex; gap: 16px; font-size: 12px; color: #52514e;
+                    margin-bottom: 4px; align-items: center; }
+    .lkey { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid;
+            vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+    .chartwrap { position: relative; }
+    .chartwrap canvas { display: block; width: 100%; }
+    .viz-tip { position: absolute; pointer-events: none; background: #fff;
+               border: 1px solid rgba(11,11,11,0.14); box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+               border-radius: 4px; padding: 6px 9px; font-size: 12px; color: #52514e;
+               display: none; z-index: 5; white-space: nowrap; }
+    .viz-tip .trow { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+    .viz-tip .tval { color: #0b0b0b; font-weight: 600; margin-left: auto; padding-left: 10px;
+                     font-variant-numeric: tabular-nums; }
+    .viz-tip .thead { color: #898781; font-variant-numeric: tabular-nums; }
+    #canvas-stack { position: relative; margin: 1em 0 0 0; background: #000; }
+    #sim-canvas { width: 100%; image-rendering: pixelated; display: block; background: #000; }
+    #overlay-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+                      pointer-events: none; }
+    .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
+    #sim-info { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+                margin: 6px 0 4px 0; font-variant-numeric: tabular-nums; }
+    #sim-legend { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
+                  margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .chip { display: inline-block; width: 10px; height: 10px; vertical-align: middle;
+            margin-right: 3px; }
+    table.params { border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+    table.params td, table.params th { border: 1px solid #ddd; padding: 4px 9px; text-align: left; }
+    table.params th { background: #f6f6f4; font-weight: 600; }
+    @media (max-width: 700px) {
+      body { padding: 20px; }
+      .columns { flex-direction: column; gap: 24px; }
+      .sidebar { width: 100%; }
+      .ctl-cols { flex-direction: column; gap: 5px; }
+    }
+  </style>
 </head>
 <body class="project-page">
 
@@ -22,432 +89,1182 @@
 <div class="columns">
 
   <div class="sidebar">
-    <h1>Human-River Geomorphic Coupling</h1>
+    <h1>Meander Village</h1>
 
-    <p>Rivers draw people in &mdash; they provide water, food, and transport &mdash; but they also wander, eroding what is built beside them. This model turns that tension into a cellular automaton: a fixed population settles as close to a migrating river as it can, is forced to rebuild when the channel erodes its land, and moves voluntarily only when a distinctly better spot opens up.</p>
-
-    <p>The whole model has just <b>three knobs</b>: how fast the river migrates, how many people there are, and how reluctant they are to move.</p>
-
-    <hr class="separator">
-
-    <p>By Brayden Noh.</p>
+    <p>Rivers draw people in: water, food, transport. But rivers also wander, eroding
+    what is built beside them. Here households chase a migrating river across its
+    floodplain, drowning and rebuilding as the channel sweeps by.</p>
   </div>
 
   <div class="main">
 
-    <p>The grid has two cell types: <b style="color:#00f;">river cells</b> \(R(\mathbf{x},t)=1\) (blue) and <b>floodplain cells</b> \(R=0\) (black). Floodplain cells can host settlement cells \(V(\mathbf{x},t)=1\), colored by their status each timestep: <b style="color:#ff8000;">stable</b> (orange &mdash; persisted from the previous step), <b style="color:#1aff1a;">new</b> (green &mdash; just built), <b style="color:#aaa;">abandoned</b> (white &mdash; voluntarily vacated), and <b style="color:#ff1a1a;">drowned</b> (red &mdash; destroyed by the advancing river). Population is conserved: \(\sum_{\mathbf{x}} V(\mathbf{x},t) = N\) for all \(t\).</p>
+    <p>The river follows the Howard-Knutson rule: each centerline node migrates along its
+    local normal at the rate</p>
 
-    <p>Every household wants one thing: to be as close to the river as possible. So each floodplain cell has utility</p>
+    <div class="eq">R = &Omega;&thinsp;k<sub>l</sub>W&kappa; + &Gamma;&thinsp;&#10216;k<sub>l</sub>W&kappa;&#10217;,
+    &nbsp;&nbsp;&nbsp; &#10216;f&thinsp;&#10217; = &Sigma;<sub>up</sub>&thinsp;f&thinsp;e<sup>&minus;&alpha;s</sup> &frasl; &Sigma;<sub>up</sub>&thinsp;e<sup>&minus;&alpha;s</sup></div>
 
-    \[
-    U(\mathbf{x}, t) \;=\; -\,\mathcal{D}(\mathbf{x}, t),
-    \qquad
-    \mathcal{D}(\mathbf{x},t) \;=\; \min_{\mathbf{y}:\,R(\mathbf{y},t)=1} \|\mathbf{x}-\mathbf{y}\|,
-    \]
+    <p>where &kappa; is curvature, <span class="mvar">s</span> is distance upstream,
+    &Omega; = &minus;1, &Gamma; = 2.5, W = 100 m, and the memory length
+    <span class="mvar">&#8467;</span> = 1/(&alpha;W) is the meander scale. When two banks
+    come within the cutoff distance, the loop is cut off as an oxbow. Each step the channel
+    is rasterized onto a grid, and a distance transform gives every floodplain cell its
+    distance <span class="mvar">D</span> to the river.</p>
 
-    <p>where \(\mathcal{D}\) is the distance (in cells) to the nearest river cell. There is no other term &mdash; no clustering bonus, no weights. Movement happens two ways:</p>
+    <p>Households settle the grid with utility</p>
 
-    <ul>
-      <li><b>Forced migration.</b> When the river erodes a settlement cell, that household has no choice: it is relocated to the nearest open cell to the river.</li>
-      <li><b>Voluntary migration.</b> The worst-placed household relocates to the best open cell only if that cell is at least \(\mu\) cells closer to the river,
-        \[
-        \mathcal{D}_{\text{worst}} - \mathcal{D}_{\text{best}} \;>\; \mu ,
-        \]
-        repeated until no such move remains. Here \(\mu\) is <b>friction</b> &mdash; reluctance to move.</li>
-    </ul>
+    <div class="eq">U = &minus;w<sub>d</sub>&thinsp;D + w<sub>c</sub>&thinsp;C</div>
 
-    <p>Friction is the single behavioral parameter. At \(\mu = 0\) the rule is purely <b>greedy</b>: households relocate for <em>any</em> improvement, so the settlement always occupies the \(N\) cells closest to the river &mdash; a parameter-free model. Larger \(\mu\) makes the settlement sticky, so it lags behind the migrating channel and relocates in rarer, larger jumps.</p>
+    <p>with w<sub>d</sub> = 1 and <span class="mvar">C</span> the number of settled
+    neighbors (cohesion). A household the river erodes is relocated to the best open cell:
+    forced migration. The worst-placed household moves to the best open cell when it gains
+    more than the stubbornness <span class="mvar">&mu;</span>: voluntary migration.
+    Population is conserved.</p>
 
-    <p>The <b>migration rate</b> is simply the timestep: how many river frames the channel advances each step. A larger migration rate moves the river farther per step, so it drowns more land and forces more relocation. Together with the <b>population</b> \(N\) and the <b>friction</b> \(\mu\), that is the entire model. Press <b>Play</b> and tune the three sliders.</p>
-
-    <!-- Simulator -->
-    <div id="sim-container" style="margin: 1em 0;">
-      <canvas id="sim-canvas" style="width: 100%; image-rendering: pixelated; background: #000; display: block;"></canvas>
+    <!-- ── Simulator ── -->
+    <div id="canvas-stack">
+      <canvas id="sim-canvas" width="160" height="80"></canvas>
+      <canvas id="overlay-canvas"></canvas>
     </div>
 
-    <div id="sim-info" style="font-family: monospace; font-size: 13px; margin-bottom: 0.4em;">
-      Timestep: <span id="info-timestep">0</span> / <span id="info-total">1001</span> &nbsp;&bull;&nbsp;
-      Population: <span id="info-pop">0</span> &nbsp;&bull;&nbsp;
-      Forced: <span id="info-forced">0</span> &nbsp;&bull;&nbsp;
-      Voluntary: <span id="info-voluntary">0</span>
-    </div>
-    <div id="sim-legend" style="font-family: monospace; font-size: 12px; margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px;">
-      <span><span style="display:inline-block;width:10px;height:10px;background:#00f;vertical-align:middle;margin-right:3px;"></span>River</span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:#ff8000;vertical-align:middle;margin-right:3px;"></span>Stable <span id="info-stable">0</span></span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:#1aff1a;vertical-align:middle;margin-right:3px;"></span>New <span id="info-new">0</span></span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:#fff;border:1px solid #999;vertical-align:middle;margin-right:3px;"></span>Abandoned <span id="info-abandoned">0</span></span>
-      <span><span style="display:inline-block;width:10px;height:10px;background:#ff1a1a;vertical-align:middle;margin-right:3px;"></span>Drowned <span id="info-drowned">0</span></span>
+    <div id="sim-info">
+      t = <span id="info-years">0</span> yr &nbsp;&bull;&nbsp;
+      sinuosity <span id="info-sinu">&ndash;</span> &nbsp;&bull;&nbsp;
+      pop <span id="info-pop">0</span> &nbsp;&bull;&nbsp;
+      forced <span id="info-forced">0</span> (&Sigma; <span id="info-forced-cum">0</span>) &nbsp;&bull;&nbsp;
+      voluntary <span id="info-vol">0</span> (&Sigma; <span id="info-vol-cum">0</span>) &nbsp;&bull;&nbsp;
+      oxbows <span id="info-oxbows">0</span>
     </div>
 
-    <div id="sim-controls" style="margin-bottom: 1em;">
-      <div style="margin-bottom: 0.4em;">
-        <button id="btn-play" style="padding:0.2em 0.8em; cursor:pointer;">&#9654; Play</button>
-        <button id="btn-pause" disabled style="padding:0.2em 0.8em; cursor:pointer;">&#9646;&#9646; Pause</button>
-        <button id="btn-reset" style="padding:0.2em 0.8em; cursor:pointer;">Reset</button>
+    <div id="sim-legend">
+      <span><span class="chip" style="background:#0028ff;"></span>River</span>
+      <span><span class="chip" style="background:#ff8000;"></span>Stable <span id="cnt-stable">0</span></span>
+      <span><span class="chip" style="background:#1aff1a;"></span>New <span id="cnt-new">0</span></span>
+      <span><span class="chip" style="background:#fff;border:1px solid #999;"></span>Abandoned <span id="cnt-abandoned">0</span></span>
+      <span><span class="chip" style="background:#ff1a1a;"></span>Drowned <span id="cnt-drowned">0</span></span>
+      <span><span class="chip" style="background:#26364f;"></span>Oxbow scar</span>
+    </div>
+
+    <div id="sim-controls">
+      <div class="btnrow">
+        <button id="btn-play">&#9654; Play</button>
+        <button id="btn-pause" disabled>&#9646;&#9646; Pause</button>
+        <button id="btn-step">Step</button>
+        <button id="btn-reset">Reset village</button>
+        <button id="btn-newriver">New river</button>
       </div>
 
-      <!-- the three model parameters -->
-      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 460px; font-size: 85%;">
-        <label for="sl-migrate">Migration rate \(\;\)(river / step)</label>
-        <input id="sl-migrate" type="range" min="1" max="12" step="1" value="2">
-        <span id="val-migrate">2</span>
+      <!-- the model parameters: river column left, settlement column right -->
+      <div class="ctl-cols">
+        <div class="ctl-grid">
+          <label for="sl-kl">Migration rate <span class="mvar">k<sub>l</sub></span> (m/yr)</label>
+          <input id="sl-kl" type="range" min="1" max="100" step="1" value="50">
+          <span id="val-kl" class="mono">50</span>
 
-        <label for="sl-pop">Population \(N\)</label>
-        <input id="sl-pop" type="range" min="10" max="5000" step="10" value="1000">
-        <span id="val-pop">1000</span>
+          <label for="sl-crdist">Cutoff distance (&times;<span class="mvar">W</span>)</label>
+          <input id="sl-crdist" type="range" min="1" max="12" step="0.5" value="2">
+          <span id="val-crdist" class="mono">2</span>
 
-        <label for="sl-friction">Friction \(\mu\)</label>
-        <input id="sl-friction" type="range" min="0" max="12" step="0.5" value="3">
-        <span id="val-friction">3</span>
+          <label for="sl-scale">Meander scale <span class="mvar">&#8467;</span> (&times;<span class="mvar">W</span>)</label>
+          <input id="sl-scale" type="range" min="1" max="8" step="0.25" value="1">
+          <span id="val-scale" class="mono">1</span>
+        </div>
+
+        <div class="ctl-grid">
+          <label for="sl-pop">Population <span class="mvar">N</span></label>
+          <input id="sl-pop" type="range" min="10" max="5000" step="10" value="500">
+          <span id="val-pop" class="mono">500</span>
+
+          <label for="sl-coh">Cohesion <span class="mvar">w<sub>c</sub></span></label>
+          <input id="sl-coh" type="range" min="0" max="8" step="0.25" value="0">
+          <span id="val-coh" class="mono">0</span>
+
+          <label for="sl-friction">Stubbornness <span class="mvar">&mu;</span> (cells)</label>
+          <input id="sl-friction" type="range" min="0" max="12" step="0.5" value="5">
+          <span id="val-friction" class="mono">5</span>
+        </div>
       </div>
 
-      <!-- visual-only control, not part of the model -->
-      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; max-width: 460px; font-size: 80%; margin-top: 0.5em; color:#767676;">
-        <label for="sl-speed">Animation delay (visual only)</label>
-        <input id="sl-speed" type="range" min="0" max="300" step="10" value="40">
-        <span id="val-speed">40 ms</span>
+      <details class="adv">
+        <summary>Advanced &amp; visual settings</summary>
+        <div class="ctl-grid">
+          <label for="sl-cell">Grid cell (m)</label>
+          <input id="sl-cell" type="range" min="50" max="100" step="10" value="50">
+          <span id="val-cell" class="mono">50</span>
+
+          <label for="sel-mode">Convolution (phase lag)</label>
+          <select id="sel-mode">
+            <option value="up" selected>Upstream (downstream lag, natural)</option>
+            <option value="sym">Symmetric (no lag)</option>
+            <option value="down">Downstream (upstream lag)</option>
+          </select>
+          <span></span>
+
+          <label for="sl-ypf">River &Delta;t per step (yr)</label>
+          <input id="sl-ypf" type="range" min="0.1" max="5" step="0.1" value="1">
+          <span id="val-ypf" class="mono">1</span>
+
+          <label for="sl-delay">Animation delay (ms)</label>
+          <input id="sl-delay" type="range" min="0" max="300" step="10" value="100">
+          <span id="val-delay" class="mono">100</span>
+
+          <label for="inp-seed">River seed</label>
+          <input id="inp-seed" type="number" value="77" style="width:100%; font-size:12px; padding:2px 4px;">
+          <button id="btn-seed" style="font-size:12px;">Rebuild</button>
+
+          <label>Valley walls (keep river in frame)</label>
+          <input id="chk-valley" type="checkbox" checked style="justify-self:start;">
+          <span></span>
+
+          <label>Oxbow scars</label>
+          <input id="chk-scars" type="checkbox" style="justify-self:start;">
+          <span></span>
+
+          <label>Centerline overlay</label>
+          <input id="chk-centerline" type="checkbox" style="justify-self:start;">
+          <span></span>
+        </div>
+      </details>
+    </div>
+
+    <!-- ── Charts ── -->
+    <div class="chartbox">
+      <div class="chart-title">Relocations per step</div>
+      <div class="chart-legend">
+        <span><span class="lkey" style="border-color:#e34948;"></span>Forced</span>
+        <span><span class="lkey" style="border-color:#2a78d6;"></span>Voluntary</span>
+      </div>
+      <div class="chartwrap">
+        <canvas id="chart-moves" height="110"></canvas>
+        <div class="viz-tip" id="tip-moves"></div>
       </div>
     </div>
 
-    <p id="loading-msg" style="font-size: 85%; color: #767676;"><i>Loading river data&hellip;</i></p>
+    <div class="chartbox">
+      <div class="chart-title">Channel sinuosity</div>
+      <div class="chartwrap">
+        <canvas id="chart-sinu" height="90"></canvas>
+        <div class="viz-tip" id="tip-sinu"></div>
+      </div>
+    </div>
 
   </div>
-
 </div>
 
 <script>
-(function() {
-"use strict";
+/*==CORE==*/
+/* ================================================================
+   Simulation core - no DOM. Faithful ports of:
+     coremeanderpy.py  (_migrate, _migrate_symmetric, _migrate_downstream,
+                        _resample, _smooth, detect_and_execute_cutoffs)
+     7.7/friction_crdist_sweep.py (_init_channel, _rasterize)
+     7.7/model.py      (compute_baseU, pick_seed, grow_village,
+                        find_worst, find_best, ca_step)
+   ================================================================ */
 
-var CELL_SIZE = 50;          // 50 m cells -> 160 x 80 grid, matching the 7.7 experiment
-var XMIN = 1000, XMAX = 9000;
-var YMIN = -2000, YMAX = 2000;
-var COLS = Math.round((XMAX - XMIN) / CELL_SIZE);   // 160
-var ROWS = Math.round((YMAX - YMIN) / CELL_SIZE);   //  80
-var N = ROWS * COLS;
-var MAX_SWAPS = 4000;   // internal cap on voluntary relaxation per step (not a model parameter)
-
-var OFFSETS_DR = [-1,-1,-1, 0, 0, 1, 1, 1];
-var OFFSETS_DC = [-1, 0, 1,-1, 1,-1, 0, 1];
-
-var riverTimesteps = null;
-var village, prevVillage, river, neighbors, dist;
-var playing = false;
-var currentStep = 0;
-var animFrameId = null;
-var lastFrameTime = 0;
-var lastForced = 0, lastVoluntary = 0;
-
-var canvas = document.getElementById("sim-canvas");
-var ctx = canvas.getContext("2d");
-canvas.width = COLS;
-canvas.height = ROWS;
-
-var infoStep = document.getElementById("info-timestep");
-var infoTotal = document.getElementById("info-total");
-var infoPop = document.getElementById("info-pop");
-var infoForced = document.getElementById("info-forced");
-var infoVoluntary = document.getElementById("info-voluntary");
-var loadingMsg = document.getElementById("loading-msg");
-var btnPlay = document.getElementById("btn-play");
-var btnPause = document.getElementById("btn-pause");
-var btnReset = document.getElementById("btn-reset");
-
-var sliders = {
-  migrate:  { el: document.getElementById("sl-migrate"),  valEl: document.getElementById("val-migrate"),  fmt: function(v){return v;} },
-  pop:      { el: document.getElementById("sl-pop"),      valEl: document.getElementById("val-pop"),      fmt: function(v){return v;} },
-  friction: { el: document.getElementById("sl-friction"), valEl: document.getElementById("val-friction"), fmt: function(v){return v;} },
-  speed:    { el: document.getElementById("sl-speed"),    valEl: document.getElementById("val-speed"),    fmt: function(v){return v+" ms";} }
-};
-function getParam(name) { return parseFloat(sliders[name].el.value); }
-Object.keys(sliders).forEach(function(key) {
-  var s = sliders[key];
-  s.el.addEventListener("input", function() { s.valEl.textContent = s.fmt(s.el.value); });
-});
-
-function loadRiverData(cb) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "assets/river_data.json");
-  xhr.onload = function() {
-    var data = JSON.parse(xhr.responseText);
-    riverTimesteps = data.timesteps;
-    infoTotal.textContent = riverTimesteps.length - 1;
-    loadingMsg.style.display = "none";
-    cb();
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  xhr.send();
 }
 
-// rasterize the centerline to a 1-cell-wide river (no width dilation), matching 7.7
-function rasterizeChannel(flatCoords) {
-  var grid = new Uint8Array(N);
-  var nPts = flatCoords.length / 2;
-  for (var i = 0; i < nPts - 1; i++) {
-    var x0 = flatCoords[i*2], y0 = flatCoords[i*2+1];
-    var x1 = flatCoords[(i+1)*2], y1 = flatCoords[(i+1)*2+1];
-    var c0 = Math.round((x0 - XMIN) / CELL_SIZE);
-    var r0 = Math.round((y0 - YMIN) / CELL_SIZE);
-    var c1 = Math.round((x1 - XMIN) / CELL_SIZE);
-    var r1 = Math.round((y1 - YMIN) / CELL_SIZE);
-    var dc = Math.abs(c1-c0), dr = Math.abs(r1-r0);
-    var sc = c0<c1?1:-1, sr = r0<r1?1:-1;
-    var err = dc - dr;
-    while (true) {
-      if (r0>=0 && r0<ROWS && c0>=0 && c0<COLS) grid[r0*COLS+c0]=1;
-      if (r0===r1 && c0===c1) break;
-      var e2 = 2*err;
-      if (e2 > -dr) { err -= dr; c0 += sc; }
-      if (e2 < dc) { err += dc; r0 += sr; }
+function gaussFactory(rng) {
+  var spare = null;
+  return function() {
+    if (spare !== null) { var v0 = spare; spare = null; return v0; }
+    var u, v, s;
+    do { u = 2*rng() - 1; v = 2*rng() - 1; s = u*u + v*v; } while (s >= 1 || s === 0);
+    var m = Math.sqrt(-2 * Math.log(s) / s);
+    spare = v * m;
+    return u * m;
+  };
+}
+
+/* Sine-generated initial centerline (7.7 _init_channel; L extended so the
+   widened grid window stays clear of the pinned ends at any theta0). */
+function makeInitialChannel(seed) {
+  var rng = mulberry32(seed >>> 0);
+  var gauss = gaussFactory(rng);
+  var theta0 = 1.5 * (0.9 + 0.2 * rng());
+  var phase = 2 * Math.PI * rng();
+  var n = 3001, L = 30000.0, lamb = 1000.0;
+  var ds = L / (n - 1);
+  var x = new Float64Array(n), y = new Float64Array(n);
+  for (var i = 1; i < n; i++) {
+    var s = L * i / (n - 1);
+    var th = theta0 * Math.sin(2 * Math.PI * s / lamb + phase) + 0.05 * gauss();
+    x[i] = x[i-1] + ds * Math.cos(th);
+    y[i] = y[i-1] + ds * Math.sin(th);
+  }
+  return [x, y];
+}
+
+/* Upstream convolution (standard Howard-Knutson): downstream phase lag. */
+function migrateUpstream(x, y, klW, dt, alpha, omega, gamma) {
+  var n = x.length, i;
+  var dx = new Float64Array(n), dy = new Float64Array(n);
+  dx[0] = x[1]-x[0];         dy[0] = y[1]-y[0];
+  dx[n-1] = x[n-1]-x[n-2];   dy[n-1] = y[n-1]-y[n-2];
+  for (i = 1; i < n-1; i++) { dx[i] = (x[i+1]-x[i-1])*0.5; dy[i] = (y[i+1]-y[i-1])*0.5; }
+  var ddx = new Float64Array(n), ddy = new Float64Array(n);
+  ddx[0] = dx[1]-dx[0];       ddy[0] = dy[1]-dy[0];
+  ddx[n-1] = dx[n-1]-dx[n-2]; ddy[n-1] = dy[n-1]-dy[n-2];
+  for (i = 1; i < n-1; i++) { ddx[i] = (dx[i+1]-dx[i-1])*0.5; ddy[i] = (dy[i+1]-dy[i-1])*0.5; }
+  var Wsum = 0.0, Ssum = 0.0;
+  var xo = x.slice(), yo = y.slice();
+  for (i = 0; i < n; i++) {
+    var denom = Math.pow(dx[i]*dx[i] + dy[i]*dy[i], 1.5);
+    if (denom < 1e-30) denom = 1e-30;
+    var curv = (dx[i]*ddy[i] - dy[i]*ddx[i]) / denom;
+    var R0 = klW * curv;
+    var seg = 0.0;
+    if (i > 0) { var ax = x[i]-x[i-1], ay = y[i]-y[i-1]; seg = Math.sqrt(ax*ax + ay*ay); }
+    var decay = Math.exp(-alpha * seg);
+    Wsum = R0 + decay * Wsum;
+    Ssum = 1.0 + decay * Ssum;
+    var R = omega * R0 + gamma * Wsum / Ssum;
+    var dsi = Math.sqrt(dx[i]*dx[i] + dy[i]*dy[i]);
+    if (dsi < 1e-30) dsi = 1e-30;
+    var nx = dy[i] / dsi, ny = -dx[i] / dsi;
+    if (i > 0 && i < n-1) { xo[i] = x[i] + R*nx*dt; yo[i] = y[i] + R*ny*dt; }
+  }
+  return [xo, yo];
+}
+
+/* Symmetric convolution: bends grow without longitudinal translation. */
+function migrateSymmetric(x, y, klW, dt, alpha, omega, gamma) {
+  var n = x.length, i;
+  var dx = new Float64Array(n), dy = new Float64Array(n);
+  dx[0] = x[1]-x[0];         dy[0] = y[1]-y[0];
+  dx[n-1] = x[n-1]-x[n-2];   dy[n-1] = y[n-1]-y[n-2];
+  for (i = 1; i < n-1; i++) { dx[i] = (x[i+1]-x[i-1])*0.5; dy[i] = (y[i+1]-y[i-1])*0.5; }
+  var ddx = new Float64Array(n), ddy = new Float64Array(n);
+  ddx[0] = dx[1]-dx[0];       ddy[0] = dy[1]-dy[0];
+  ddx[n-1] = dx[n-1]-dx[n-2]; ddy[n-1] = dy[n-1]-dy[n-2];
+  for (i = 1; i < n-1; i++) { ddx[i] = (dx[i+1]-dx[i-1])*0.5; ddy[i] = (dy[i+1]-dy[i-1])*0.5; }
+  var R0 = new Float64Array(n), segLen = new Float64Array(n);
+  for (i = 0; i < n; i++) {
+    var denom = Math.pow(dx[i]*dx[i] + dy[i]*dy[i], 1.5);
+    if (denom < 1e-30) denom = 1e-30;
+    R0[i] = klW * (dx[i]*ddy[i] - dy[i]*ddx[i]) / denom;
+    if (i > 0) { var ax = x[i]-x[i-1], ay = y[i]-y[i-1]; segLen[i] = Math.sqrt(ax*ax + ay*ay); }
+  }
+  var Rf = new Float64Array(n), Rb = new Float64Array(n);
+  var Wsum = 0.0, Ssum = 0.0;
+  for (i = 0; i < n; i++) {
+    var dec = Math.exp(-alpha * segLen[i]);
+    Wsum = R0[i] + dec * Wsum; Ssum = 1.0 + dec * Ssum;
+    Rf[i] = omega * R0[i] + gamma * Wsum / Ssum;
+  }
+  Wsum = 0.0; Ssum = 0.0;
+  for (i = n-1; i >= 0; i--) {
+    var segB = (i < n-1) ? segLen[i+1] : 0.0;
+    var decB = Math.exp(-alpha * segB);
+    Wsum = R0[i] + decB * Wsum; Ssum = 1.0 + decB * Ssum;
+    Rb[i] = omega * R0[i] + gamma * Wsum / Ssum;
+  }
+  var xo = x.slice(), yo = y.slice();
+  for (i = 0; i < n; i++) {
+    var R = 0.5 * (Rf[i] + Rb[i]);
+    var dsi = Math.sqrt(dx[i]*dx[i] + dy[i]*dy[i]);
+    if (dsi < 1e-30) dsi = 1e-30;
+    var nx = dy[i]/dsi, ny = -dx[i]/dsi;
+    if (i > 0 && i < n-1) { xo[i] = x[i] + R*nx*dt; yo[i] = y[i] + R*ny*dt; }
+  }
+  return [xo, yo];
+}
+
+/* Downstream convolution: upstream phase lag, bends translate up-valley. */
+function migrateDownstream(x, y, klW, dt, alpha, omega, gamma) {
+  var n = x.length, i;
+  var dx = new Float64Array(n), dy = new Float64Array(n);
+  dx[0] = x[1]-x[0];         dy[0] = y[1]-y[0];
+  dx[n-1] = x[n-1]-x[n-2];   dy[n-1] = y[n-1]-y[n-2];
+  for (i = 1; i < n-1; i++) { dx[i] = (x[i+1]-x[i-1])*0.5; dy[i] = (y[i+1]-y[i-1])*0.5; }
+  var ddx = new Float64Array(n), ddy = new Float64Array(n);
+  ddx[0] = dx[1]-dx[0];       ddy[0] = dy[1]-dy[0];
+  ddx[n-1] = dx[n-1]-dx[n-2]; ddy[n-1] = dy[n-1]-dy[n-2];
+  for (i = 1; i < n-1; i++) { ddx[i] = (dx[i+1]-dx[i-1])*0.5; ddy[i] = (dy[i+1]-dy[i-1])*0.5; }
+  var R0 = new Float64Array(n), segLen = new Float64Array(n);
+  for (i = 0; i < n; i++) {
+    var denom = Math.pow(dx[i]*dx[i] + dy[i]*dy[i], 1.5);
+    if (denom < 1e-30) denom = 1e-30;
+    R0[i] = klW * (dx[i]*ddy[i] - dy[i]*ddx[i]) / denom;
+    if (i < n-1) { var ax = x[i+1]-x[i], ay = y[i+1]-y[i]; segLen[i] = Math.sqrt(ax*ax + ay*ay); }
+  }
+  var Wsum = 0.0, Ssum = 0.0;
+  var xo = x.slice(), yo = y.slice();
+  for (i = n-1; i >= 0; i--) {
+    var segB = (i < n-1) ? segLen[i] : 0.0;
+    var dec = Math.exp(-alpha * segB);
+    Wsum = R0[i] + dec * Wsum; Ssum = 1.0 + dec * Ssum;
+    var R = omega * R0[i] + gamma * Wsum / Ssum;
+    var dsi = Math.sqrt(dx[i]*dx[i] + dy[i]*dy[i]);
+    if (dsi < 1e-30) dsi = 1e-30;
+    var nx = dy[i]/dsi, ny = -dx[i]/dsi;
+    if (i > 0 && i < n-1) { xo[i] = x[i] + R*nx*dt; yo[i] = y[i] + R*ny*dt; }
+  }
+  return [xo, yo];
+}
+
+/* Linear resample preserving endpoints. */
+function resample(x, y, dsTarget) {
+  var n = x.length, i;
+  var s = new Float64Array(n);
+  for (i = 1; i < n; i++) {
+    var ax = x[i]-x[i-1], ay = y[i]-y[i-1];
+    s[i] = s[i-1] + Math.sqrt(ax*ax + ay*ay);
+  }
+  var total = s[n-1];
+  if (total < 2 * dsTarget) return [x.slice(), y.slice()];
+  var nNew = Math.floor(total / dsTarget + 0.5);
+  if (nNew < 2) nNew = 2;
+  var xN = new Float64Array(nNew + 1), yN = new Float64Array(nNew + 1);
+  xN[0] = x[0];      yN[0] = y[0];
+  xN[nNew] = x[n-1]; yN[nNew] = y[n-1];
+  var j = 0;
+  for (i = 1; i < nNew; i++) {
+    var sT = total * i / nNew;
+    while (j < n-2 && s[j+1] < sT) j++;
+    var denom = s[j+1] - s[j];
+    if (denom < 1e-30) denom = 1e-30;
+    var f = (sT - s[j]) / denom;
+    xN[i] = x[j] + f * (x[j+1] - x[j]);
+    yN[i] = y[j] + f * (y[j+1] - y[j]);
+  }
+  return [xN, yN];
+}
+
+/* Light 3-point averaging, endpoints fixed. */
+function smooth3(x, y, nPasses) {
+  for (var p = 0; p < nPasses; p++) {
+    var xn = x.slice(), yn = y.slice();
+    for (var i = 1; i < x.length - 1; i++) {
+      xn[i] = 0.25*x[i-1] + 0.5*x[i] + 0.25*x[i+1];
+      yn[i] = 0.25*y[i-1] + 0.5*y[i] + 0.25*y[i+1];
+    }
+    x = xn; y = yn;
+  }
+  return [x, y];
+}
+
+/* Neck cutoff detection + execution (spatial hash replaces cKDTree). */
+function detectCutoffs(x, y, cutoffDist, band) {
+  var oxbows = [];
+  var cut2 = cutoffDist * cutoffDist;
+  var inv = 1.0 / cutoffDist;
+  while (x.length >= 5) {
+    var n = x.length, i, k;
+    var bins = new Map();
+    var pairs = [];
+    for (i = 0; i < n; i++) {
+      var cx = Math.floor(x[i] * inv), cy = Math.floor(y[i] * inv);
+      for (var gx = cx-1; gx <= cx+1; gx++) {
+        for (var gy = cy-1; gy <= cy+1; gy++) {
+          var bin = bins.get(gx * 262144 + gy);
+          if (!bin) continue;
+          for (var b = 0; b < bin.length; b++) {
+            var j = bin[b];
+            if (i - j < band) continue;
+            var ax = x[i]-x[j], ay = y[i]-y[j];
+            var d2 = ax*ax + ay*ay;
+            if (d2 <= cut2) pairs.push([d2, j, i]);
+          }
+        }
+      }
+      var key = cx * 262144 + cy;
+      var arr = bins.get(key);
+      if (!arr) { arr = []; bins.set(key, arr); }
+      arr.push(i);
+    }
+    if (pairs.length === 0) break;
+    pairs.sort(function(a, b2) { return a[0] - b2[0]; });
+    var used = new Uint8Array(n);
+    var cuts = [];
+    for (k = 0; k < pairs.length; k++) {
+      var ii = pairs[k][1], jj = pairs[k][2];
+      var blocked = false;
+      for (i = ii; i <= jj; i++) if (used[i]) { blocked = true; break; }
+      if (blocked) continue;
+      for (i = ii; i <= jj; i++) used[i] = 1;
+      cuts.push([ii, jj]);
+    }
+    if (cuts.length === 0) break;
+    cuts.sort(function(a, b3) { return b3[0] - a[0]; });
+    for (k = 0; k < cuts.length; k++) {
+      var i0 = cuts[k][0], j0 = cuts[k][1];
+      oxbows.push({ x: x.slice(i0, j0+1), y: y.slice(i0, j0+1) });
+      var m = x.length;
+      var xN = new Float64Array(i0 + 1 + (m - j0));
+      var yN = new Float64Array(i0 + 1 + (m - j0));
+      xN.set(x.subarray(0, i0+1), 0); xN.set(x.subarray(j0), i0+1);
+      yN.set(y.subarray(0, i0+1), 0); yN.set(y.subarray(j0), i0+1);
+      x = xN; y = yN;
     }
   }
-  return grid;
+  return { x: x, y: y, oxbows: oxbows };
 }
 
-function distanceTransform(binaryGrid) {
-  var INF = 1e10;
-  var f = new Float32Array(N);
-  var d = new Float32Array(N);
-  for (var i = 0; i < N; i++) f[i] = binaryGrid[i] ? 0 : INF;
-  var colBuf = new Float32Array(ROWS);
-  for (var c = 0; c < COLS; c++) {
-    colBuf[0] = f[0*COLS+c];
-    for (var r = 1; r < ROWS; r++) colBuf[r] = Math.min(f[r*COLS+c], colBuf[r-1]+1);
-    for (var r2 = ROWS-2; r2 >= 0; r2--) colBuf[r2] = Math.min(colBuf[r2], colBuf[r2+1]+1);
-    for (var r3 = 0; r3 < ROWS; r3++) f[r3*COLS+c] = colBuf[r3]*colBuf[r3];
+/* Valley-wall confinement: smoothly damp outward migration as nodes approach
+   y = +-yEnd (soft erodibility, like a confined meander belt). Nodes moving
+   back toward the valley axis are never damped. Mutates the migrated arrays. */
+function confineValley(xOld, yOld, xNew, yNew, yStart, yEnd) {
+  var n = xNew.length;
+  for (var i = 1; i < n - 1; i++) {
+    var y0 = yOld[i];
+    var a = y0 < 0 ? -y0 : y0;
+    if (a <= yStart) continue;
+    var dy = yNew[i] - y0;
+    if ((y0 > 0 && dy <= 0) || (y0 < 0 && dy >= 0)) continue;
+    var f = 0.0;
+    if (a < yEnd) {
+      var t = (a - yStart) / (yEnd - yStart);
+      f = 1 - t * t * (3 - 2 * t);
+    }
+    xNew[i] = xOld[i] + (xNew[i] - xOld[i]) * f;
+    yNew[i] = y0 + dy * f;
   }
+}
+
+function sinuosity(x, y) {
+  var arc = 0, n = x.length;
+  for (var i = 1; i < n; i++) {
+    var ax = x[i]-x[i-1], ay = y[i]-y[i-1];
+    arc += Math.sqrt(ax*ax + ay*ay);
+  }
+  var sx = x[n-1]-x[0], sy = y[n-1]-y[0];
+  var straight = Math.sqrt(sx*sx + sy*sy);
+  return straight > 0 ? arc / straight : NaN;
+}
+
+/* Rasterize centerline to a 1-cell-wide river mask (7.7 _rasterize:
+   50 interpolated samples per segment, int-truncation indexing). */
+function rasterize(x, y, grid, GP) {
+  grid.fill(0);
+  var n = x.length;
+  for (var i = 0; i < n-1; i++) {
+    var x0 = x[i], y0 = y[i], dx = x[i+1]-x[i], dy = y[i+1]-y[i];
+    for (var k = 0; k < 50; k++) {
+      var t = k / 49;
+      var ci = Math.trunc((x0 + dx*t - GP.XMIN) / GP.CELL);
+      var ri = Math.trunc((y0 + dy*t - GP.YMIN) / GP.CELL);
+      if (ci >= 0 && ci < GP.COLS && ri >= 0 && ri < GP.ROWS) grid[ri*GP.COLS + ci] = 1;
+    }
+  }
+}
+
+/* Exact Euclidean distance transform (Felzenszwalb), distances in cells. */
+function makeEdt(ROWS, COLS) {
+  var N = ROWS * COLS;
+  var f = new Float64Array(N);
+  var colBuf = new Float64Array(ROWS);
   var v = new Int32Array(COLS);
-  var z = new Float32Array(COLS+1);
-  var rowD = new Float32Array(COLS);
-  for (var r4 = 0; r4 < ROWS; r4++) {
-    var off = r4*COLS;
-    var k = 0; v[0]=0; z[0]=-INF; z[1]=INF;
-    for (var q = 1; q < COLS; q++) {
-      var s = ((f[off+q]+q*q)-(f[off+v[k]]+v[k]*v[k]))/(2*q-2*v[k]);
-      while (s <= z[k]) { k--; s=((f[off+q]+q*q)-(f[off+v[k]]+v[k]*v[k]))/(2*q-2*v[k]); }
-      k++; v[k]=q; z[k]=s; z[k+1]=INF;
+  var z = new Float64Array(COLS + 1);
+  var rowD = new Float64Array(COLS);
+  var INF = 1e10;
+  return function edt(grid, dist) {
+    var r, c, q, k2;
+    for (var i = 0; i < N; i++) f[i] = grid[i] ? 0 : INF;
+    for (c = 0; c < COLS; c++) {
+      colBuf[0] = f[c];
+      for (r = 1; r < ROWS; r++) colBuf[r] = Math.min(f[r*COLS + c], colBuf[r-1] + 1);
+      for (r = ROWS-2; r >= 0; r--) colBuf[r] = Math.min(colBuf[r], colBuf[r+1] + 1);
+      for (r = 0; r < ROWS; r++) f[r*COLS + c] = colBuf[r] * colBuf[r];
     }
-    k=0;
-    for (var q2 = 0; q2 < COLS; q2++) {
-      while (z[k+1] < q2) k++;
-      var dq = q2-v[k]; rowD[q2] = dq*dq + f[off+v[k]];
+    for (r = 0; r < ROWS; r++) {
+      var off = r * COLS;
+      var k = 0; v[0] = 0; z[0] = -INF; z[1] = INF;
+      for (q = 1; q < COLS; q++) {
+        var s = ((f[off+q] + q*q) - (f[off+v[k]] + v[k]*v[k])) / (2*q - 2*v[k]);
+        while (s <= z[k]) {
+          k--;
+          s = ((f[off+q] + q*q) - (f[off+v[k]] + v[k]*v[k])) / (2*q - 2*v[k]);
+        }
+        k++; v[k] = q; z[k] = s; z[k+1] = INF;
+      }
+      k = 0;
+      for (q = 0; q < COLS; q++) {
+        while (z[k+1] < q) k++;
+        var dq = q - v[k];
+        rowD[q] = dq*dq + f[off+v[k]];
+      }
+      for (k2 = 0; k2 < COLS; k2++) dist[off+k2] = Math.sqrt(rowD[k2]);
     }
-    for (var q3 = 0; q3 < COLS; q3++) d[off+q3] = Math.sqrt(rowD[q3]);
+  };
+}
+
+/* ── Settlement CA (7.7 model.py) ── */
+
+function computeBaseU(dist, river, wDist, baseU, N) {
+  for (var i = 0; i < N; i++) baseU[i] = river[i] ? -1e20 : -dist[i] * wDist;
+}
+
+function updateNeighbors(neigh, r, c, delta, ROWS, COLS) {
+  for (var dr = -1; dr <= 1; dr++) {
+    for (var dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      var rr = r + dr, cc = c + dc;
+      if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) neigh[rr*COLS + cc] += delta;
+    }
   }
-  return d;
 }
 
-function updateNeighbors(r, c, delta) {
-  for (var i = 0; i < 8; i++) {
-    var rr = r+OFFSETS_DR[i], cc = c+OFFSETS_DC[i];
-    if (rr>=0 && rr<ROWS && cc>=0 && cc<COLS) neighbors[rr*COLS+cc] += delta;
-  }
-}
-
-// utility = -distance to river (no cohesion, no weights); river cells forbidden
-function computeBaseU(distGrid, riverGrid) {
-  var baseU = new Float32Array(N);
-  for (var i = 0; i < N; i++) baseU[i] = riverGrid[i] ? -1e20 : -distGrid[i];
-  return baseU;
-}
-
-// best open cell = closest to the river; prefer the settlement perimeter so it stays contiguous
-function getBestPerimeter(baseU) {
-  var bestScore = -Infinity, bestIdx = -1;
+function findWorst(village, baseU, neigh, wCoh, N) {
+  var worst = 1e30, wi = -1;
   for (var i = 0; i < N; i++) {
-    if (village[i] || river[i] || neighbors[i]===0) continue;
-    if (baseU[i] > bestScore) { bestScore = baseU[i]; bestIdx = i; }
-  }
-  if (bestIdx === -1) {
-    for (var j = 0; j < N; j++) {
-      if (village[j] || river[j]) continue;
-      if (baseU[j] > bestScore) { bestScore = baseU[j]; bestIdx = j; }
+    if (village[i]) {
+      var s = baseU[i] + neigh[i] * wCoh;
+      if (s < worst) { worst = s; wi = i; }
     }
   }
-  return { idx: bestIdx, score: bestScore };
+  return [worst, wi];
 }
 
-// worst occupied cell = farthest from the river
-function getWorstVillage(baseU) {
-  var worstScore = Infinity, worstIdx = -1;
-  for (var i = 0; i < N; i++) {
-    if (!village[i]) continue;
-    if (baseU[i] < worstScore) { worstScore = baseU[i]; worstIdx = i; }
+function findBest(village, river, baseU, neigh, wCoh, N) {
+  var best = -1e30, bi = -1, i, s;
+  for (i = 0; i < N; i++) {
+    if (village[i] === 0 && river[i] === 0 && neigh[i] > 0) {
+      s = baseU[i] + neigh[i] * wCoh;
+      if (s > best) { best = s; bi = i; }
+    }
   }
-  return { idx: worstIdx, score: worstScore };
+  if (bi === -1) {
+    for (i = 0; i < N; i++) {
+      if (village[i] === 0 && river[i] === 0) {
+        s = baseU[i] + neigh[i] * wCoh;
+        if (s > best) { best = s; bi = i; }
+      }
+    }
+  }
+  return [best, bi];
 }
 
-// one timestep: forced relocation (drowning) then greedy voluntary relaxation.
-// friction mu = 0 -> pure greedy (any improvement); returns [forced, voluntary] counts.
-function caStep(baseU, friction) {
-  var forced = 0, voluntary = 0;
-  var drowned = [];
-  for (var i = 0; i < N; i++) { if (village[i] && river[i]) drowned.push(i); }
-  for (var d2 = 0; d2 < drowned.length; d2++) {
-    var idx = drowned[d2];
-    var r = (idx/COLS)|0, c = idx%COLS;
-    village[idx] = 0; updateNeighbors(r, c, -1);
-  }
-  for (var d3 = 0; d3 < drowned.length; d3++) {
-    var best = getBestPerimeter(baseU);
-    if (best.idx >= 0) {
-      village[best.idx] = 1;
-      var br = (best.idx/COLS)|0, bc = best.idx%COLS;
-      updateNeighbors(br, bc, 1);
+/* One timestep: forced relocation (drowning) then voluntary relaxation. */
+function caStep(village, neigh, river, baseU, wCoh, friction, maxSwaps, ROWS, COLS) {
+  var N = ROWS * COLS, i;
+  var forced = 0;
+  for (i = 0; i < N; i++) {
+    if (village[i] === 1 && river[i] === 1) {
+      village[i] = 0;
+      updateNeighbors(neigh, (i / COLS) | 0, i % COLS, -1, ROWS, COLS);
       forced++;
     }
   }
-  for (var s = 0; s < MAX_SWAPS; s++) {
-    var worst = getWorstVillage(baseU);
-    if (worst.idx < 0) break;
-    var best2 = getBestPerimeter(baseU);
-    if (best2.idx < 0) break;
-    if (best2.score > worst.score + friction) {
-      var wr = (worst.idx/COLS)|0, wc2 = worst.idx%COLS;
-      village[worst.idx] = 0; updateNeighbors(wr, wc2, -1);
-      village[best2.idx] = 1;
-      var br2 = (best2.idx/COLS)|0, bc2 = best2.idx%COLS;
-      updateNeighbors(br2, bc2, 1);
+  for (i = 0; i < forced; i++) {
+    var fb = findBest(village, river, baseU, neigh, wCoh, N);
+    if (fb[1] === -1) break;
+    village[fb[1]] = 1;
+    updateNeighbors(neigh, (fb[1] / COLS) | 0, fb[1] % COLS, 1, ROWS, COLS);
+  }
+  var voluntary = 0;
+  for (var s = 0; s < maxSwaps; s++) {
+    var w = findWorst(village, baseU, neigh, wCoh, N);
+    if (w[1] === -1) break;
+    var b = findBest(village, river, baseU, neigh, wCoh, N);
+    if (b[1] === -1) break;
+    if (b[0] > w[0] + friction) {
+      village[w[1]] = 0;
+      updateNeighbors(neigh, (w[1] / COLS) | 0, w[1] % COLS, -1, ROWS, COLS);
+      village[b[1]] = 1;
+      updateNeighbors(neigh, (b[1] / COLS) | 0, b[1] % COLS, 1, ROWS, COLS);
       voluntary++;
     } else break;
   }
   return [forced, voluntary];
 }
 
-function initVillage() {
-  var friction = getParam("friction"), pop = getParam("pop");
-  currentStep = 0;
-  river = rasterizeChannel(riverTimesteps[0]);
-  dist = distanceTransform(river);
-  var baseU = computeBaseU(dist, river);
-  village = new Uint8Array(N);
-  neighbors = new Int16Array(N);
-  var bestStartScore = -Infinity, bestStartIdx = 0;
-  var centerR = ROWS/2, centerC = COLS/2;
-  for (var i = 0; i < N; i++) {
-    if (river[i]) continue;
-    var r = (i/COLS)|0, c = i%COLS;
-    var dCenter = Math.sqrt((r-centerR)*(r-centerR)+(c-centerC)*(c-centerC));
-    var score = baseU[i] - dCenter*0.05;
-    if (score > bestStartScore) { bestStartScore = score; bestStartIdx = i; }
-  }
-  village[bestStartIdx] = 1;
-  var sr = (bestStartIdx/COLS)|0, sc2 = bestStartIdx%COLS;
-  updateNeighbors(sr, sc2, 1);
-  for (var g = 1; g < pop; g++) {
-    var best = getBestPerimeter(baseU);
-    if (best.idx >= 0) {
-      village[best.idx] = 1;
-      var r2 = (best.idx/COLS)|0, c2 = best.idx%COLS;
-      updateNeighbors(r2, c2, 1);
+function pickSeed(baseU, river, ROWS, COLS) {
+  var cr = Math.floor(ROWS / 2), cc = Math.floor(COLS / 2);
+  var best = -Infinity, bi = 0;
+  for (var r = 0; r < ROWS; r++) {
+    for (var c = 0; c < COLS; c++) {
+      var i = r*COLS + c;
+      var s = river[i] ? -1e30
+            : baseU[i] - 0.05 * Math.sqrt((r-cr)*(r-cr) + (c-cc)*(c-cc));
+      if (s > best) { best = s; bi = i; }
     }
   }
-  for (var b = 0; b < 40; b++) caStep(baseU, friction);
-  lastForced = 0; lastVoluntary = 0;
-  prevVillage = new Uint8Array(village);
-  render(); updateInfoDisplay();
+  return bi;
 }
 
-var imgData = ctx.createImageData(COLS, ROWS);
+function growVillage(village, neigh, river, baseU, wCoh, targetN, seedIdx, ROWS, COLS) {
+  village[seedIdx] = 1;
+  updateNeighbors(neigh, (seedIdx / COLS) | 0, seedIdx % COLS, 1, ROWS, COLS);
+  var count = 1;
+  while (count < targetN) {
+    var fb = findBest(village, river, baseU, neigh, wCoh, ROWS * COLS);
+    if (fb[1] === -1) break;
+    village[fb[1]] = 1;
+    updateNeighbors(neigh, (fb[1] / COLS) | 0, fb[1] % COLS, 1, ROWS, COLS);
+    count++;
+  }
+  return count;
+}
+/*==ENDCORE==*/
+</script>
 
-function render() {
-  var pixels = imgData.data;
-  for (var i = 0; i < N; i++) {
-    var off = i*4;
-    var wasV = prevVillage[i], nowV = village[i], nowR = river[i];
-    if (wasV && nowR)                { pixels[off]=255; pixels[off+1]=26;  pixels[off+2]=26;  pixels[off+3]=255; }
-    else if (wasV && nowV)           { pixels[off]=255; pixels[off+1]=128; pixels[off+2]=0;   pixels[off+3]=255; }
-    else if (!wasV && nowV)          { pixels[off]=26;  pixels[off+1]=255; pixels[off+2]=26;  pixels[off+3]=255; }
-    else if (wasV && !nowV && !nowR) { pixels[off]=255; pixels[off+1]=255; pixels[off+2]=255; pixels[off+3]=255; }
-    else if (nowR)                   { pixels[off]=0;   pixels[off+1]=40;  pixels[off+2]=255; pixels[off+3]=255; }
-    else                             { pixels[off]=0;   pixels[off+1]=0;   pixels[off+2]=0;   pixels[off+3]=255; }
-  }
-  var flipped = ctx.createImageData(COLS, ROWS);
-  var fp = flipped.data;
-  for (var r = 0; r < ROWS; r++) {
-    var srcOff = r*COLS*4, dstOff = (ROWS-1-r)*COLS*4;
-    for (var c = 0; c < COLS*4; c++) fp[dstOff+c] = pixels[srcOff+c];
-  }
-  ctx.putImageData(flipped, 0, 0);
+<script>
+(function() {
+"use strict";
+
+/* ── Constants (7.7 spatial setup; grid cell size is a slider) ── */
+var W = 100.0;                       // channel width (m)
+var DS = 50.0;                       // centerline node spacing (m)
+var XMIN = 1000, XMAX = 12200, YMIN = -2000, YMAX = 2000;   // 11.2 km x 4 km window
+var CELL, COLS, ROWS, NC, GP;        // set by allocGrid()
+var OMEGA = -1.0, GAMMA = 2.5;       // alpha comes from the meander-scale slider
+var WALL_START = 1400, WALL_END = 1800;   // valley-wall ramp (m from axis)
+var W_DIST = 1.0;
+var MAX_SWAPS = 40000;               // full relaxation (7.7), convergent when w_coh = 0
+var MAX_SWAPS_COH = 2000;            // bounded relaxation with cohesion: best-response
+                                     // with externalities need not converge, so cap per
+                                     // step and let relaxation continue across frames
+var SETTLE_MAX = 150;
+var WARMUP_YEARS = 30, WARMUP_KL = 100;
+var SCAR_TAU = 150;                  // oxbow scar fade e-folding (yr)
+
+/* ── State ── */
+var rx = null, ry = null;            // river centerline (m)
+var river, dist, baseU, village, prevVillage, neigh, edt, imgData;
+var tYears = 0;
+var cumForced = 0, cumVol = 0, cumOxbows = 0;
+var lastForced = 0, lastVol = 0;
+var scars = [];                      // {x, y, t}
+var playing = false, animId = null, lastTime = 0;
+var hist = { t: [], f: [], v: [], s: [], p: [] };
+
+/* ── DOM ── */
+function $(id) { return document.getElementById(id); }
+var canvas = $("sim-canvas"), ctx = canvas.getContext("2d");
+var overlay = $("overlay-canvas"), octx = overlay.getContext("2d");
+
+/* (Re)build the Eulerian grid at a given cell size (m). The river is
+   vector-based and unaffected; the village must be re-seeded after. */
+function allocGrid(cell) {
+  CELL = cell;
+  COLS = Math.round((XMAX - XMIN) / CELL);
+  ROWS = Math.round((YMAX - YMIN) / CELL);
+  NC = ROWS * COLS;
+  GP = { XMIN: XMIN, YMIN: YMIN, CELL: CELL, ROWS: ROWS, COLS: COLS };
+  river = new Uint8Array(NC);
+  dist = new Float64Array(NC);
+  baseU = new Float64Array(NC);
+  village = new Uint8Array(NC);
+  prevVillage = new Uint8Array(NC);
+  neigh = new Int16Array(NC);
+  edt = makeEdt(ROWS, COLS);
+  canvas.width = COLS;
+  canvas.height = ROWS;
+  imgData = ctx.createImageData(COLS, ROWS);
 }
 
-var infoStable = document.getElementById("info-stable");
-var infoNew = document.getElementById("info-new");
-var infoAbandoned = document.getElementById("info-abandoned");
-var infoDrowned = document.getElementById("info-drowned");
+var sliders = [
+  ["sl-kl", "val-kl"], ["sl-crdist", "val-crdist"], ["sl-scale", "val-scale"],
+  ["sl-friction", "val-friction"], ["sl-pop", "val-pop"], ["sl-coh", "val-coh"],
+  ["sl-cell", "val-cell"], ["sl-ypf", "val-ypf"], ["sl-delay", "val-delay"]
+];
+sliders.forEach(function(pair) {
+  var el = $(pair[0]), val = $(pair[1]);
+  el.addEventListener("input", function() { val.textContent = el.value; });
+});
+function P(id) { return parseFloat($(id).value); }
 
-function updateInfoDisplay() {
-  infoStep.textContent = currentStep;
-  var pop = 0, nStable = 0, nNew = 0, nAbandoned = 0, nDrowned = 0;
-  for (var i = 0; i < N; i++) {
-    var wasV = prevVillage[i], nowV = village[i], nowR = river[i];
-    if (nowV) pop++;
-    if (wasV && nowR)               nDrowned++;
-    else if (wasV && nowV)          nStable++;
-    else if (!wasV && nowV)         nNew++;
-    else if (wasV && !nowV && !nowR) nAbandoned++;
-  }
-  infoPop.textContent = pop;
-  infoForced.textContent = lastForced;
-  infoVoluntary.textContent = lastVoluntary;
-  infoStable.textContent = nStable;
-  infoNew.textContent = nNew;
-  infoAbandoned.textContent = nAbandoned;
-  infoDrowned.textContent = nDrowned;
+/* ── River stepping ── */
+function riverParams() {
+  var crdist = P("sl-crdist") * W;
+  return {
+    kl: P("sl-kl"),
+    crdist: crdist,
+    band: Math.ceil(crdist / DS) + 3,
+    mode: $("sel-mode").value,
+    alpha: 1.0 / (P("sl-scale") * W),      // memory length ell*W -> alpha
+    confine: $("chk-valley").checked
+  };
 }
 
+function migrateFn(mode) {
+  return mode === "sym" ? migrateSymmetric :
+         mode === "down" ? migrateDownstream : migrateUpstream;
+}
+
+/* Advance the river by `years` at rate `kl`, splitting into stable substeps. */
+function advanceRiver(years, kl, p, recordScars) {
+  var mig = migrateFn(p.mode);
+  var dtMax = Math.min(0.5, 7.0 / kl);
+  var K = Math.max(1, Math.ceil(years / dtMax));
+  var dt = years / K;
+  for (var k = 0; k < K; k++) {
+    var r = mig(rx, ry, kl * W, dt, p.alpha, OMEGA, GAMMA);
+    if (p.confine) confineValley(rx, ry, r[0], r[1], WALL_START, WALL_END);
+    rx = r[0]; ry = r[1];
+    var cut = detectCutoffs(rx, ry, p.crdist, p.band);
+    rx = cut.x; ry = cut.y;
+    if (cut.oxbows.length > 0) {
+      cumOxbows += cut.oxbows.length;
+      if (recordScars) {
+        for (var o = 0; o < cut.oxbows.length; o++)
+          scars.push({ x: cut.oxbows[o].x, y: cut.oxbows[o].y, t: tYears });
+      }
+      var sm = smooth3(rx, ry, 3);
+      rx = sm[0]; ry = sm[1];
+    }
+    var rs = resample(rx, ry, DS);
+    rx = rs[0]; ry = rs[1];
+    tYears += dt;
+  }
+}
+
+/* ── Village init ── */
+function refreshFields() {
+  rasterize(rx, ry, river, GP);
+  edt(river, dist);
+  computeBaseU(dist, river, W_DIST, baseU, NC);
+}
+
+function relaxCap(wCoh) { return wCoh > 0 ? MAX_SWAPS_COH : MAX_SWAPS; }
+
+function initVillage() {
+  refreshFields();
+  village.fill(0); neigh.fill(0);
+  var wCoh = P("sl-coh"), friction = P("sl-friction");
+  var cap = relaxCap(wCoh);
+  var seedIdx = pickSeed(baseU, river, ROWS, COLS);
+  growVillage(village, neigh, river, baseU, wCoh, Math.round(P("sl-pop")), seedIdx, ROWS, COLS);
+  for (var s = 0; s < SETTLE_MAX; s++) {
+    var fv = caStep(village, neigh, river, baseU, wCoh, friction, cap, ROWS, COLS);
+    if (fv[0] + fv[1] === 0 || fv[1] >= cap) break;
+  }
+  prevVillage.set(village);
+  lastForced = 0; lastVol = 0;
+  cumForced = 0; cumVol = 0;
+}
+
+function buildWorld(seed) {
+  allocGrid(Math.round(P("sl-cell")));
+  var p = riverParams();
+  var ch = makeInitialChannel(seed);
+  var rs0 = resample(ch[0], ch[1], DS);
+  rx = rs0[0]; ry = rs0[1];
+  tYears = 0; cumOxbows = 0; scars = [];
+  advanceRiver(WARMUP_YEARS, WARMUP_KL, p, false);
+  tYears = 0; cumOxbows = 0;          // clock starts after warm-up
+  initVillage();
+  hist = { t: [], f: [], v: [], s: [], p: [] };
+  renderAll();
+}
+
+/* ── Coupled step: river Δt, re-grid, CA ── */
 function step() {
-  if (currentStep >= riverTimesteps.length - 1) { pause(); return; }
-  var migRate = Math.round(getParam("migrate"));          // migration rate = timestep (frames/step)
-  currentStep = Math.min(currentStep + migRate, riverTimesteps.length - 1);
-  var friction = getParam("friction");
-  prevVillage = new Uint8Array(village);
-  river = rasterizeChannel(riverTimesteps[currentStep]);
-  dist = distanceTransform(river);
-  var baseU = computeBaseU(dist, river);
-  var fv = caStep(baseU, friction);
-  lastForced = fv[0]; lastVoluntary = fv[1];
-  render(); updateInfoDisplay();
+  var p = riverParams();
+  advanceRiver(P("sl-ypf"), p.kl, p, true);
+  prevVillage.set(village);
+  refreshFields();
+  var wCoh = P("sl-coh");
+  var fv = caStep(village, neigh, river, baseU, wCoh, P("sl-friction"),
+                  relaxCap(wCoh), ROWS, COLS);
+  lastForced = fv[0]; lastVol = fv[1];
+  cumForced += fv[0]; cumVol += fv[1];
+  var pop = 0;
+  for (var i = 0; i < NC; i++) pop += village[i];
+  hist.t.push(tYears); hist.f.push(fv[0]); hist.v.push(fv[1]);
+  hist.s.push(sinuosity(rx, ry)); hist.p.push(pop);
+  renderAll();
 }
 
-function animate(timestamp) {
-  if (!playing) return;
-  var delay = getParam("speed");
-  if (timestamp - lastFrameTime >= delay) { lastFrameTime = timestamp; step(); }
-  animFrameId = requestAnimationFrame(animate);
-}
-
-function play() {
-  if (!riverTimesteps) return;
-  playing = true; btnPlay.disabled = true; btnPause.disabled = false;
-  lastFrameTime = performance.now(); animFrameId = requestAnimationFrame(animate);
-}
-function pause() { playing = false; btnPlay.disabled = false; btnPause.disabled = true; if (animFrameId) cancelAnimationFrame(animFrameId); }
-function reset() { pause(); initVillage(); }
-
-btnPlay.addEventListener("click", play);
-btnPause.addEventListener("click", pause);
-btnReset.addEventListener("click", reset);
-
-// changing population rebuilds to the new N on the current river (greedy add/remove)
-sliders.pop.el.addEventListener("change", function() {
-  if (!riverTimesteps) return;
-  var targetPop = getParam("pop");
-  var baseU = computeBaseU(dist, river);
-  var currentPop = 0; for (var i = 0; i < N; i++) if (village[i]) currentPop++;
-  while (currentPop < targetPop) {
-    var best = getBestPerimeter(baseU);
-    if (best.idx < 0) break;
-    village[best.idx] = 1; var r = (best.idx/COLS)|0, c = best.idx%COLS; updateNeighbors(r, c, 1); currentPop++;
+/* ── Rendering ── */
+function renderGrid() {
+  var px = imgData.data;
+  var nStable = 0, nNew = 0, nAband = 0, nDrown = 0, pop = 0;
+  for (var r = 0; r < ROWS; r++) {
+    var srcOff = r * COLS;
+    var dstOff = (ROWS - 1 - r) * COLS * 4;   // y increases upward
+    for (var c = 0; c < COLS; c++) {
+      var i = srcOff + c, o = dstOff + c*4;
+      var wasV = prevVillage[i], nowV = village[i], nowR = river[i];
+      var R, G, B;
+      if (wasV && nowR)                { R=255; G=26;  B=26;  nDrown++; }
+      else if (wasV && nowV)           { R=255; G=128; B=0;   nStable++; }
+      else if (!wasV && nowV)          { R=26;  G=255; B=26;  nNew++; }
+      else if (wasV && !nowV && !nowR) { R=255; G=255; B=255; nAband++; }
+      else if (nowR)                   { R=0;   G=40;  B=255; }
+      else                             { R=0;   G=0;   B=0;   }
+      px[o] = R; px[o+1] = G; px[o+2] = B; px[o+3] = 255;
+      if (nowV) pop++;
+    }
   }
-  while (currentPop > targetPop) {
-    var worst = getWorstVillage(baseU);
-    if (worst.idx < 0) break;
-    village[worst.idx] = 0; var wr = (worst.idx/COLS)|0, wc2 = worst.idx%COLS; updateNeighbors(wr, wc2, -1); currentPop--;
+  ctx.putImageData(imgData, 0, 0);
+  $("info-years").textContent = tYears.toFixed(1);
+  $("info-sinu").textContent = rx ? sinuosity(rx, ry).toFixed(2) : "-";
+  $("info-pop").textContent = pop;
+  $("info-forced").textContent = lastForced;
+  $("info-forced-cum").textContent = cumForced;
+  $("info-vol").textContent = lastVol;
+  $("info-vol-cum").textContent = cumVol;
+  $("info-oxbows").textContent = cumOxbows;
+  $("cnt-stable").textContent = nStable;
+  $("cnt-new").textContent = nNew;
+  $("cnt-abandoned").textContent = nAband;
+  $("cnt-drowned").textContent = nDrown;
+}
+
+function renderOverlay() {
+  var rect = canvas.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  if (overlay.width !== Math.round(rect.width * dpr)) {
+    overlay.width = Math.round(rect.width * dpr);
+    overlay.height = Math.round(rect.height * dpr);
   }
-  render(); updateInfoDisplay();
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.clearRect(0, 0, rect.width, rect.height);
+  var sx = rect.width / (XMAX - XMIN), sy = rect.height / (YMAX - YMIN);
+  function tx(xm) { return (xm - XMIN) * sx; }
+  function ty(ym) { return rect.height - (ym - YMIN) * sy; }
+  if ($("chk-scars").checked) {
+    var keep = [];
+    for (var k = 0; k < scars.length; k++) {
+      var sc = scars[k];
+      var a = 0.55 * Math.exp(-(tYears - sc.t) / SCAR_TAU);
+      if (a < 0.02) continue;
+      keep.push(sc);
+      octx.beginPath();
+      octx.strokeStyle = "rgba(90, 130, 210, " + a.toFixed(3) + ")";
+      octx.lineWidth = 2;
+      octx.lineJoin = "round";
+      for (var q = 0; q < sc.x.length; q++) {
+        var X = tx(sc.x[q]), Y = ty(sc.y[q]);
+        if (q === 0) octx.moveTo(X, Y); else octx.lineTo(X, Y);
+      }
+      octx.stroke();
+    }
+    scars = keep;
+  }
+  if ($("chk-centerline").checked && rx) {
+    octx.beginPath();
+    octx.strokeStyle = "rgba(140, 190, 255, 0.9)";
+    octx.lineWidth = 1.2;
+    for (var i = 0; i < rx.length; i++) {
+      var X2 = tx(rx[i]), Y2 = ty(ry[i]);
+      if (i === 0) octx.moveTo(X2, Y2); else octx.lineTo(X2, Y2);
+    }
+    octx.stroke();
+  }
+}
+
+/* ── Charts ── */
+var C_FORCED = "#e34948", C_VOL = "#2a78d6", C_SINU = "#1baf7a";
+var INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#898781",
+    GRID = "#e1e0d9", BASE = "#c3c2b7";
+var MARG = { l: 40, r: 46, t: 6, b: 16 };
+
+function niceStep(range, target) {
+  var raw = range / target;
+  var mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  var norm = raw / mag;
+  var step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+  return step * mag;
+}
+
+/* Nearest sample index for a time value (hist.t is sorted). */
+function bisectTime(tv) {
+  var t = hist.t, lo = 0, hi = t.length - 1;
+  while (lo < hi) {
+    var mid = (lo + hi) >> 1;
+    if (t[mid] < tv) lo = mid + 1; else hi = mid;
+  }
+  if (lo > 0 && Math.abs(t[lo-1] - tv) < Math.abs(t[lo] - tv)) lo--;
+  return lo;
+}
+
+function setupChart(cvId, tipId) {
+  var cv = $(cvId), tip = $(tipId);
+  var chart = { cv: cv, cctx: cv.getContext("2d"), tip: tip, hoverI: -1, draw: null };
+  cv.parentNode.addEventListener("pointermove", function(e) {
+    var rect = cv.getBoundingClientRect();
+    var xpx = e.clientX - rect.left;
+    var n = hist.t.length;
+    if (n < 2) return;
+    var plotW = rect.width - MARG.l - MARG.r;
+    var frac = Math.max(0, Math.min(1, (xpx - MARG.l) / plotW));
+    chart.hoverI = bisectTime(frac * hist.t[n-1]);
+    if (chart.draw) chart.draw();
+  });
+  cv.parentNode.addEventListener("pointerleave", function() {
+    chart.hoverI = -1;
+    tip.style.display = "none";
+    if (chart.draw) chart.draw();
+  });
+  return chart;
+}
+
+var chMoves = setupChart("chart-moves", "tip-moves");
+var chSinu = setupChart("chart-sinu", "tip-sinu");
+
+function prepCanvas(chart, cssH) {
+  var cv = chart.cv;
+  var rect = cv.parentNode.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  var wCss = Math.max(100, rect.width);
+  if (cv.width !== Math.round(wCss * dpr) || cv.height !== Math.round(cssH * dpr)) {
+    cv.width = Math.round(wCss * dpr);
+    cv.height = Math.round(cssH * dpr);
+    cv.style.height = cssH + "px";
+  }
+  var g = chart.cctx;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, wCss, cssH);
+  return { g: g, w: wCss, h: cssH };
+}
+
+function frame(g, w, h, x0, x1, y0, y1, yFmt) {
+  var pw = w - MARG.l - MARG.r, ph = h - MARG.t - MARG.b;
+  g.font = "11px Aptos, Arial, sans-serif";
+  var ys = niceStep(y1 - y0, 3);
+  g.textAlign = "right"; g.textBaseline = "middle";
+  for (var yv = y0; yv <= y1 + 1e-9; yv += ys) {
+    var yy = MARG.t + ph * (1 - (yv - y0) / (y1 - y0));
+    g.strokeStyle = yv === y0 ? BASE : GRID;
+    g.lineWidth = 1;
+    g.beginPath(); g.moveTo(MARG.l, yy); g.lineTo(MARG.l + pw, yy); g.stroke();
+    g.fillStyle = MUTED;
+    g.fillText(yFmt(yv), MARG.l - 6, yy);
+  }
+  var xs = niceStep(x1 - x0 || 1, 5);
+  g.textAlign = "center"; g.textBaseline = "top";
+  for (var xv = Math.ceil(x0 / xs) * xs; xv <= x1 + 1e-9; xv += xs) {
+    var xx = MARG.l + pw * ((xv - x0) / ((x1 - x0) || 1));
+    if (xx > MARG.l + pw - 16) continue;   // keep clear of the unit label
+    g.fillStyle = MUTED;
+    g.fillText(Math.round(xv) + "", xx, MARG.t + ph + 4);
+  }
+  g.fillStyle = MUTED; g.textAlign = "left";
+  g.fillText("yr", MARG.l + pw + 6, MARG.t + ph + 4);
+  return { pw: pw, ph: ph };
+}
+
+/* Time-positioned polyline points. Sparse: one point per sample; dense:
+   per-pixel-column max so bursts are never lost when binned. */
+function seriesPoints(data, n, pw, t1) {
+  var pts = [];
+  if (t1 <= 0) return pts;
+  if (n <= pw) {
+    for (var i = 0; i < n; i++) pts.push([pw * hist.t[i] / t1, data[i]]);
+    return pts;
+  }
+  var i2 = 0;
+  for (var c = 0; c < pw; c++) {
+    var hi = t1 * (c + 1) / pw;
+    var m = -Infinity;
+    while (i2 < n && hist.t[i2] <= hi) { if (data[i2] > m) m = data[i2]; i2++; }
+    if (m !== -Infinity) pts.push([c + 0.5, m]);
+  }
+  return pts;
+}
+
+function drawLine(g, pts, x0px, y0px, ph, ymin, ymax, color) {
+  g.strokeStyle = color; g.lineWidth = 2;
+  g.lineJoin = "round"; g.lineCap = "round";
+  g.beginPath();
+  for (var c = 0; c < pts.length; c++) {
+    var X = x0px + pts[c][0];
+    var Y = y0px + ph * (1 - (pts[c][1] - ymin) / (ymax - ymin));
+    if (c === 0) g.moveTo(X, Y); else g.lineTo(X, Y);
+  }
+  g.stroke();
+}
+
+function endDot(g, X, Y, color) {
+  g.beginPath(); g.arc(X, Y, 5.5, 0, 2*Math.PI); g.fillStyle = "#fff"; g.fill();
+  g.beginPath(); g.arc(X, Y, 4, 0, 2*Math.PI); g.fillStyle = color; g.fill();
+}
+
+function tipRow(tip, color, label, value) {
+  var row = document.createElement("div");
+  row.className = "trow";
+  if (color) {
+    var key = document.createElement("span");
+    key.className = "lkey";
+    key.style.borderColor = color;
+    row.appendChild(key);
+  }
+  var lab = document.createElement("span");
+  lab.textContent = label;
+  row.appendChild(lab);
+  var val = document.createElement("span");
+  val.className = "tval";
+  val.textContent = value;
+  row.appendChild(val);
+  tip.appendChild(row);
+}
+
+function placeTip(chart, xpx, w) {
+  var tip = chart.tip;
+  tip.style.display = "block";
+  var tw = tip.offsetWidth;
+  var left = xpx + 12;
+  if (left + tw > w - 4) left = xpx - tw - 12;
+  tip.style.left = Math.max(2, left) + "px";
+  tip.style.top = "4px";
+}
+
+function drawMovesChart() {
+  var pc = prepCanvas(chMoves, 110);
+  var g = pc.g, n = hist.t.length;
+  var x1 = n > 1 ? hist.t[n-1] : 1;
+  var ymaxRaw = 1;
+  for (var i = 0; i < n; i++) {
+    if (hist.f[i] > ymaxRaw) ymaxRaw = hist.f[i];
+    if (hist.v[i] > ymaxRaw) ymaxRaw = hist.v[i];
+  }
+  var ymax = niceStep(ymaxRaw, 3) * Math.ceil(ymaxRaw / niceStep(ymaxRaw, 3));
+  var fr = frame(g, pc.w, 110, 0, x1, 0, ymax, function(v) { return v + ""; });
+  if (n >= 2) {
+    var pw = Math.max(2, Math.round(fr.pw));
+    var fP = seriesPoints(hist.f, n, pw, x1), vP = seriesPoints(hist.v, n, pw, x1);
+    drawLine(g, vP, MARG.l, MARG.t, fr.ph, 0, ymax, C_VOL);
+    drawLine(g, fP, MARG.l, MARG.t, fr.ph, 0, ymax, C_FORCED);
+    endDot(g, MARG.l + pw, MARG.t + fr.ph * (1 - hist.v[n-1] / ymax), C_VOL);
+    endDot(g, MARG.l + pw, MARG.t + fr.ph * (1 - hist.f[n-1] / ymax), C_FORCED);
+    if (chMoves.hoverI >= 0) {
+      var hx = MARG.l + fr.pw * (hist.t[chMoves.hoverI] / x1);
+      g.strokeStyle = BASE; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(hx, MARG.t); g.lineTo(hx, MARG.t + fr.ph); g.stroke();
+      var tip = chMoves.tip;
+      tip.textContent = "";
+      var hd = document.createElement("div");
+      hd.className = "thead";
+      hd.textContent = "t = " + hist.t[chMoves.hoverI].toFixed(1) + " yr";
+      tip.appendChild(hd);
+      tipRow(tip, C_FORCED, "Forced", hist.f[chMoves.hoverI]);
+      tipRow(tip, C_VOL, "Voluntary", hist.v[chMoves.hoverI]);
+      placeTip(chMoves, hx, pc.w);
+    }
+  }
+}
+
+function drawSinuChart() {
+  var pc = prepCanvas(chSinu, 90);
+  var g = pc.g, n = hist.t.length;
+  var x1 = n > 1 ? hist.t[n-1] : 1;
+  var ymaxRaw = 1.5;
+  for (var i = 0; i < n; i++) if (hist.s[i] > ymaxRaw) ymaxRaw = hist.s[i];
+  var ymax = Math.ceil(ymaxRaw * 2) / 2;
+  var Y0 = 1.0;                        // sinuosity floor: a straight channel
+  var fr = frame(g, pc.w, 90, 0, x1, Y0, ymax, function(v) { return v.toFixed(1); });
+  if (n >= 2) {
+    var pw = Math.max(2, Math.round(fr.pw));
+    var sP = seriesPoints(hist.s, n, pw, x1);
+    drawLine(g, sP, MARG.l, MARG.t, fr.ph, Y0, ymax, C_SINU);
+    var Yend = MARG.t + fr.ph * (1 - (hist.s[n-1] - Y0) / (ymax - Y0));
+    endDot(g, MARG.l + pw, Yend, C_SINU);
+    g.font = "600 11px Aptos, Arial, sans-serif";
+    g.fillStyle = INK; g.textAlign = "left"; g.textBaseline = "middle";
+    g.fillText(hist.s[n-1].toFixed(2), MARG.l + pw + 9, Yend);
+    if (chSinu.hoverI >= 0) {
+      var hx = MARG.l + fr.pw * (hist.t[chSinu.hoverI] / x1);
+      g.strokeStyle = BASE; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(hx, MARG.t); g.lineTo(hx, MARG.t + fr.ph); g.stroke();
+      var tip = chSinu.tip;
+      tip.textContent = "";
+      var hd = document.createElement("div");
+      hd.className = "thead";
+      hd.textContent = "t = " + hist.t[chSinu.hoverI].toFixed(1) + " yr";
+      tip.appendChild(hd);
+      tipRow(tip, C_SINU, "Sinuosity", hist.s[chSinu.hoverI].toFixed(3));
+      placeTip(chSinu, hx, pc.w);
+    }
+  }
+}
+
+chMoves.draw = drawMovesChart;
+chSinu.draw = drawSinuChart;
+
+function renderAll() {
+  renderGrid();
+  renderOverlay();
+  drawMovesChart();
+  drawSinuChart();
+}
+
+/* ── Visual toggles re-render immediately (matters while paused) ── */
+["chk-scars", "chk-centerline"].forEach(function(id) {
+  $(id).addEventListener("change", renderAll);
 });
 
-loadRiverData(function() { initVillage(); });
+/* ── Grid resolution: rebuild the grid and re-seed the village ── */
+$("sl-cell").addEventListener("change", function() {
+  allocGrid(Math.round(P("sl-cell")));
+  initVillage();
+  hist = { t: [], f: [], v: [], s: [], p: [] };
+  renderAll();
+});
+
+/* ── Population slider: greedy add/remove to target on current field ── */
+$("sl-pop").addEventListener("change", function() {
+  var target = Math.round(P("sl-pop"));
+  var wCoh = P("sl-coh");
+  var pop = 0;
+  for (var i = 0; i < NC; i++) pop += village[i];
+  while (pop < target) {
+    var fb = findBest(village, river, baseU, neigh, wCoh, NC);
+    if (fb[1] === -1) break;
+    village[fb[1]] = 1;
+    updateNeighbors(neigh, (fb[1] / COLS) | 0, fb[1] % COLS, 1, ROWS, COLS);
+    pop++;
+  }
+  while (pop > target) {
+    var w = findWorst(village, baseU, neigh, wCoh, NC);
+    if (w[1] === -1) break;
+    village[w[1]] = 0;
+    updateNeighbors(neigh, (w[1] / COLS) | 0, w[1] % COLS, -1, ROWS, COLS);
+    pop--;
+  }
+  renderAll();
+});
+
+/* ── Play / pause / step / reset ── */
+function animate(ts) {
+  if (!playing) return;
+  if (ts - lastTime >= P("sl-delay")) { lastTime = ts; step(); }
+  animId = requestAnimationFrame(animate);
+}
+function play() {
+  if (playing) return;
+  playing = true;
+  $("btn-play").disabled = true; $("btn-pause").disabled = false;
+  lastTime = performance.now();
+  animId = requestAnimationFrame(animate);
+}
+function pause() {
+  playing = false;
+  $("btn-play").disabled = false; $("btn-pause").disabled = true;
+  if (animId) cancelAnimationFrame(animId);
+}
+$("btn-play").addEventListener("click", play);
+$("btn-pause").addEventListener("click", pause);
+$("btn-step").addEventListener("click", function() { pause(); step(); });
+$("btn-reset").addEventListener("click", function() {
+  pause();
+  initVillage();
+  hist = { t: [], f: [], v: [], s: [], p: [] };
+  renderAll();
+});
+$("btn-newriver").addEventListener("click", function() {
+  pause();
+  var s = (Math.random() * 1e9) | 0;
+  $("inp-seed").value = s;
+  buildWorld(s);
+});
+$("btn-seed").addEventListener("click", function() {
+  pause();
+  buildWorld(Math.round(P("inp-seed")) >>> 0);
+});
+window.addEventListener("resize", renderAll);
+
+/* ── Boot ── */
+buildWorld(77);
 })();
 </script>
 
