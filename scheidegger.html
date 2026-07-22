@@ -23,6 +23,8 @@
     @media (max-width: 700px) {
       .project-page .sidebar { position: static; max-height: none; overflow: visible; }
     }
+    .sidebar .citation { font-size: 12.5px; line-height: 1.5; color: #767676; }
+    .sidebar .citation a { word-break: break-word; }
     /* demo styling, matched to the site's monospace/figure conventions */
     #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
     #stats .yes { color: #197a3a; }
@@ -57,21 +59,22 @@
     <hr class="separator">
 
     <p>By Brayden Noh.</p>
+
+    <hr class="separator">
+
+    <p class="citation">Noh, B. (2026). A percolation transition for Scheidegger river networks. <em>Physica A: Statistical Mechanics and its Applications</em>, in press.
+    <a href="https://doi.org/10.1016/j.physa.2026.131829">doi:10.1016/j.physa.2026.131829</a></p>
   </div>
 
   <div class="main">
 
-    <p>Some rivers run to the sea, others do not. Whether a river makes it is really a question about connection. Rain falls across a landscape, trickles downhill, and is soaked up by the ground along the way. A continuous river exists only when the flowing water joins into an unbroken path that reaches from the headwaters all the way to the coast. Asking when that connected path first appears is a percolation problem, the same question physicists ask about when water first finds its way through a porous rock.</p>
+    <p>What determines a river? A drop lands on a patch of ground and the ground has two options: absorb it, or decline and hand it to gravity, which happens once the soil is saturated. And the same transaction repeats upward through scale: hillslopes draining across their width, subbasins across their length, basins to the river, the river to the sea. Which is why this is really percolation theory, how purely local random connections become global pathways, and the whole continent's drainage assembled out of decisions made by dirt.</p>
 
-    <p>What counts as a river is decided cell by cell, through runoff. Each cell collects the rain that lands on it plus whatever water arrives from the cells upstream, holds back a fixed amount in storage, and sends the rest downhill. A cell carries a river only when that runoff is positive, meaning water genuinely leaves it. The whole model is this one balance, written for a cell at position \(\mathbf{x}\),</p>
+    <p>Below is that transaction on a lattice. Rain lands on each cell with probability \(p\), the ground holds back a fixed amount \(C\), and the excess is handed to one of the two cells diagonally downhill, left or right, decided at random once and then fixed for good. That is Scheidegger's landscape, about the least you can assume about a tilted rough surface and still get branching, merging streams that scale like real ones.</p>
 
-    \[
-    \rho(\mathbf{x}) \;=\; \max\!\Bigl(0,\;\; r(\mathbf{x}) \;+\!\! \sum_{\mathbf{x}'\,\to\,\mathbf{x}} \rho(\mathbf{x}') \;-\; C \Bigr).
-    \]
+    <p>What makes it interesting is that the handoffs accumulate. Two trickles too small to escape their own cells can meet at a confluence and clear the threshold together, so a cell can carry a river without a single drop having landed on it. Raise \(p\) or lower \(C\) and those overflowing cells link up until the basin flips from disconnected puddles to one river reaching the sea, along a critical curve \(p_c(C)\). Sit right at that edge and resample the rain: the same \((p, C)\) sometimes spans and sometimes does not. That is where the world's marginal rivers live.</p>
 
-    <p>Here \(\rho\) is the runoff, the rainfall \(r\) equals 1 with probability \(p\) and 0 otherwise, the sum collects the runoff from every upstream cell that drains into \(\mathbf{x}\), and \(C\) is the storage capacity. In words, runoff is water in minus water stored, and never less than zero. Two numbers then control everything you see below. The rainfall \(p\) sets how often a cell gets rain, and the storage \(C\) sets how thirsty the ground is.</p>
-
-    <!-- Interactive demo (placed first, so it is visible immediately) -->
+    <!-- Interactive demo -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
       <div id="canvasWrap" style="line-height:0;"><canvas id="canvas"></canvas></div>
       <div id="cbarWrap">
@@ -113,18 +116,6 @@
     <span class="sw" style="background:orangered;"></span> spanning river, a connected overflow path from top to bottom.
     Resample rain redraws the rainfall at the same \((p, C)\), and new landscape redraws the random flow directions.
     </p>
-
-    <p>One thing to notice in the picture. The river is made of overflow, not of cells merely touching. A cell joins the network only when its runoff is positive, so that water is genuinely passing through it, and the basin counts as spanning only when these overflowing cells form an unbroken chain of flow from the top row down to the bottom. The orange-red cells are exactly that spanning chain of overflow. The pale blue threads carry water too, and the brighter they are the more drainage they have gathered, but their flow does not reach all the way down. The near-black cells are dry.</p>
-
-    <p>The terrain is a Scheidegger lattice, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it, down-left or down-right, chosen once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage networks.</p>
-
-    <p>The reason a river can survive on little rain is that runoff accumulates downstream. Two trickles that are each too small to overflow on their own can meet at a confluence and break through together. A cell can run with a river even when no rain fell on it, fed entirely from upstream.</p>
-
-    <p>Sweep \(p\) and \(C\) and the basin flips from no river to river across a sharp critical curve \(p_c(C)\). Right at that edge a small nudge in rainfall or storage can switch the river on or off, which is exactly where the world's marginal rivers live.</p>
-
-    <p>A few things to try. Start near \(p \approx 0.4\) and \(C \approx 0.5\), then raise \(p\) slowly until an orange-red spanning river snaps into place. Now raise \(C\), a drier and thirstier basin, and watch it break apart again. Sit right at the edge and press resample rain. Near the transition the same \((p, C)\) sometimes spans and sometimes does not, the finite-size fuzz of a critical point.</p>
-
-    <p>This page is a companion to the paper of the same title, where repeating this sweep over many random landscapes turns the on and off behavior into a full phase diagram and a measured critical exponent.</p>
 
   </div>
 
