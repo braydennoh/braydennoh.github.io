@@ -27,8 +27,6 @@
     .sidebar .citation a { word-break: break-word; }
     /* demo styling, matched to the site's monospace/figure conventions */
     #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
-    #stats .yes { color: #197a3a; }
-    #stats .no  { color: #b3261e; }
     .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
     #sim-controls input[type=range] { accent-color: #003399; }
     /* colorbar for w(y,x), mirroring the paper figure */
@@ -72,7 +70,7 @@
 
     <p>Below is that transaction on a lattice. Rain lands on each cell with probability \(p\), the ground holds back a fixed amount \(C\), and the excess is handed to one of the two cells diagonally downhill, left or right, decided at random once and then fixed for good. That is Scheidegger's landscape, about the least you can assume about a tilted rough surface and still get branching, merging streams that scale like real ones.</p>
 
-    <p>What makes it interesting is that the handoffs accumulate. Two trickles too small to escape their own cells can meet at a confluence and clear the threshold together, so a cell can carry a river without a single drop having landed on it. Raise \(p\) or lower \(C\) and those overflowing cells link up until the basin flips from disconnected puddles to one river reaching the sea, along a critical curve \(p_c(C)\). Sit right at that edge and resample the rain: the same \((p, C)\) sometimes spans and sometimes does not. That is where the world's marginal rivers live.</p>
+    <p>What makes it interesting is that the handoffs accumulate. Two trickles too small to escape their own cells can meet at a confluence and clear the threshold together, so a cell can carry a river without a single drop having landed on it. Raise \(p\) or lower \(C\) and those overflowing cells link up until the basin flips from disconnected puddles to one river reaching the sea, along a critical curve \(p_c(C)\). Sit right at that edge and resample the rain: the same \((p, C)\) sometimes spans and sometimes does not.</p>
 
     <!-- Interactive demo -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
@@ -103,15 +101,11 @@
         <label for="C">\(C\)</label>
         <input id="C" type="range" min="0" max="1" step="0.01" value="0.50">
         <span id="Cv">0.50</span>
-
-        <label for="seed">rain seed</label>
-        <input id="seed" type="number" value="1" style="width:70px;">
-        <span></span>
       </div>
     </div>
 
     <p style="font-size: 85%; color: #767676;">
-    Figure 1. Overflow on an \(L\times L\) Scheidegger basin at rainfall \(p\) and storage \(C\).
+    Overflow on an \(L\times L\) Scheidegger basin at rainfall \(p\) and storage \(C\).
     Background shades the cumulative water \(w(y,x)\) arriving at each cell on a logarithmic scale, dark where the ground is dry and pale where many streams have merged.
     <span class="sw" style="background:orangered;"></span> spanning river, a connected overflow path from top to bottom.
     Resample rain redraws the rainfall at the same \((p, C)\), and new landscape redraws the random flow directions.
@@ -166,7 +160,7 @@
   const stats = S('stats');
   const sliders = { L: S('L'), p: S('p'), C: S('C') };
   const Lval = S('Lv'), pval = S('pv'), Cval = S('Cv');
-  const seedInp = S('seed');
+  let rainSeed = 1;   // advanced by "resample rain"; no longer surfaced in the UI
 
   // mulberry32 seeded RNG
   function rngFrom(seed) {
@@ -308,25 +302,18 @@
     Cval.textContent = Cv.toFixed(2);
 
     if (forceNewDirs || !dirArr || dirL !== Lv) { dirArr = genDirections(Lv, dirSeed); dirL = Lv; }
-    const seed = parseInt(seedInp.value) || 1;
-    const t0 = performance.now();
-    const out = simulate(Lv, pv, Cv, dirArr, seed);
-    const t1 = performance.now();
+    const out = simulate(Lv, pv, Cv, dirArr, rainSeed);
     draw(Lv, out.water, out.spanning);
 
     const total = Lv * Lv;
-    const percYes = out.bottomSpan > 0;
     stats.innerHTML =
       `active: ${(out.active / total).toFixed(3)} &bull; ` +
       `spanning sites: ${(out.span / total).toFixed(3)} &bull; ` +
-      `top&rarr;bottom: ${out.bottomSpan}/${Lv} &bull; ` +
-      `reaches the sea? <span class="${percYes ? 'yes' : 'no'}">${percYes ? 'YES' : 'no'}</span> ` +
-      `<span style="color:#999;">(${(t1 - t0).toFixed(1)} ms)</span>`;
+      `top&rarr;bottom: ${out.bottomSpan}/${Lv}`;
   }
 
   for (const k of ['L', 'p', 'C']) sliders[k].addEventListener('input', () => update(k === 'L'));
-  seedInp.addEventListener('input', () => update());
-  S('resample').addEventListener('click', () => { seedInp.value = (parseInt(seedInp.value) || 1) + 1; update(); });
+  S('resample').addEventListener('click', () => { rainSeed++; update(); });
   S('newdir').addEventListener('click', () => { dirSeed = (dirSeed + 1) | 0; update(true); });
 
   let rt;
