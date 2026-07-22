@@ -86,8 +86,8 @@
 
     <div id="sim-controls" style="margin-bottom: 0.6em;">
       <div style="margin-bottom: 0.5em;">
-        <button id="resample" type="button" style="padding:0.2em 0.8em; cursor:pointer;">resample rain</button>
-        <button id="newdir" type="button" style="padding:0.2em 0.8em; cursor:pointer;">new landscape</button>
+        <button id="resample" type="button" style="padding:0.2em 0.8em; cursor:pointer;">resample rain \(r\)</button>
+        <button id="newdir" type="button" style="padding:0.2em 0.8em; cursor:pointer;">resample directions \(D\)</button>
       </div>
       <div style="display:grid; grid-template-columns:auto 1fr auto; gap:4px 10px; align-items:center; max-width:420px; font-size:85%;">
         <label for="L">\(L\)</label>
@@ -108,7 +108,7 @@
     Overflow on an \(L\times L\) Scheidegger basin at rainfall \(p\) and storage \(C\).
     Background shades the cumulative water \(w(y,x)\) arriving at each cell on a logarithmic scale, dark where the ground is dry and pale where many streams have merged.
     <span class="sw" style="background:orangered;"></span> spanning river, a connected overflow path from top to bottom.
-    Resample rain redraws the rainfall at the same \((p, C)\), and new landscape redraws the random flow directions.
+    Resample \(r\) draws a fresh rain field, wet with probability \(p\) at every cell, and resample \(D\) draws fresh Scheidegger flow directions. Both leave \((p, C)\) untouched, so what changes is the realization, not the parameters.
     </p>
 
   </div>
