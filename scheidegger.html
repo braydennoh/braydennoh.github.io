@@ -29,6 +29,13 @@
     #stats .no  { color: #b3261e; }
     .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
     #sim-controls input[type=range] { accent-color: #003399; }
+    /* colorbar for w(y,x), mirroring the paper figure */
+    #cbarWrap { margin-top: 6px; }
+    #cbar { display: block; border: 1px solid #ddd; max-width: 100%; height: 10px; }
+    /* ticks sit at their true log positions (0.1/1/10/100/1000 -> 0, .25, .5, .75, 1) */
+    #cbarTicks { position: relative; height: 14px; font-family: monospace; font-size: 11px; color: #767676; margin-top: 1px; }
+    #cbarTicks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+    #cbarLabel { font-size: 11px; color: #767676; text-align: center; margin-top: 1px; }
   </style>
 </head>
 <body class="project-page">
@@ -67,6 +74,11 @@
     <!-- Interactive demo (placed first, so it is visible immediately) -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
       <div id="canvasWrap" style="line-height:0;"><canvas id="canvas"></canvas></div>
+      <div id="cbarWrap">
+        <canvas id="cbar"></canvas>
+        <div id="cbarTicks"><span>0.1</span><span>1</span><span>10</span><span>100</span><span>1000</span></div>
+        <div id="cbarLabel">\(w(y,x)\) cumulative drainage (log)</div>
+      </div>
     </div>
 
     <div id="stats" style="font-family:monospace; font-size:13px; color:#222; margin-bottom:0.5em;"></div>
@@ -97,13 +109,12 @@
 
     <p style="font-size: 85%; color: #767676;">
     Figure 1. Overflow on an \(L\times L\) Scheidegger basin at rainfall \(p\) and storage \(C\).
-    <span class="sw" style="background:#f00;"></span> spanning river, a connected overflow path from top to bottom.
-    <span class="sw" style="background:#00f;"></span> overflowing cell with runoff \(>0\) that is not part of a spanning path.
-    <span class="sw" style="background:#000;"></span> dry.
+    Background shades the cumulative water \(w(y,x)\) arriving at each cell on a logarithmic scale, dark where the ground is dry and pale where many streams have merged.
+    <span class="sw" style="background:orangered;"></span> spanning river, a connected overflow path from top to bottom.
     Resample rain redraws the rainfall at the same \((p, C)\), and new landscape redraws the random flow directions.
     </p>
 
-    <p>One thing to notice in the picture. The river is made of overflow, not of cells merely touching. A cell joins the network only when its runoff is positive, so that water is genuinely passing through it, and the basin counts as spanning only when these overflowing cells form an unbroken chain of flow from the top row down to the bottom. The red cells are exactly that spanning chain of overflow. The blue cells overflow too, but their flow does not reach all the way down, and the black cells are dry.</p>
+    <p>One thing to notice in the picture. The river is made of overflow, not of cells merely touching. A cell joins the network only when its runoff is positive, so that water is genuinely passing through it, and the basin counts as spanning only when these overflowing cells form an unbroken chain of flow from the top row down to the bottom. The orange-red cells are exactly that spanning chain of overflow. The pale blue threads carry water too, and the brighter they are the more drainage they have gathered, but their flow does not reach all the way down. The near-black cells are dry.</p>
 
     <p>The terrain is a Scheidegger lattice, a minimal model of a tilted, randomly rough surface. Every cell sends its water to one of the two cells diagonally below it, down-left or down-right, chosen once at random and then fixed. Trace those arrows downhill and you get branching, merging streams with the same scaling statistics as real drainage networks.</p>
 
@@ -111,7 +122,7 @@
 
     <p>Sweep \(p\) and \(C\) and the basin flips from no river to river across a sharp critical curve \(p_c(C)\). Right at that edge a small nudge in rainfall or storage can switch the river on or off, which is exactly where the world's marginal rivers live.</p>
 
-    <p>A few things to try. Start near \(p \approx 0.4\) and \(C \approx 0.5\), then raise \(p\) slowly until a red spanning river snaps into place. Now raise \(C\), a drier and thirstier basin, and watch it break apart again. Sit right at the edge and press resample rain. Near the transition the same \((p, C)\) sometimes spans and sometimes does not, the finite-size fuzz of a critical point.</p>
+    <p>A few things to try. Start near \(p \approx 0.4\) and \(C \approx 0.5\), then raise \(p\) slowly until an orange-red spanning river snaps into place. Now raise \(C\), a drier and thirstier basin, and watch it break apart again. Sit right at the edge and press resample rain. Near the transition the same \((p, C)\) sometimes spans and sometimes does not, the finite-size fuzz of a critical point.</p>
 
     <p>This page is a companion to the paper of the same title, where repeating this sweep over many random landscapes turns the on and off behavior into a full phase diagram and a measured critical exponent.</p>
 
@@ -124,6 +135,43 @@
   const cv = document.getElementById('canvas');
   const ctx = cv.getContext('2d');
   const S = id => document.getElementById(id);
+
+  // Colour scheme copied from the paper figures (code/spanning_viz_grid.py):
+  // background is the cumulative water field w on the crameri "oslo" colormap
+  // under matplotlib's LogNorm(vmin=1e-1, vmax=1e3), spanning path in orangered.
+  const OSLO_HEX =
+    '01010101020302040502050703060904070b04080d05090f050a10060b12060c13070d15080e16080f170910180911190a121b' +
+    '0b131c0b131d0b141e0c151f0c16200d16220d17230d18240d19250d19270d1a280d1b290e1b2a0e1c2c0e1d2d0e1e2e0e1e2f' +
+    '0e1f310e20320f21330f21350f22360f23370f24390f253a10263c10263d10273e102840102941112a43112b44112b45112c47' +
+    '122d48122e4a122f4b12304c13314e13324f13325114335214345414355514365715375815385a15395b163a5d163b5e173b60' +
+    '173c61173d63183e64183f6619406719416919426a1a436c1a446d1b456f1b46701c47721c48731d48751d49761e4a781e4b7a' +
+    '1f4c7b204d7d204e7e214f8021508122518323528523538624548825558926568b26578c27588e285990295a912a5b932b5c94' +
+    '2c5d962d5e982e5f992f609b30619c31629e3263a03364a13465a33666a43767a63869a83a6aa93b6bab3d6cac3e6dae406eaf' +
+    '4170b14371b24472b34673b54775b64976b84b77b94c78ba4e7abb507bbc517cbd537dbe547ebf567fc05881c15982c25b83c3' +
+    '5c84c35e85c46086c56187c56388c66489c6658ac7678bc7688cc76a8dc86b8ec86c8fc86e90c86f90c97091c97292c97393c9' +
+    '7494c97594c97795c97896c97997ca7a98ca7b98ca7d99ca7e9aca7f9bca809bca819cca839dca849eca859eca869fca87a0ca' +
+    '89a0ca8aa1ca8ba2c98ca3c98da3c98ea4c990a5c991a6c992a6c993a7c994a8c996a9c997a9c998aac999abc99aacc99cacc9' +
+    '9dadc99eaec99fafc9a0afc9a2b0caa3b1caa4b2caa5b3caa7b4caa8b4caa9b5caaab6caacb7caadb8cbaeb9cbb0bacbb1bbcb' +
+    'b2bcccb4bdccb5bdccb6becdb8bfcdb9c1cdbac2cebcc3cebdc4cfbfc5cfc0c6d0c2c7d1c3c8d1c5c9d2c6cbd3c7ccd3c9cdd4' +
+    'caced5ccd0d6ced1d7cfd2d8d1d3d9d2d5dad4d6dbd5d8dcd7d9ddd8dadedadcdfdbdde0dddee1dee0e2e0e1e4e2e3e5e3e4e6' +
+    'e5e6e7e6e7e9e8e9eae9eaebebecedecedeeeeeeefeff0f1f1f1f2f3f3f4f4f4f5f6f6f6f7f7f8f9f9f9fafafbfcfcfcfdfdfe' +
+    'ffffff';
+  const OSLO = new Uint8Array(768);
+  for (let i = 0; i < 768; i++) OSLO[i] = parseInt(OSLO_HEX.substr(i * 2, 2), 16);
+
+  // LogNorm(1e-1, 1e3) applied to max(w, 0.1), then matplotlib's index rule
+  // (floor(t * 256), clipped to 255) — identical mapping to the figures.
+  const WMIN = 0.1, WMAX = 1e3;
+  const LG = 1 / Math.LN10;
+  const NA = 1 / (Math.log10(WMAX) - Math.log10(WMIN));
+  const NB = -Math.log10(WMIN) * NA;
+  function osloIndex(w) {
+    const t = (w > WMIN ? Math.log(w) * LG : Math.log10(WMIN)) * NA + NB;
+    if (t <= 0) return 0;
+    if (t >= 1) return 255;
+    return Math.floor(t * 256);
+  }
+  const SPAN_R = 255, SPAN_G = 69, SPAN_B = 0;   // orangered
   const stats = S('stats');
   const sliders = { L: S('L'), p: S('p'), C: S('C') };
   const Lval = S('Lv'), pval = S('pv'), Cval = S('Cv');
@@ -205,7 +253,7 @@
     }
     for (let x = 0; x < L; x++) if (topR[lb + x]) bottomSpan++;
 
-    return { runoff, spanning, active, span, bottomSpan };
+    return { runoff, water, spanning, active, span, bottomSpan };
   }
 
   function fitDisplay() {
@@ -216,13 +264,40 @@
   let DISPLAY = fitDisplay();
   cv.width = DISPLAY; cv.height = DISPLAY;
 
-  function draw(L, runoff, spanning) {
+  // colorbar: the same 256 oslo entries left-to-right, so the log ticks
+  // 0.1 / 1 / 10 / 100 / 1000 land at evenly spaced positions.
+  const cb = S('cbar'), cbx = cb.getContext('2d');
+  const cbTicks = S('cbarTicks'), cbLabel = S('cbarLabel');
+  function drawColorbar() {
+    cb.width = DISPLAY; cb.height = 1;
+    cb.style.width = DISPLAY + 'px';
+    const bar = cbx.createImageData(DISPLAY, 1);
+    const b = bar.data;
+    for (let x = 0, j = 0; x < DISPLAY; x++, j += 4) {
+      const k = Math.min(255, Math.floor((x / DISPLAY) * 256)) * 3;
+      b[j] = OSLO[k]; b[j+1] = OSLO[k+1]; b[j+2] = OSLO[k+2]; b[j+3] = 255;
+    }
+    cbx.putImageData(bar, 0, 0);
+    // pin each label to its LogNorm position along the bar
+    cbTicks.style.width = DISPLAY + 'px';
+    cbLabel.style.width = DISPLAY + 'px';
+    const spans = cbTicks.children;
+    for (let i = 0; i < spans.length; i++) {
+      const t = (Math.log10(parseFloat(spans[i].textContent)) - Math.log10(WMIN)) * NA;
+      spans[i].style.left = (t * DISPLAY) + 'px';
+    }
+  }
+  drawColorbar();
+
+  function draw(L, water, spanning) {
     const img = ctx.createImageData(L, L);
     const d = img.data;
     for (let i = 0, j = 0; i < L * L; i++, j += 4) {
-      if (spanning[i])        { d[j]=255; d[j+1]=0;   d[j+2]=0;   }
-      else if (runoff[i] > 0) { d[j]=0;   d[j+1]=0;   d[j+2]=255; }
-      else                    { d[j]=0;   d[j+1]=0;   d[j+2]=0;   }
+      if (spanning[i]) { d[j]=SPAN_R; d[j+1]=SPAN_G; d[j+2]=SPAN_B; }
+      else {
+        const k = osloIndex(water[i]) * 3;
+        d[j] = OSLO[k]; d[j+1] = OSLO[k+1]; d[j+2] = OSLO[k+2];
+      }
       d[j+3] = 255;
     }
     const off = document.createElement('canvas');
@@ -246,7 +321,7 @@
     const t0 = performance.now();
     const out = simulate(Lv, pv, Cv, dirArr, seed);
     const t1 = performance.now();
-    draw(Lv, out.runoff, out.spanning);
+    draw(Lv, out.water, out.spanning);
 
     const total = Lv * Lv;
     const percYes = out.bottomSpan > 0;
@@ -268,7 +343,7 @@
     clearTimeout(rt);
     rt = setTimeout(() => {
       const nd = fitDisplay();
-      if (nd !== DISPLAY) { DISPLAY = nd; cv.width = DISPLAY; cv.height = DISPLAY; update(); }
+      if (nd !== DISPLAY) { DISPLAY = nd; cv.width = DISPLAY; cv.height = DISPLAY; drawColorbar(); update(); }
     }, 150);
   });
 
