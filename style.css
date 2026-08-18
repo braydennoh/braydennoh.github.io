@@ -204,6 +204,15 @@ h1 {
   line-height: 1.5;
 }
 
+/* Notes page */
+.notes-list {
+  list-style: none;
+}
+
+.notes-list li {
+  margin-bottom: 10px;
+}
+
 /* About page */
 .about-page .sidebar img.portrait {
   width: 100%;
