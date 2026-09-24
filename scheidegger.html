@@ -68,11 +68,9 @@
 
   <div class="main">
 
-    <p>What determines a river? A drop lands on a patch of ground and the ground has two options: absorb it, or decline and hand it to gravity, which happens once the soil is saturated. And the same transaction repeats upward through scale: hillslopes draining across their width, subbasins across their length, basins to the river, the river to the sea. Which is why this is really percolation theory, how purely local random connections become global pathways, and the whole continent's drainage assembled out of decisions made by dirt.</p>
+    <p>What determines a river? A drop of rain lands on a patch of ground, and the ground can either absorb it or pass it downhill if it is saturated. This transaction happens at all scales, from hillslope to basin to river to sea. Percolation theory relates how local, random connections merge to form a large-scale, system-spanning network (rivers in this example).</p>
 
-    <p>Below is that transaction on a lattice. Rain lands on each cell with probability \(p\), the ground holds back a fixed amount \(C\), and the excess is handed to one of the two cells diagonally downhill, left or right, decided at random once and then fixed for good. That is Scheidegger's landscape, about the least you can assume about a tilted rough surface and still get branching, merging streams that scale like real ones.</p>
-
-    <p>What makes it interesting is that the handoffs accumulate. Two trickles too small to escape their own cells can meet at a confluence and clear the threshold together, so a cell can carry a river without a single drop having landed on it. Raise \(p\) or lower \(C\) and those overflowing cells link up until the basin flips from disconnected puddles to one river reaching the sea, along a critical curve \(p_c(C)\). Sit right at that edge and resample the rain: the same \((p, C)\) sometimes spans and sometimes does not.</p>
+    <p>The simulation below shows how percolation can be used to determine a spanning river, which is based on the spatial density of rainfall (input flux) and ground storage capacity (output flux). Rain lands on each cell with probability \(p\), the ground can deplete a fixed amount \(C\), and the excess is handed off to one of two cells downhill (due to gravity), chosen at random (Scheidegger lattice). You will be able to observe that handoffs accumulate. A cell can carry a river without a single drop of rain having landed on it because of the supply from upstream.</p>
 
     <!-- Interactive demo -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
