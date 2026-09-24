@@ -4,46 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meander Village - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="appearance.js"></script>
   <style>
-    /* Self-contained page style, matching braydennoh.github.io/style.css */
-    @font-face {
-      font-family: "Myriad Pro";
-      src: url("assets/fonts/MyriadPro-Regular.woff2") format("woff2");
-      font-weight: 400; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: "Myriad Pro";
-      src: url("assets/fonts/MyriadPro-Bold.woff2") format("woff2");
-      font-weight: 700; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: "Myriad Pro";
-      src: url("assets/fonts/MyriadPro-Italic.woff2") format("woff2");
-      font-weight: 400; font-style: italic; font-display: swap;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: "Myriad Pro", Arial, Helvetica, sans-serif;
-      font-size: 15px; line-height: 1.5; color: #222;
-      background: #fff; padding: 39px 60px 30px; max-width: 1224px;
-    }
-    a { color: #003399; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    a:visited { color: #003399; }
-    nav { font-size: 15px; margin-bottom: 26px; }
-    nav a { margin-right: 4px; }
-    nav .sep { margin-right: 4px; color: #999; }
-    h1 { font-size: 28px; font-weight: normal; margin-bottom: 20px; }
-    .columns { display: flex; gap: 40px; }
-    .sidebar { width: 280px; flex-shrink: 0; font-size: 14px; line-height: 1.6; }
-    .sidebar p { margin-bottom: 16px; }
-    .sidebar .separator { border: none; border-top: 1px dotted #ccc; margin: 16px 0; }
-    .main { flex: 1; min-width: 0; }
-    .main p { margin-bottom: 16px; line-height: 1.6; }
+    /* Simulator page: the shell (width, nav, columns, text-size panel) comes from style.css;
+       these rules are only what this page adds */
+    .main { min-width: 0; }
     .btnrow { margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
     var, .mvar { font-style: italic; font-family: Georgia, "Times New Roman", serif; }
     .eq { text-align: center; font-family: Georgia, "Times New Roman", serif; font-style: italic;
-          margin: 14px 0 16px 0; font-size: 15.5px; }
+          margin: 14px 0 16px 0; font-size: calc(15.5px * var(--ts)); }
     button { padding: 0.2em 0.8em; cursor: pointer; font-family: inherit; font-size: 13px; }
     button:disabled { cursor: default; }
     .ctl-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 5px 10px;
@@ -54,22 +24,6 @@
     details.adv { margin-top: 0.7em; font-size: 90%; }
     details.adv summary { cursor: pointer; color: #555; font-size: 13px; }
     details.adv .ctl-grid { margin-top: 0.5em; }
-    .chartbox { margin: 18px 0 6px 0; }
-    .chart-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 2px; }
-    .chart-legend { display: flex; gap: 16px; font-size: 12px; color: #52514e;
-                    margin-bottom: 4px; align-items: center; }
-    .lkey { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid;
-            vertical-align: middle; margin-right: 5px; border-radius: 2px; }
-    .chartwrap { position: relative; }
-    .chartwrap canvas { display: block; width: 100%; }
-    .viz-tip { position: absolute; pointer-events: none; background: #fff;
-               border: 1px solid rgba(11,11,11,0.14); box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-               border-radius: 4px; padding: 6px 9px; font-size: 12px; color: #52514e;
-               display: none; z-index: 5; white-space: nowrap; }
-    .viz-tip .trow { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
-    .viz-tip .tval { color: #0b0b0b; font-weight: 600; margin-left: auto; padding-left: 10px;
-                     font-variant-numeric: tabular-nums; }
-    .viz-tip .thead { color: #898781; font-variant-numeric: tabular-nums; }
     #canvas-stack { position: relative; margin: 1em 0 0 0; background: #000; }
     #sim-canvas { width: 100%; image-rendering: pixelated; display: block; background: #000; }
     #overlay-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
@@ -77,6 +31,8 @@
     .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
     #sim-info { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
                 margin: 6px 0 4px 0; font-variant-numeric: tabular-nums; }
+    /* the readout wraps between items, never between a label and its number */
+    #sim-info > span { white-space: nowrap; }
     #sim-legend { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
                   margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px; }
     .chip { display: inline-block; width: 10px; height: 10px; vertical-align: middle;
@@ -85,9 +41,6 @@
     table.params td, table.params th { border: 1px solid #ddd; padding: 4px 9px; text-align: left; }
     table.params th { background: #f6f6f4; font-weight: 600; }
     @media (max-width: 700px) {
-      body { padding: 26px 30px 20px; }
-      .columns { flex-direction: column; gap: 24px; }
-      .sidebar { width: 100%; }
       .ctl-cols { flex-direction: column; gap: 5px; }
     }
   </style>
@@ -144,11 +97,11 @@
     </div>
 
     <div id="sim-info">
-      t = <span id="info-years">0</span> yr &nbsp;&bull;&nbsp;
-      sinuosity <span id="info-sinu">&ndash;</span> &nbsp;&bull;&nbsp;
-      pop <span id="info-pop">0</span> &nbsp;&bull;&nbsp;
-      forced <span id="info-forced">0</span> (&Sigma; <span id="info-forced-cum">0</span>) &nbsp;&bull;&nbsp;
-      voluntary <span id="info-vol">0</span> (&Sigma; <span id="info-vol-cum">0</span>)
+      <span>t = <span id="info-years">0</span> yr</span> &nbsp;&bull;&nbsp;
+      <span>sinuosity <span id="info-sinu">&ndash;</span></span> &nbsp;&bull;&nbsp;
+      <span>pop <span id="info-pop">0</span></span> &nbsp;&bull;&nbsp;
+      <span>forced <span id="info-forced">0</span> (&Sigma; <span id="info-forced-cum">0</span>)</span> &nbsp;&bull;&nbsp;
+      <span>voluntary <span id="info-vol">0</span> (&Sigma; <span id="info-vol-cum">0</span>)</span>
     </div>
 
     <div id="sim-legend">
@@ -240,27 +193,6 @@
           <span></span>
         </div>
       </details>
-    </div>
-
-    <!-- ── Charts ── -->
-    <div class="chartbox">
-      <div class="chart-title">Relocations per step</div>
-      <div class="chart-legend">
-        <span><span class="lkey" style="border-color:#e34948;"></span>Forced</span>
-        <span><span class="lkey" style="border-color:#2a78d6;"></span>Voluntary</span>
-      </div>
-      <div class="chartwrap">
-        <canvas id="chart-moves" height="110"></canvas>
-        <div class="viz-tip" id="tip-moves"></div>
-      </div>
-    </div>
-
-    <div class="chartbox">
-      <div class="chart-title">Channel sinuosity</div>
-      <div class="chartwrap">
-        <canvas id="chart-sinu" height="90"></canvas>
-        <div class="viz-tip" id="tip-sinu"></div>
-      </div>
     </div>
 
   </div>
@@ -967,239 +899,9 @@ function renderOverlay() {
   }
 }
 
-/* ── Charts ── */
-var C_FORCED = "#e34948", C_VOL = "#2a78d6", C_SINU = "#1baf7a";
-var INK = "#0b0b0b", INK2 = "#52514e", MUTED = "#898781",
-    GRID = "#e1e0d9", BASE = "#c3c2b7";
-var MARG = { l: 40, r: 46, t: 6, b: 16 };
-
-function niceStep(range, target) {
-  var raw = range / target;
-  var mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
-  var norm = raw / mag;
-  var step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
-  return step * mag;
-}
-
-/* Nearest sample index for a time value (hist.t is sorted). */
-function bisectTime(tv) {
-  var t = hist.t, lo = 0, hi = t.length - 1;
-  while (lo < hi) {
-    var mid = (lo + hi) >> 1;
-    if (t[mid] < tv) lo = mid + 1; else hi = mid;
-  }
-  if (lo > 0 && Math.abs(t[lo-1] - tv) < Math.abs(t[lo] - tv)) lo--;
-  return lo;
-}
-
-function setupChart(cvId, tipId) {
-  var cv = $(cvId), tip = $(tipId);
-  var chart = { cv: cv, cctx: cv.getContext("2d"), tip: tip, hoverI: -1, draw: null };
-  cv.parentNode.addEventListener("pointermove", function(e) {
-    var rect = cv.getBoundingClientRect();
-    var xpx = e.clientX - rect.left;
-    var n = hist.t.length;
-    if (n < 2) return;
-    var plotW = rect.width - MARG.l - MARG.r;
-    var frac = Math.max(0, Math.min(1, (xpx - MARG.l) / plotW));
-    chart.hoverI = bisectTime(frac * hist.t[n-1]);
-    if (chart.draw) chart.draw();
-  });
-  cv.parentNode.addEventListener("pointerleave", function() {
-    chart.hoverI = -1;
-    tip.style.display = "none";
-    if (chart.draw) chart.draw();
-  });
-  return chart;
-}
-
-var chMoves = setupChart("chart-moves", "tip-moves");
-var chSinu = setupChart("chart-sinu", "tip-sinu");
-
-function prepCanvas(chart, cssH) {
-  var cv = chart.cv;
-  var rect = cv.parentNode.getBoundingClientRect();
-  var dpr = window.devicePixelRatio || 1;
-  var wCss = Math.max(100, rect.width);
-  if (cv.width !== Math.round(wCss * dpr) || cv.height !== Math.round(cssH * dpr)) {
-    cv.width = Math.round(wCss * dpr);
-    cv.height = Math.round(cssH * dpr);
-    cv.style.height = cssH + "px";
-  }
-  var g = chart.cctx;
-  g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  g.clearRect(0, 0, wCss, cssH);
-  return { g: g, w: wCss, h: cssH };
-}
-
-function frame(g, w, h, x0, x1, y0, y1, yFmt) {
-  var pw = w - MARG.l - MARG.r, ph = h - MARG.t - MARG.b;
-  g.font = "11px Aptos, Arial, sans-serif";
-  var ys = niceStep(y1 - y0, 3);
-  g.textAlign = "right"; g.textBaseline = "middle";
-  for (var yv = y0; yv <= y1 + 1e-9; yv += ys) {
-    var yy = MARG.t + ph * (1 - (yv - y0) / (y1 - y0));
-    g.strokeStyle = yv === y0 ? BASE : GRID;
-    g.lineWidth = 1;
-    g.beginPath(); g.moveTo(MARG.l, yy); g.lineTo(MARG.l + pw, yy); g.stroke();
-    g.fillStyle = MUTED;
-    g.fillText(yFmt(yv), MARG.l - 6, yy);
-  }
-  var xs = niceStep(x1 - x0 || 1, 5);
-  g.textAlign = "center"; g.textBaseline = "top";
-  for (var xv = Math.ceil(x0 / xs) * xs; xv <= x1 + 1e-9; xv += xs) {
-    var xx = MARG.l + pw * ((xv - x0) / ((x1 - x0) || 1));
-    if (xx > MARG.l + pw - 16) continue;   // keep clear of the unit label
-    g.fillStyle = MUTED;
-    g.fillText(Math.round(xv) + "", xx, MARG.t + ph + 4);
-  }
-  g.fillStyle = MUTED; g.textAlign = "left";
-  g.fillText("yr", MARG.l + pw + 6, MARG.t + ph + 4);
-  return { pw: pw, ph: ph };
-}
-
-/* Time-positioned polyline points. Sparse: one point per sample; dense:
-   per-pixel-column max so bursts are never lost when binned. */
-function seriesPoints(data, n, pw, t1) {
-  var pts = [];
-  if (t1 <= 0) return pts;
-  if (n <= pw) {
-    for (var i = 0; i < n; i++) pts.push([pw * hist.t[i] / t1, data[i]]);
-    return pts;
-  }
-  var i2 = 0;
-  for (var c = 0; c < pw; c++) {
-    var hi = t1 * (c + 1) / pw;
-    var m = -Infinity;
-    while (i2 < n && hist.t[i2] <= hi) { if (data[i2] > m) m = data[i2]; i2++; }
-    if (m !== -Infinity) pts.push([c + 0.5, m]);
-  }
-  return pts;
-}
-
-function drawLine(g, pts, x0px, y0px, ph, ymin, ymax, color) {
-  g.strokeStyle = color; g.lineWidth = 2;
-  g.lineJoin = "round"; g.lineCap = "round";
-  g.beginPath();
-  for (var c = 0; c < pts.length; c++) {
-    var X = x0px + pts[c][0];
-    var Y = y0px + ph * (1 - (pts[c][1] - ymin) / (ymax - ymin));
-    if (c === 0) g.moveTo(X, Y); else g.lineTo(X, Y);
-  }
-  g.stroke();
-}
-
-function endDot(g, X, Y, color) {
-  g.beginPath(); g.arc(X, Y, 5.5, 0, 2*Math.PI); g.fillStyle = "#fff"; g.fill();
-  g.beginPath(); g.arc(X, Y, 4, 0, 2*Math.PI); g.fillStyle = color; g.fill();
-}
-
-function tipRow(tip, color, label, value) {
-  var row = document.createElement("div");
-  row.className = "trow";
-  if (color) {
-    var key = document.createElement("span");
-    key.className = "lkey";
-    key.style.borderColor = color;
-    row.appendChild(key);
-  }
-  var lab = document.createElement("span");
-  lab.textContent = label;
-  row.appendChild(lab);
-  var val = document.createElement("span");
-  val.className = "tval";
-  val.textContent = value;
-  row.appendChild(val);
-  tip.appendChild(row);
-}
-
-function placeTip(chart, xpx, w) {
-  var tip = chart.tip;
-  tip.style.display = "block";
-  var tw = tip.offsetWidth;
-  var left = xpx + 12;
-  if (left + tw > w - 4) left = xpx - tw - 12;
-  tip.style.left = Math.max(2, left) + "px";
-  tip.style.top = "4px";
-}
-
-function drawMovesChart() {
-  var pc = prepCanvas(chMoves, 110);
-  var g = pc.g, n = hist.t.length;
-  var x1 = n > 1 ? hist.t[n-1] : 1;
-  var ymaxRaw = 1;
-  for (var i = 0; i < n; i++) {
-    if (hist.f[i] > ymaxRaw) ymaxRaw = hist.f[i];
-    if (hist.v[i] > ymaxRaw) ymaxRaw = hist.v[i];
-  }
-  var ymax = niceStep(ymaxRaw, 3) * Math.ceil(ymaxRaw / niceStep(ymaxRaw, 3));
-  var fr = frame(g, pc.w, 110, 0, x1, 0, ymax, function(v) { return v + ""; });
-  if (n >= 2) {
-    var pw = Math.max(2, Math.round(fr.pw));
-    var fP = seriesPoints(hist.f, n, pw, x1), vP = seriesPoints(hist.v, n, pw, x1);
-    drawLine(g, vP, MARG.l, MARG.t, fr.ph, 0, ymax, C_VOL);
-    drawLine(g, fP, MARG.l, MARG.t, fr.ph, 0, ymax, C_FORCED);
-    endDot(g, MARG.l + pw, MARG.t + fr.ph * (1 - hist.v[n-1] / ymax), C_VOL);
-    endDot(g, MARG.l + pw, MARG.t + fr.ph * (1 - hist.f[n-1] / ymax), C_FORCED);
-    if (chMoves.hoverI >= 0) {
-      var hx = MARG.l + fr.pw * (hist.t[chMoves.hoverI] / x1);
-      g.strokeStyle = BASE; g.lineWidth = 1;
-      g.beginPath(); g.moveTo(hx, MARG.t); g.lineTo(hx, MARG.t + fr.ph); g.stroke();
-      var tip = chMoves.tip;
-      tip.textContent = "";
-      var hd = document.createElement("div");
-      hd.className = "thead";
-      hd.textContent = "t = " + hist.t[chMoves.hoverI].toFixed(1) + " yr";
-      tip.appendChild(hd);
-      tipRow(tip, C_FORCED, "Forced", hist.f[chMoves.hoverI]);
-      tipRow(tip, C_VOL, "Voluntary", hist.v[chMoves.hoverI]);
-      placeTip(chMoves, hx, pc.w);
-    }
-  }
-}
-
-function drawSinuChart() {
-  var pc = prepCanvas(chSinu, 90);
-  var g = pc.g, n = hist.t.length;
-  var x1 = n > 1 ? hist.t[n-1] : 1;
-  var ymaxRaw = 1.5;
-  for (var i = 0; i < n; i++) if (hist.s[i] > ymaxRaw) ymaxRaw = hist.s[i];
-  var ymax = Math.ceil(ymaxRaw * 2) / 2;
-  var Y0 = 1.0;                        // sinuosity floor: a straight channel
-  var fr = frame(g, pc.w, 90, 0, x1, Y0, ymax, function(v) { return v.toFixed(1); });
-  if (n >= 2) {
-    var pw = Math.max(2, Math.round(fr.pw));
-    var sP = seriesPoints(hist.s, n, pw, x1);
-    drawLine(g, sP, MARG.l, MARG.t, fr.ph, Y0, ymax, C_SINU);
-    var Yend = MARG.t + fr.ph * (1 - (hist.s[n-1] - Y0) / (ymax - Y0));
-    endDot(g, MARG.l + pw, Yend, C_SINU);
-    g.font = "600 11px Aptos, Arial, sans-serif";
-    g.fillStyle = INK; g.textAlign = "left"; g.textBaseline = "middle";
-    g.fillText(hist.s[n-1].toFixed(2), MARG.l + pw + 9, Yend);
-    if (chSinu.hoverI >= 0) {
-      var hx = MARG.l + fr.pw * (hist.t[chSinu.hoverI] / x1);
-      g.strokeStyle = BASE; g.lineWidth = 1;
-      g.beginPath(); g.moveTo(hx, MARG.t); g.lineTo(hx, MARG.t + fr.ph); g.stroke();
-      var tip = chSinu.tip;
-      tip.textContent = "";
-      var hd = document.createElement("div");
-      hd.className = "thead";
-      hd.textContent = "t = " + hist.t[chSinu.hoverI].toFixed(1) + " yr";
-      tip.appendChild(hd);
-      tipRow(tip, C_SINU, "Sinuosity", hist.s[chSinu.hoverI].toFixed(3));
-      placeTip(chSinu, hx, pc.w);
-    }
-  }
-}
-
-chMoves.draw = drawMovesChart;
-chSinu.draw = drawSinuChart;
-
 function renderAll() {
   renderGrid();
   renderOverlay();
-  drawMovesChart();
-  drawSinuChart();
 }
 
 /* ── Visual toggles re-render immediately (matters while paused) ── */
