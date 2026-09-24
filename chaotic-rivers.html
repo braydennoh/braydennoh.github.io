@@ -6,6 +6,23 @@
   <title>Meander Cutoffs Induce Chaos - Brayden Noh</title>
   <link rel="stylesheet" href="style.css">
   <script src="appearance.js"></script>
+  <style>
+    /* demo controls, square and flat like the Appearance box (as on the Scheidegger and Human River
+       pages).  The sliders are a light 10px bar with a solid blue square handle exactly as tall as the
+       bar; neither has a real border (the bar's outline is an inset shadow), so the two line up in
+       every browser */
+    /* align-self: stretch gives Play and Reset one height (the row centres its items, and the
+       fallback-font play symbol makes Play a pixel taller than Reset) */
+    #chaos-sim button { border: 1px solid #ddd; border-radius: 0; background: #fafbfc; color: #222; align-self: stretch; }
+    #chaos-sim button:hover { background: #f0f2f5; }
+    #chaos-sim button:active { background: #e6e9ee; }
+    #chaos-sim input[type=range] { -webkit-appearance: none; appearance: none; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+    #chaos-sim input[type=range]::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #chaos-sim input[type=range]::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #chaos-sim input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #chaos-sim input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #chaos-sim input[type=range]:focus-visible { outline: 1px solid #003399; outline-offset: 2px; }
+  </style>
 </head>
 <body class="project-page">
 

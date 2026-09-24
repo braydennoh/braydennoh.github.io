@@ -12,24 +12,24 @@
   <script src="appearance.js"></script>
   <style>
     .main { min-width: 0; }
-    /* Keep the left column visible while the page scrolls (sticky, so the
-       exact two-column layout and typography are preserved). */
-    .project-page .sidebar {
-      position: sticky;
-      top: 30px;
-      align-self: flex-start;
-      max-height: calc(100vh - 60px);
-      overflow: auto;
-    }
-    @media (max-width: 700px) {
-      .project-page .sidebar { position: static; max-height: none; overflow: visible; }
-    }
     .sidebar .citation { font-size: 12.5px; line-height: 1.5; color: #767676; }
     .sidebar .citation a { word-break: break-word; }
     /* demo styling, matched to the site's monospace/figure conventions */
     #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
     .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
-    #sim-controls input[type=range] { accent-color: #003399; }
+    /* sliders: square and flat like the buttons, a light bar with a solid blue square handle.  Both
+       are exactly 10px tall and have no real borders (the bar's outline is an inset shadow), so the
+       handle's top and bottom edges sit exactly on the bar's, whatever box sizing the browser uses */
+    #sim-controls input[type=range] { -webkit-appearance: none; appearance: none; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+    #sim-controls input[type=range]::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]:focus-visible { outline: 1px solid #003399; outline-offset: 2px; }
+    /* resample buttons: square and flat, drawn like the Appearance box */
+    #sim-controls button { border: 1px solid #ddd; border-radius: 0; background: #fafbfc; color: #222; }
+    #sim-controls button:hover { background: #f0f2f5; }
+    #sim-controls button:active { background: #e6e9ee; }
     /* colorbar for w(y,x), mirroring the paper figure */
     #cbarWrap { margin-top: 6px; }
     #cbar { display: block; border: 1px solid #ddd; max-width: 100%; height: 10px; }
@@ -54,7 +54,7 @@
   <div class="sidebar">
     <h1>A percolation transition for Scheidegger river networks</h1>
 
-    <p>Rain falls on a randomly tilted landscape, and every patch of ground soaks up a little water and passes the overflow downhill. Tune the rainfall \(p\) and the storage \(C\) and watch whether the overflow links into a single river reaching from the headwaters to the sea, a percolation transition along a critical curve \(p_c(C)\).</p>
+    <p>Some rivers flow to the sea, whereas others vanish inland. This is a percolation problem because wet clusters either span from headwaters to an outlet or remain internally disconnected. Water aggregates as it flows downhill, and we therefore couple Scheidegger&rsquo;s directed random walk to a minimal rainfall and storage rule to determine when aggregation produces a spanning cluster. We define a square lattice on which each site receives Bernoulli rainfall with probability \(p\) and retains water up to a local storage capacity \(C\), with any excess routed downstream as Hortonian overland flow along the Scheidegger direction. The model exhibits a directed spanning transition along a critical curve \(p_c(C)\). Above this curve, overflow forms a connected path from the headwaters to the outlet. Below it, overflow remains confined to disconnected internal clusters. Mapping fifteen river basins onto the same \((p, C)\) plane using basin-averaged precipitation and aridity separates them into spanning, endorheic, and marginal populations. The marginal basins lie near the critical curve, where small changes in rainfall supply or storage capacity can switch the river between spanning and non-spanning.</p>
 
     <hr class="separator">
 
@@ -68,11 +68,9 @@
 
   <div class="main">
 
-    <p>What determines a river? A drop lands on a patch of ground and the ground has two options: absorb it, or decline and hand it to gravity, which happens once the soil is saturated. And the same transaction repeats upward through scale: hillslopes draining across their width, subbasins across their length, basins to the river, the river to the sea. Which is why this is really percolation theory, how purely local random connections become global pathways, and the whole continent's drainage assembled out of decisions made by dirt.</p>
+    <p>What determines a river? A drop of rain lands on a patch of ground, and the ground can either absorb it or pass it downhill if it is saturated. This transaction happens at all scales, from hillslope to basin to river to sea. Percolation theory relates how local, random connections merge to form a large-scale, system-spanning network (rivers in this example).</p>
 
-    <p>Below is that transaction on a lattice. Rain lands on each cell with probability \(p\), the ground holds back a fixed amount \(C\), and the excess is handed to one of the two cells diagonally downhill, left or right, decided at random once and then fixed for good. That is Scheidegger's landscape, about the least you can assume about a tilted rough surface and still get branching, merging streams that scale like real ones.</p>
-
-    <p>What makes it interesting is that the handoffs accumulate. Two trickles too small to escape their own cells can meet at a confluence and clear the threshold together, so a cell can carry a river without a single drop having landed on it. Raise \(p\) or lower \(C\) and those overflowing cells link up until the basin flips from disconnected puddles to one river reaching the sea, along a critical curve \(p_c(C)\). Sit right at that edge and resample the rain: the same \((p, C)\) sometimes spans and sometimes does not.</p>
+    <p>The simulation below shows how percolation can be used to determine a spanning river, which is based on the spatial density of rainfall (input flux) and ground storage capacity (output flux). Rain lands on each cell with probability \(p\), the ground can deplete a fixed amount \(C\), and the excess is handed off to one of two cells downhill (due to gravity), chosen at random (Scheidegger lattice). You will be able to observe that handoffs accumulate. A cell can carry a river without a single drop of rain having landed on it because of the supply from upstream.</p>
 
     <!-- Interactive demo -->
     <div id="sim-container" style="margin: 0.6em 0 0.6em;">
@@ -83,8 +81,6 @@
         <div id="cbarLabel">\(w(y,x)\) cumulative drainage (log)</div>
       </div>
     </div>
-
-    <div id="stats" style="font-family:monospace; font-size:13px; color:#222; margin-bottom:0.5em;"></div>
 
     <div id="sim-controls" style="margin-bottom: 0.6em;">
       <div style="margin-bottom: 0.5em;">
@@ -159,7 +155,6 @@
     return Math.floor(t * 256);
   }
   const SPAN_R = 255, SPAN_G = 69, SPAN_B = 0;   // orangered
-  const stats = S('stats');
   const sliders = { L: S('L'), p: S('p'), C: S('C') };
   const Lval = S('Lv'), pval = S('pv'), Cval = S('Cv');
   let rainSeed = 1;   // advanced by "resample rain"; no longer surfaced in the UI
@@ -246,7 +241,7 @@
   function fitDisplay() {
     const m = document.querySelector('.main');
     const w = (m && m.clientWidth > 0) ? m.clientWidth : 520;
-    return Math.max(280, Math.min(540, Math.floor(w)));
+    return Math.max(280, Math.min(540, Math.floor(w) - 2));   // - 2: the plot's 1px border
   }
   let DISPLAY = fitDisplay();
   cv.width = DISPLAY; cv.height = DISPLAY;
@@ -256,8 +251,10 @@
   const cb = S('cbar'), cbx = cb.getContext('2d');
   const cbTicks = S('cbarTicks'), cbLabel = S('cbarLabel');
   function drawColorbar() {
+    // the plot is a DISPLAY-wide bitmap inside a 1px border, so the bar (also bordered) is
+    // DISPLAY + 2 wide overall and its colours line up pixel for pixel with the plot's
     cb.width = DISPLAY; cb.height = 1;
-    cb.style.width = DISPLAY + 'px';
+    cb.style.width = (DISPLAY + 2) + 'px';
     const bar = cbx.createImageData(DISPLAY, 1);
     const b = bar.data;
     for (let x = 0, j = 0; x < DISPLAY; x++, j += 4) {
@@ -266,12 +263,12 @@
     }
     cbx.putImageData(bar, 0, 0);
     // pin each label to its LogNorm position along the bar
-    cbTicks.style.width = DISPLAY + 'px';
-    cbLabel.style.width = DISPLAY + 'px';
+    cbTicks.style.width = (DISPLAY + 2) + 'px';
+    cbLabel.style.width = (DISPLAY + 2) + 'px';
     const spans = cbTicks.children;
     for (let i = 0; i < spans.length; i++) {
       const t = (Math.log10(parseFloat(spans[i].textContent)) - Math.log10(WMIN)) * NA;
-      spans[i].style.left = (t * DISPLAY) + 'px';
+      spans[i].style.left = (1 + t * DISPLAY) + 'px';
     }
   }
   drawColorbar();
@@ -306,12 +303,6 @@
     if (forceNewDirs || !dirArr || dirL !== Lv) { dirArr = genDirections(Lv, dirSeed); dirL = Lv; }
     const out = simulate(Lv, pv, Cv, dirArr, rainSeed);
     draw(Lv, out.water, out.spanning);
-
-    const total = Lv * Lv;
-    stats.innerHTML =
-      `active: ${(out.active / total).toFixed(3)} &bull; ` +
-      `spanning sites: ${(out.span / total).toFixed(3)} &bull; ` +
-      `top&rarr;bottom: ${out.bottomSpan}/${Lv}`;
   }
 
   for (const k of ['L', 'p', 'C']) sliders[k].addEventListener('input', () => update(k === 'L'));
