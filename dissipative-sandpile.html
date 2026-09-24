@@ -110,10 +110,6 @@
         <input id="speedSlider" type="range" min="1" max="100000" step="1" value="10000">
         <span id="speedVal">10000</span>
       </div>
-
-      <div style="margin-top: 0.5em; font-size: 85%;">
-        <label><input type="checkbox" id="contourToggle"> show contours</label>
-      </div>
     </div>
 
     <p>Even though the simulation is non-conservative (no materials move between cells), the topography still produces somewhat stable and organized drainage networks.</p>
@@ -148,13 +144,10 @@ let unstableBuf;
 let topoImg, flowImg;
 
 let recv, accArr, orderArr;
-let contourBuf;
-let mainMask, ccVisited, ccStack;
 
 let totalGrains = 0, totalTopples = 0;
 let paused = false;
 let grainsPerFrame = 10000;
-let showContours = false;
 
 const NB8 = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 
@@ -170,10 +163,6 @@ function rebuildGrid(newN) {
   recv = new Int32Array(NN);
   accArr = new Int32Array(NN);
   orderArr = new Int32Array(NN);
-  contourBuf = new Int32Array(NN);
-  mainMask = new Uint8Array(NN);
-  ccVisited = new Uint8Array(NN);
-  ccStack = new Int32Array(NN);
   topoImg = createImage(N, N);
   flowImg = createImage(N, N);
   nActive = 0;
@@ -243,11 +232,6 @@ function setup() {
     grainsPerFrame = +speedSlider.value;
     speedVal.textContent = grainsPerFrame;
   });
-  const contourToggle = document.getElementById('contourToggle');
-  showContours = contourToggle.checked;
-  contourToggle.addEventListener('change', () => {
-    showContours = contourToggle.checked;
-  });
   const pauseBtn = document.getElementById('pauseBtn');
   const clearBtn = document.getElementById('clearBtn');
   pauseBtn.addEventListener('click', () => {
@@ -273,15 +257,6 @@ function ice(t) {
 }
 const terrain = ice;
 function flowColor(t) { return ice(1 - t); }
-
-function thermalColor(t) {
-  if (t < 0) t = 0; else if (t > 1) t = 1;
-  let r, g, b;
-  if (t < 1/3)       { r = 3 * t;     g = 0;          b = 0; }
-  else if (t < 2/3)  { r = 1;          g = 3 * t - 1;  b = 0; }
-  else               { r = 1;          g = 1;          b = 3 * t - 2; }
-  return `rgb(${Math.round(255*r)}, ${Math.round(255*g)}, ${Math.round(255*b)})`;
-}
 
 function slopeAtIdx(c) {
   const i = (c / N) | 0, j = c - i * N;
@@ -391,138 +366,6 @@ function drawTopo(maxH) {
   image(topoImg, 0, 0, GRID_PX, GRID_PX);
 }
 
-function computeContourData(T) {
-  ccVisited.fill(0);
-  mainMask.fill(0);
-  let maxStart = -1, maxSize = 0;
-  for (let start = 0; start < NN; start++) {
-    if (ccVisited[start]) continue;
-    if (!active[start] || grid[start] < T) { ccVisited[start] = 1; continue; }
-    let size = 0, top = 0;
-    const compStart = start;
-    ccStack[top++] = start;
-    ccVisited[start] = 1;
-    while (top > 0) {
-      const c = ccStack[--top];
-      size++;
-      const i = (c / N) | 0, j = c - i * N;
-      for (let dk = 0; dk < 8; dk++) {
-        const ni = i + NB8[dk][0], nj = j + NB8[dk][1];
-        if (ni < 0 || ni >= N || nj < 0 || nj >= N) continue;
-        const nc = ni * N + nj;
-        if (!ccVisited[nc] && active[nc] && grid[nc] >= T) { ccVisited[nc] = 1; ccStack[top++] = nc; }
-      }
-    }
-    if (size > maxSize) { maxSize = size; maxStart = compStart; }
-  }
-  if (maxStart === -1) return { area: 0, perimeter: 0 };
-  ccVisited.fill(0);
-  let top = 0, area = 0, perimeter = 0;
-  ccStack[top++] = maxStart;
-  ccVisited[maxStart] = 1;
-  mainMask[maxStart] = 1;
-  while (top > 0) {
-    const c = ccStack[--top];
-    area++;
-    const i = (c / N) | 0, j = c - i * N;
-    for (let dk = 0; dk < 8; dk++) {
-      const ni = i + NB8[dk][0], nj = j + NB8[dk][1];
-      if (ni < 0 || ni >= N || nj < 0 || nj >= N) continue;
-      const nc = ni * N + nj;
-      if (!ccVisited[nc] && active[nc] && grid[nc] >= T) { ccVisited[nc] = 1; mainMask[nc] = 1; ccStack[top++] = nc; }
-    }
-    if (i > 0)     { const nc = c - N; if (!active[nc] || grid[nc] < T) perimeter++; } else perimeter++;
-    if (i < N - 1) { const nc = c + N; if (!active[nc] || grid[nc] < T) perimeter++; } else perimeter++;
-    if (j > 0)     { const nc = c - 1; if (!active[nc] || grid[nc] < T) perimeter++; } else perimeter++;
-    if (j < N - 1) { const nc = c + 1; if (!active[nc] || grid[nc] < T) perimeter++; } else perimeter++;
-  }
-  return { area, perimeter };
-}
-
-const CONTOUR_STEP = 50;
-function computeContourLevels() {
-  if (nActive === 0) return [];
-  let maxH = 0;
-  for (let k = 0; k < NN; k++) if (active[k] && grid[k] > maxH) maxH = grid[k];
-  if (maxH < CONTOUR_STEP) return [];
-  const levels = [];
-  for (let t = CONTOUR_STEP; t <= maxH; t += CONTOUR_STEP) levels.push(t);
-  return levels;
-}
-
-function renderContours(levels, maxH) {
-  const stats = [];
-  if (levels.length === 0) return stats;
-  const s = GRID_PX / N;
-  const fontPx = Math.max(9, Math.min(14, Math.floor(s * 2.2)));
-  textSize(fontPx);
-  textAlign(LEFT, TOP);
-  textFont('monospace');
-  for (let li = 0; li < levels.length; li++) {
-    const T = levels[li];
-    const res = computeContourData(T);
-    stats.push({ T, area: res.area, perimeter: res.perimeter });
-    if (res.area === 0) continue;
-    const ct = maxH > 0 ? T / maxH : 0;
-    const levelColor = thermalColor(ct);
-    noFill();
-    const drawMS = () => {
-      for (let i = -1; i < N; i++) {
-        for (let j = -1; j < N; j++) {
-          const inTL = (i >= 0 && j >= 0)             ? mainMask[i * N + j]             : 0;
-          const inTR = (i >= 0 && j + 1 < N)          ? mainMask[i * N + j + 1]         : 0;
-          const inBR = (i + 1 < N && j + 1 < N)       ? mainMask[(i + 1) * N + j + 1]   : 0;
-          const inBL = (i + 1 < N && j >= 0)          ? mainMask[(i + 1) * N + j]       : 0;
-          let code = 0;
-          if (inTL) code |= 1;
-          if (inTR) code |= 2;
-          if (inBR) code |= 4;
-          if (inBL) code |= 8;
-          if (code === 0 || code === 15) continue;
-          const topX = (j + 0.5) * s, topY = (i + 0) * s;
-          const rightX = (j + 1) * s, rightY = (i + 0.5) * s;
-          const botX = (j + 0.5) * s, botY = (i + 1) * s;
-          const leftX = (j + 0) * s,  leftY = (i + 0.5) * s;
-          switch (code) {
-            case 1: case 14: line(topX,topY,leftX,leftY); break;
-            case 2: case 13: line(topX,topY,rightX,rightY); break;
-            case 3: case 12: line(leftX,leftY,rightX,rightY); break;
-            case 4: case 11: line(rightX,rightY,botX,botY); break;
-            case 6: case 9:  line(topX,topY,botX,botY); break;
-            case 7: case 8:  line(leftX,leftY,botX,botY); break;
-            case 5:
-              line(topX,topY,rightX,rightY);
-              line(leftX,leftY,botX,botY);
-              break;
-            case 10:
-              line(topX,topY,leftX,leftY);
-              line(rightX,rightY,botX,botY);
-              break;
-          }
-        }
-      }
-    };
-    stroke(0, 0, 0, 200); strokeWeight(2.4); drawMS();
-    stroke(levelColor);   strokeWeight(1);   drawMS();
-    {
-      const label = 'h=' + T;
-      const padX = 3, padY = 2;
-      const tw = textWidth(label);
-      const th = textAscent() + textDescent();
-      const rowIdx = Math.max(0, Math.round(T / CONTOUR_STEP) - 1);
-      const x = 4;
-      const y = 4 + rowIdx * (th + padY * 2 + 3);
-      noStroke();
-      fill(17, 17, 17, 220);
-      rect(x, y, tw + padX * 2, th + padY * 2);
-      fill(levelColor);
-      text(label, x + padX, y + padY);
-    }
-  }
-  noStroke();
-  return stats;
-}
-
 function drawFlow() {
   let maxA = 1;
   for (let k = 0; k < NN; k++) if (accArr[k] > maxA) maxA = accArr[k];
@@ -563,10 +406,6 @@ function draw() {
   }
   computeFlowAcc();
   drawTopo(maxH);
-  if (showContours) {
-    const levels = computeContourLevels();
-    renderContours(levels, maxH);
-  }
   const maxA = drawFlow();
 
   info.status.textContent  = paused ? '[PAUSED] ' : '';
