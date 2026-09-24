@@ -56,8 +56,6 @@
 
   <div class="main">
 
-    <p>The left panel is the topography. Each cell carries an integer height \(h(\mathbf{x}, t)\) and the color maps taller to lighter. The right panel is D8 flow accumulation. Every cell routes its flow to its lowest 8-neighbor (steepest gradient descent), and the color counts how many upstream cells drain through each point.</p>
-
     <p>At every timestep, one grain is dropped on a uniformly random active cell, then the grid relaxes. A cell \(\mathbf{x}\) is unstable when its drop to the lowest 8-neighbor exceeds the critical slope \(S_c\):</p>
 
     \[
@@ -69,6 +67,8 @@
     \[
     h(\mathbf{x}, t^{+}) \;=\; h(\mathbf{x}, t) \;-\; \varepsilon .
     \]
+
+    <p>Below, the left panel shows topography. Each cell carries an integer height \(h(\mathbf{x}, t)\), and lighter colors represent taller values. The right panel is a D8 flow accumulation, so the color counts how many upstream cells drain through each point. Darker color means more.</p>
 
     <!-- Simulator -->
     <div id="sim-container" style="margin: 1em 0;">
@@ -116,11 +116,7 @@
       </div>
     </div>
 
-    <p style="font-size: 85%; color: #767676;">
-    Figure 1. Left: topography \(h(\mathbf{x}, t)\) on the composite active region (ice colormap, darker is lower). Right: D8 flow accumulation on the same stable landscape (lighter is more drainage). Slider values update live. Press <kbd>space</kbd> to pause, <kbd>c</kbd> to clear.
-    </p>
-
-    <p>The interesting part is on the right panel: even though the physics is non-conservative and no material moves between cells, the stable topography still produces organized drainage networks with flow accumulation orders of magnitude above background. Toggling show contours overlays contours every 50 blocks of elevation on the largest connected region at each level, so the ridges and valleys of the landscape are visible over the colormap. The active region is a composite shape: quarter-circle (top-left), square corner (top-right), 45&deg; diagonal cut (bottom-right), and an L-shaped notch (bottom-left). A single run exposes how each boundary type shapes the drainage pattern that emerges.</p>
+    <p>Even though the simulation is non-conservative (no materials move between cells), the topography still produces somewhat stable and organized drainage networks.</p>
 
   </div>
 
