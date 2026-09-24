@@ -153,7 +153,6 @@ h1 {
 .intro {
   max-width: 504px;
   margin-bottom: 20px;
-  font-size: calc(17px * var(--ts));       /* 2px above body text, and it scales with it */
 }
 
 /* Project pages */
