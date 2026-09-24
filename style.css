@@ -34,8 +34,8 @@ body {
   line-height: 1.5;
   color: #222;
   background: #fff;
-  padding: 30px 40px;
-  max-width: 960px;
+  padding: 39px 60px 30px;
+  max-width: 1000px;
 }
 
 a {
@@ -53,8 +53,8 @@ a:visited {
 
 /* Top nav */
 nav {
-  font-size: 13px;
-  margin-bottom: 20px;
+  font-size: 15px;
+  margin-bottom: 26px;
 }
 
 nav a {
@@ -241,7 +241,7 @@ h1 {
 /* Mobile responsiveness */
 @media (max-width: 700px) {
   body {
-    padding: 20px 20px;
+    padding: 26px 30px 20px;
   }
 
   .columns {
