@@ -148,6 +148,13 @@ h1 {
   hyphens: auto;
 }
 
+/* Index: a line above the project gallery, kept to the gallery's width (4 x 108 + 3 x 24) so
+   the text and the grid share a right edge */
+.intro {
+  max-width: 504px;
+  margin-bottom: 20px;
+}
+
 /* Project pages */
 .project-page .sidebar h1 {
   font-size: 28px;
