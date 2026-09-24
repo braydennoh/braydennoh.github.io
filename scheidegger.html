@@ -17,7 +17,15 @@
     /* demo styling, matched to the site's monospace/figure conventions */
     #canvas { image-rendering: pixelated; image-rendering: crisp-edges; border: 1px solid #ddd; max-width: 100%; height: auto; }
     .sw { display: inline-block; width: 11px; height: 11px; vertical-align: middle; margin: 0 3px 0 8px; border: 1px solid #bbb; }
-    #sim-controls input[type=range] { accent-color: #003399; }
+    /* sliders: square and flat like the buttons, a light bar with a solid blue square handle.  Both
+       are exactly 10px tall and have no real borders (the bar's outline is an inset shadow), so the
+       handle's top and bottom edges sit exactly on the bar's, whatever box sizing the browser uses */
+    #sim-controls input[type=range] { -webkit-appearance: none; appearance: none; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+    #sim-controls input[type=range]::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]:focus-visible { outline: 1px solid #003399; outline-offset: 2px; }
     /* resample buttons: square and flat, drawn like the Appearance box */
     #sim-controls button { border: 1px solid #ddd; border-radius: 0; background: #fafbfc; color: #222; }
     #sim-controls button:hover { background: #f0f2f5; }
