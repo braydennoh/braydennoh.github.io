@@ -28,12 +28,21 @@
   box-sizing: border-box;
 }
 
+/* --ts is the text-size scale the Appearance panel sets (appearance.js), 1 at Standard.  Body
+   and content text are written as a multiple of it, so the panel resizes them; the nav and the
+   page headings keep their fixed sizes. */
+:root {
+  --ts: 1;
+}
+
 body {
   font-family: "Myriad Pro", Arial, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   line-height: 1.5;
   color: #222;
   background: #fff;
+  /* 39px on top and 60px at the sides.  max-width grows by the 40px the side margins added, so
+     every column keeps its width and the extra space is all margin. */
   padding: 39px 60px 30px;
   max-width: 1000px;
 }
@@ -82,7 +91,7 @@ h1 {
 .sidebar {
   width: 280px;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   line-height: 1.6;
 }
 
@@ -91,7 +100,7 @@ h1 {
 }
 
 .sidebar h3 {
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   font-weight: bold;
   margin-bottom: 6px;
 }
@@ -133,7 +142,7 @@ h1 {
 }
 
 .project .caption {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts));
   color: #444;
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -186,20 +195,20 @@ h1 {
 }
 
 .research-item .details h3 {
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   font-weight: normal;
   margin-bottom: 2px;
 }
 
 .research-item .details .authors {
   font-style: italic;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: #555;
   margin-bottom: 4px;
 }
 
 .research-item .details p {
-  font-size: 14px;
+  font-size: calc(14px * var(--ts));
   margin-bottom: 0;
   line-height: 1.5;
 }
@@ -223,7 +232,7 @@ h1 {
 }
 
 .about-page .sidebar .contact {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts));
   color: #555;
   margin-top: 16px;
 }
@@ -234,8 +243,42 @@ h1 {
 }
 
 .about-page .main h3 {
-  font-size: 15px;
+  font-size: calc(15px * var(--ts));
   margin-bottom: 4px;
+}
+
+/* Appearance panel (appearance.js): text size only */
+.appearance {
+  width: 150px;
+  font-size: 13px;
+  color: #555;
+  border: 1px solid #ddd;
+  background: #fafbfc;
+  padding: 12px 14px;
+}
+.appearance h2 { font-size: 13px; font-weight: normal; color: #222; margin: 0 0 11px; }
+.appearance .grp > span { display: block; font-size: 12px; margin-bottom: 4px; }
+.appearance label { display: block; line-height: 1.95; color: #222; cursor: pointer; }
+.appearance input { margin-right: 7px; accent-color: #003399; vertical-align: -1px; }
+/* each choice previews its own size */
+.appearance .t1 { font-size: 11.5px; }
+.appearance .t2 { font-size: 13px; }
+.appearance .t3 { font-size: 15.5px; }
+
+/* Wide windows: the panel sits in the EMPTY margin to the right of the page, so no column gives
+   up any width.  The page is left-aligned and capped at 1000px, so its content ends at 940px
+   (1000 less the 60px margin); the panel starts one 40px gap after that and ends at 1130px,
+   which clears a 1160px window even with a scrollbar.  top is where the content starts:
+   39px of margin, the 22.5px nav line and its 26px gap. */
+@media (min-width: 1160px) {
+  .appearance { position: fixed; top: 88px; left: 980px; }
+}
+/* Narrower windows have no such margin, so the panel drops beneath the columns instead of
+   squeezing them.  The right margin makes it take a whole row, which is what forces the wrap,
+   while the box stays its own 150px. */
+@media (max-width: 1159.98px) {
+  .columns { flex-wrap: wrap; }
+  .appearance { margin-top: 22px; margin-right: calc(100% - 150px); }
 }
 
 /* Mobile responsiveness */
