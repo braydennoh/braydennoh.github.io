@@ -13,6 +13,23 @@
   <script src="appearance.js"></script>
   <style>
     .main { min-width: 0; }
+    /* demo controls, square and flat like the Appearance box (as on the Scheidegger, Human River and
+       Chaotic Rivers pages).  The sliders are a light 10px bar with a solid blue square handle exactly
+       as tall as the bar; neither has a real border (the bar's outline is an inset shadow), so the two
+       line up in every browser */
+    /* the pause/play symbols come from a fallback font that would make "Resume" a pixel taller than
+       "Clear": the flex row stretches both buttons to one height, and the fixed line-height keeps
+       that height the same whether the button reads Pause or Resume, so toggling moves nothing */
+    #sim-controls .btnrow { display: flex; gap: 4px; }
+    #sim-controls button { border: 1px solid #ddd; border-radius: 0; background: #fafbfc; color: #222; line-height: 16px; }
+    #sim-controls button:hover { background: #f0f2f5; }
+    #sim-controls button:active { background: #e6e9ee; }
+    #sim-controls input[type=range] { -webkit-appearance: none; appearance: none; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+    #sim-controls input[type=range]::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    #sim-controls input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    #sim-controls input[type=range]:focus-visible { outline: 1px solid #003399; outline-offset: 2px; }
   </style>
 </head>
 <body class="project-page">
@@ -71,7 +88,7 @@
     </div>
 
     <div id="sim-controls" style="margin-bottom: 1em;">
-      <div style="margin-bottom: 0.4em;">
+      <div class="btnrow" style="margin-bottom: 0.4em;">
         <button id="pauseBtn" type="button" style="padding:0.2em 0.8em; cursor:pointer;">&#9646;&#9646; Pause</button>
         <button id="clearBtn" type="button" style="padding:0.2em 0.8em; cursor:pointer;">Clear</button>
       </div>
