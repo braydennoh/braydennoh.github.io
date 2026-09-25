@@ -229,6 +229,24 @@ h1 {
   margin-bottom: 10px;
 }
 
+.quotes {
+  margin-top: 26px;
+}
+
+.quotes h3 {
+  font-size: calc(15px * var(--ts));
+  margin-bottom: 6px;
+}
+
+.quotes blockquote {
+  margin-bottom: 16px;
+}
+
+.quotes .attribution {
+  font-size: calc(13px * var(--ts));
+  color: #555;
+}
+
 /* About page */
 .about-page .sidebar img.portrait {
   width: 100%;
