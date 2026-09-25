@@ -235,6 +235,7 @@ h1 {
 
 .quotes h3 {
   font-size: calc(15px * var(--ts));
+  font-weight: normal;
   margin-bottom: 6px;
 }
 
