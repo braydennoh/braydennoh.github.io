@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ucayali River - Brayden Noh</title>
+<style>
+@font-face { font-family: "Myriad Pro"; src: url("assets/fonts/MyriadPro-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+:root { --river: #3f97ff; --dim: rgba(255, 255, 255, 0.58); }
+html, body { margin: 0; height: 100%; background: #0d0d0d; overflow: hidden; }
+body, button, input { font: 400 14px/1.3 "Myriad Pro", system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; }
+* { font-weight: 400; box-sizing: border-box; }
+#stage { position: fixed; inset: 0; cursor: grab; touch-action: none; user-select: none; }
+#stage.drag { cursor: grabbing; }
+#world, #world2 { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#world > *, #world2 > * { position: absolute; left: 0; top: 0; display: block; }
+#world2 { pointer-events: none; }
+#ov { image-rendering: pixelated; }
+#gl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+#lines { overflow: visible; pointer-events: none; }
+#lines polyline, #lines path { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+#rmajor { stroke: rgba(255, 255, 255, 0.9); stroke-width: 1.6px; }
+#rminor { stroke: rgba(255, 255, 255, 0.65); stroke-width: 0.8px; }
+#rtrack { stroke: rgba(255, 255, 255, 0.4); stroke-width: 0.6px; }
+#lines #bld { fill: #ffffff; stroke: rgba(0, 0, 0, 0.55); stroke-width: 0.5px; }
+.ui { position: fixed; }
+#bl, #north, #tip { z-index: 3; }
+#base.off { visibility: hidden; }
+#places { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+.sub { color: rgba(255, 255, 255, 0.82); }
+.muted { color: var(--dim); }
+#bl { right: 22px; bottom: 20px; width: min(370px, calc(100vw - 44px)); }
+#ylab { font-size: 46px; line-height: 1; margin-bottom: 2px; }
+.row { display: flex; align-items: center; gap: 14px; margin: 6px 0; white-space: nowrap; }
+button.txt { background: none; border: 0; padding: 2px 0; color: var(--dim); cursor: pointer; border-bottom: 1px solid transparent; }
+button.txt:hover { color: #fff; }
+button.txt[aria-pressed="true"] { color: #fff; border-bottom-color: #fff; }
+button.txt:disabled { opacity: 0.35; cursor: default; }
+#play { width: 18px; text-align: left; color: #fff; border: 0; }
+input[type=range] { -webkit-appearance: none; appearance: none; flex: 1; height: 18px; background: transparent; margin: 0; cursor: pointer; }
+input[type=range]::-webkit-slider-runnable-track { height: 2px; background: rgba(255, 255, 255, 0.5); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #fff; margin-top: -5.5px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.6); }
+input[type=range]::-moz-range-track { height: 2px; background: rgba(255, 255, 255, 0.5); }
+input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border: 0; border-radius: 50%; background: #fff; }
+#ltitle { margin-top: 10px; }
+#bar { width: 100%; height: 6px; display: block; margin: 5px 0 3px; border-radius: 0; }
+.ticks { display: flex; justify-content: space-between; color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+#north { right: 22px; top: 20px; color: rgba(255, 255, 255, 0.82); }
+#tip { pointer-events: none; display: none; white-space: nowrap; }
+#tv { font-size: 20px; }
+#note { color: #ffc2ad; margin-top: 6px; display: none; }
+.place { position: fixed; pointer-events: none; font-size: 15px; transform: translate(-4px, -50%); white-space: nowrap; }
+.place.village { font-size: 12px; color: rgba(255, 255, 255, 0.85); }
+.place.small { font-size: 11px; color: rgba(255, 255, 255, 0.75); }
+.place.hide { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <img id="base" alt="Landsat composite of the Ucayali River" draggable="false">
+    <canvas id="ov"></canvas>
+  </div>
+  <canvas id="gl"></canvas>
+  <div id="world2"><svg id="lines"><g id="osm"><path id="rtrack"/><path id="rminor"/><path id="rmajor"/><path id="bld"/></g></svg></div>
+</div>
+<div id="bl" class="ui">
+  <div id="ylab"></div>
+  <div class="row"><button id="play" class="txt" aria-label="Play years">&#9654;</button><input id="yr" type="range" aria-label="Year"></div>
+  <div class="row">
+    <button class="txt" id="imgtog" aria-pressed="true">Imagery</button>
+  </div>
+  <div class="sub" id="ltitle"></div>
+  <canvas id="bar" width="370" height="6"></canvas>
+  <div class="ticks" id="ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div>
+  <div id="note">Landsat images not found next to this folder.</div>
+</div>
+<div id="north" class="ui">N &rarr;</div>
+<div id="places"></div>
+<div id="tip" class="ui"><div id="tv"></div><div class="sub" id="tl2"></div><div class="muted" id="to"></div></div>
+<script src="assets/ucayali-river/data.js"></script>
+<script>
+const D = window.RISK, NX = D.nx, NY = D.ny, BOX = D.box || 1, BX = D.bx || NX, BY = D.by || NY;
+const $ = id => document.getElementById(id);
+const stage = $('stage'), world = $('world'), world2 = $('world2'), base = $('base'), ov = $('ov'), svg = $('lines');
+base.width = NX; base.height = NY; base.style.width = NX + 'px'; base.style.height = NY + 'px';
+ov.width = BX; ov.height = BY; ov.style.width = BX * BOX + 'px'; ov.style.height = BY * BOX + 'px';
+svg.setAttribute('viewBox', `0 0 ${NX} ${NY}`); svg.style.width = NX + 'px'; svg.style.height = NY + 'px';
+for (const w of [world, world2]) { w.style.width = NX + 'px'; w.style.height = NY + 'px'; }
+const ctx = ov.getContext('2d');
+
+const yr = $('yr');
+yr.min = D.start + 1; yr.max = D.end;
+document.body.style.background = `rgb(${D.lut[0][0]},${D.lut[0][1]},${D.lut[0][2]})`;
+const LUT32 = new Uint32Array(256);
+D.lut.forEach((c, i) => new Uint8Array(LUT32.buffer).set(c, 4 * i));
+$('ltitle').textContent = `Chance the river has occupied this ground since ${D.start}`;
+
+function decode(src, w, h) {
+  return new Promise((ok, fail) => {
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(im, 0, 0);
+      const d = g.getImageData(0, 0, w, h).data, v = new Uint8Array(w * h);
+      for (let i = 0; i < v.length; i++) v[i] = d[4 * i];
+      ok(v);
+    };
+    im.onerror = fail;
+    im.src = src;
+  });
+}
+const cache = new Map();
+function layerData(t) {
+  if (!cache.has(t)) cache.set(t, decode(D.pe[t - 1], BX, BY));
+  return cache.get(t);
+}
+base.onerror = () => { $('note').style.display = 'block'; };
+base.src = D.img;
+
+
+// the overlay is drawn on the GPU: each 300 m risk box is looked up per screen pixel, so box edges stay crisp at any zoom
+const glc = $('gl'), gl = glc.getContext('webgl2', { premultipliedAlpha: false, antialias: false });
+let G = null;
+if (gl && gl.getParameter(gl.MAX_TEXTURE_SIZE) >= Math.max(BX, BY)) {
+  const sh = (type, src) => { const x = gl.createShader(type); gl.shaderSource(x, src); gl.compileShader(x); return x; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, `#version 300 es
+in vec2 a;
+void main() { gl_Position = vec4(a, 0.0, 1.0); }`));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `#version 300 es
+precision highp float;
+uniform sampler2D uP;
+uniform sampler2D uL;
+uniform vec2 uView, uBox;
+uniform float uDpr, uS, uTx, uTy, uNX, uNY;
+out vec4 o;
+void main() {
+  vec2 f = vec2(gl_FragCoord.x, uView.y - gl_FragCoord.y) / uDpr;
+  vec2 px = vec2((f.y - uTy) / uS, uNY - (f.x - uTx) / uS);
+  float p = texture(uP, clamp(px / uBox, 0.0, 1.0)).r * 2.55;
+  vec4 c = texture(uL, vec2((clamp(p, 0.0, 1.0) * 100.0 + 0.5) / 101.0, 0.5));
+  float inside = step(0.0, px.x) * step(0.0, px.y) * step(px.x, uNX) * step(px.y, uNY);
+  o = vec4(c.rgb, step(0.005, p) * inside);
+}`));
+  gl.bindAttribLocation(prog, 0, 'a');
+  gl.linkProgram(prog);
+  if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    const tex = () => {
+      const t = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.NEAREST], [gl.TEXTURE_MAG_FILTER, gl.NEAREST], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+      return t;
+    };
+    G = { prog, tp: tex(), tl: tex(), u: {} };
+    for (const n of ['uP', 'uL', 'uView', 'uBox', 'uDpr', 'uS', 'uTx', 'uTy', 'uNX', 'uNY']) G.u[n] = gl.getUniformLocation(prog, n);
+    gl.bindTexture(gl.TEXTURE_2D, G.tl);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 101, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(D.lut.flat()));
+  }
+}
+function glProb(v) {
+  gl.bindTexture(gl.TEXTURE_2D, G.tp);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, BX, BY, 0, gl.RED, gl.UNSIGNED_BYTE, v);
+}
+let drawPending = false;
+function drawGL() {
+  if (!G || drawPending) return;
+  drawPending = true;
+  requestAnimationFrame(() => {
+    drawPending = false;
+    const dpr = devicePixelRatio || 1, w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr);
+    if (glc.width !== w || glc.height !== h) { glc.width = w; glc.height = h; }
+    gl.viewport(0, 0, w, h);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (!cur) return;
+    gl.useProgram(G.prog);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, G.tp); gl.uniform1i(G.u.uP, 0);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, G.tl); gl.uniform1i(G.u.uL, 1);
+    gl.uniform2f(G.u.uView, w, h); gl.uniform2f(G.u.uBox, BX * BOX, BY * BOX);
+    gl.uniform1f(G.u.uDpr, dpr); gl.uniform1f(G.u.uS, s); gl.uniform1f(G.u.uTx, tx); gl.uniform1f(G.u.uTy, ty);
+    gl.uniform1f(G.u.uNX, NX); gl.uniform1f(G.u.uNY, NY);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  });
+}
+
+const hp = new URLSearchParams(location.hash.slice(1));
+let year = Math.min(D.end, Math.max(D.start + 1, +(hp.get('y') || D.start + 10)));
+let showImg = hp.get('i') !== '0', cur = null, token = 0;
+yr.value = year;
+const frame = new ImageData(BX, BY), out = new Uint32Array(frame.data.buffer);
+
+function drawBar() {
+  const c = $('bar'), g = c.getContext('2d');
+  for (let x = 0; x < c.width; x++) {
+    const k = D.lut[Math.max(1, Math.round(x / (c.width - 1) * 100))];
+    g.fillStyle = `rgb(${k[0]},${k[1]},${k[2]})`;
+    g.fillRect(x, 0, 1, c.height);
+  }
+}
+function syncControls() {
+  $('imgtog').setAttribute('aria-pressed', showImg);
+  base.classList.toggle('off', !showImg);
+  ov.style.display = G ? 'none' : '';
+  drawGL();
+}
+
+async function render() {
+  const my = ++token, t = year - D.start;
+  $('ylab').textContent = year;
+  const v = await layerData(t);
+  if (my !== token) return;
+  if (G) glProb(v);
+  else {
+    for (let i = 0; i < v.length; i++) out[i] = LUT32[v[i]];
+    ctx.putImageData(frame, 0, 0);
+  }
+  cur = v;
+  drawGL();
+  layerData(Math.min(t + 1, D.end - D.start));
+}
+
+function setYear(y) { year = Math.min(D.end, Math.max(D.start + 1, y)); yr.value = year; render(); }
+yr.addEventListener('input', () => setYear(+yr.value));
+$('imgtog').addEventListener('click', () => { showImg = !showImg; syncControls(); });
+let timer = null;
+$('play').addEventListener('click', () => {
+  if (timer) { clearInterval(timer); timer = null; $('play').innerHTML = '&#9654;'; return; }
+  $('play').innerHTML = '&#10074;&#10074;';
+  timer = setInterval(() => setYear(year >= D.end ? D.start + 1 : year + 1), 700 / 3);
+});
+
+// the frame is drawn rotated 90 degrees clockwise (north to the right) so the long axis of the reach runs across the screen
+let s = 1, s0 = 1, tx = 0, ty = 0;
+const RW = NY, RH = NX;
+const RANK = { city: 0, town: 0, village: 1, hamlet: 2, isolated_dwelling: 2, locality: 2 };
+const placeEls = ((D.osm && D.osm.places) || []).map(([name, cls, c, r]) => {
+  const el = document.createElement('div'), k = RANK[cls] ?? 2;
+  el.className = 'place ui' + (k === 1 ? ' village' : k === 2 ? ' small' : '');
+  el.textContent = '• ' + name;
+  $('places').appendChild(el);
+  return [el, c, r, k];
+});
+if (D.osm) {
+  $('bld').setAttribute('d', D.osm.buildings);
+  for (const k of ['major', 'minor', 'track']) $('r' + k).setAttribute('d', D.osm.roads[k]);
+}
+// the view never zooms out past the image: the smallest scale covers the window and panning stops at the image edges
+function cover() { return Math.max(innerWidth / RW, innerHeight / RH); }
+function clampView() {
+  s = Math.max(s, s0);
+  tx = Math.min(0, Math.max(innerWidth - RW * s, tx));
+  ty = Math.min(0, Math.max(innerHeight - RH * s, ty));
+}
+function apply() {
+  clampView();
+  world.style.transform = world2.style.transform = `translate(${tx}px, ${ty}px) scale(${s}) translate(${NY}px, 0px) rotate(90deg)`;
+  const keep = [$('bl'), $('north')].map(e => e.getBoundingClientRect());
+  for (const [el, c, r, k] of placeEls) {
+    const X = tx + (NY - r) * s, Y = ty + c * s;
+    el.style.left = X + 'px'; el.style.top = Y + 'px';
+    const under = keep.some(b => X > b.left - 160 && X < b.right + 10 && Y > b.top - 12 && Y < b.bottom + 12);
+    el.classList.toggle('hide', under || (k === 1 && s < s0 * 2) || (k === 2 && s < s0 * 5));
+  }
+  drawGL();
+}
+function fit() {
+  s0 = s = cover();
+  tx = (innerWidth - RW * s) / 2; ty = 0;
+  apply();
+}
+function zoomAt(x, y, k) {
+  const ns = Math.min(Math.max(s * k, s0), s0 * 24), f = ns / s;
+  tx = x - (x - tx) * f; ty = y - (y - ty) * f; s = ns; apply();
+}
+function toPixel(X, Y) { return [(Y - ty) / s, NY - (X - tx) / s]; }
+stage.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+stage.addEventListener('dblclick', fit);
+const ptrs = new Map();
+let pinch = null;
+stage.addEventListener('pointerdown', e => {
+  stage.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  stage.classList.add('drag');
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) }; }
+});
+stage.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId);
+  if (!p) { tip(e); return; }
+  $('tip').style.display = 'none';
+  if (ptrs.size === 1) { tx += e.clientX - p.x; ty += e.clientY - p.y; apply(); }
+  p.x = e.clientX; p.y = e.clientY;
+  if (ptrs.size === 2 && pinch) {
+    const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+    zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch.d);
+    pinch.d = d;
+  }
+});
+const end = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (!ptrs.size) stage.classList.remove('drag'); };
+stage.addEventListener('pointerup', end);
+stage.addEventListener('pointercancel', end);
+stage.addEventListener('pointerleave', () => { $('tip').style.display = 'none'; });
+
+function tip(e) {
+  const [px, py] = toPixel(e.clientX, e.clientY), el = $('tip');
+  if (!cur || px < 0 || py < 0 || px >= NX || py >= NY) { el.style.display = 'none'; return; }
+  const v = cur[Math.floor(py / BOX) * BX + Math.floor(px / BOX)];
+  $('tv').textContent = `${v}%`;
+  $('tl2').textContent = `chance the river reaches this box by ${year}`;
+  $('to').textContent = '';
+  el.style.display = 'block';
+  const w = el.offsetWidth, h = el.offsetHeight;
+  el.style.left = Math.min(e.clientX + 16, innerWidth - w - 8) + 'px';
+  el.style.top = Math.max(8, e.clientY - h - 10) + 'px';
+}
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight') setYear(year + 1);
+  if (e.key === 'ArrowLeft') setYear(year - 1);
+  if (e.key === '+' || e.key === '=') zoomAt(innerWidth / 2, innerHeight / 2, 1.25);
+  if (e.key === '-') zoomAt(innerWidth / 2, innerHeight / 2, 0.8);
+  if (e.key === 'i') $('imgtog').click();
+});
+addEventListener('resize', () => {
+  const cx = (innerWidth / 2 - tx) / s, cy = (innerHeight / 2 - ty) / s, z = s / s0;
+  s0 = cover(); s = s0 * z;
+  tx = innerWidth / 2 - cx * s; ty = innerHeight / 2 - cy * s; apply();
+});
+fit();
+if (hp.get('z')) {
+  const z = +hp.get('z'), c = +(hp.get('cx') || NX / 2), r = +(hp.get('cy') || NY / 2);
+  s = s0 * z; tx = innerWidth / 2 - (NY - r) * s; ty = innerHeight / 2 - c * s; apply();
+}
+syncControls(); drawBar(); render();
+</script>
+</body>
+</html>
