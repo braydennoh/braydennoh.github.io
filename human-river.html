@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meander Village - Brayden Noh</title>
+  <title>Meanderlife - Brayden Noh</title>
   <link rel="stylesheet" href="style.css">
   <script src="appearance.js"></script>
   <style>
@@ -46,15 +46,28 @@
                 margin: 6px 0 4px 0; font-variant-numeric: tabular-nums; }
     /* the readout wraps between items, never between a label and its number */
     #sim-info > span { white-space: nowrap; }
-    #sim-legend { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
+    #sim-legend, .key { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
                   margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px; }
     .chip { display: inline-block; width: 10px; height: 10px; vertical-align: middle;
             margin-right: 3px; }
     table.params { border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
     table.params td, table.params th { border: 1px solid #ddd; padding: 4px 9px; text-align: left; }
     table.params th { background: #f6f6f4; font-weight: 600; }
+    /* the rule panels above the simulator: three small CAs that play while hovered (tapped on
+       phones), like the clips on a Game of Life teaser page */
+    .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 0 0 20px 0; }
+    .rules figure { margin: 0; min-width: 0; }
+    .rules canvas { width: 100%; display: block; background: #000; image-rendering: pixelated;
+                    cursor: pointer; }
+    .rules figcaption { font-size: calc(12px * var(--ts)); line-height: 1.4; color: #666;
+                        text-align: center; margin-top: 5px; }
     @media (max-width: 700px) {
       .ctl-cols { flex-direction: column; gap: 5px; }
+      /* phones: one panel per row, the caption beside it */
+      .rules { grid-template-columns: 1fr; gap: 12px; }
+      .rules figure { display: flex; gap: 12px; align-items: center; }
+      .rules canvas { width: 40%; flex-shrink: 0; }
+      .rules figcaption { text-align: left; margin-top: 0; }
     }
   </style>
 </head>
@@ -71,37 +84,84 @@
 <div class="columns">
 
   <div class="sidebar">
-    <h1>Meander Village</h1>
+    <h1>Meanderlife</h1>
 
-    <p>Rivers draw people in: water, food, transport. But rivers also wander, eroding
-    what is built beside them. Here households chase a migrating river across its
-    floodplain, drowning and rebuilding as the channel sweeps by.</p>
+    <p>Water attracts biological agents, but water is dynamic. As a river, it meanders.
+    Here we study how agents behave when the water they depend on keeps moving.</p>
   </div>
 
   <div class="main">
 
-    <p>The river follows the Howard-Knutson rule, where each centerline node migrates
+    <p>Meandering rivers show cyclic behavior because the channel is confined to its
+    floodplain, where bends grow, cut off, and grow again. Despite these cycles, the
+    river's behavior is complex and
+    <a href="https://www.nature.com/articles/s43247-026-03370-w">chaotic</a>. The goal of
+    this site is to think about potential biological behaviors in a computer simulation of
+    meandering rivers.</p>
+
+    <p>We think three behaviors of the agents are important. First, agents are attracted to
+    the river, their source of food, water, and transport. Second, they may be attracted to,
+    or repelled by, each other. Third, the river destroys agents. We assume agents cannot
+    stop a meandering river, which is blind to their dynamics.</p>
+
+    <p>Each panel below runs one behavior beside a toy river as a cellular automaton. We
+    assume the population is conserved. Hover to play, or tap on phones.</p>
+
+    <div class="key">
+      <span><span class="chip" style="background:#0028ff;"></span>River</span>
+      <span><span class="chip" style="background:#ff8000;"></span>Agent</span>
+      <span><span class="chip" style="background:#1aff1a;"></span>New</span>
+      <span><span class="chip" style="background:#ff1a1a;"></span>Dead</span>
+      <span><span class="chip" style="background:#fff;border:1px solid #999;"></span>Abandoned</span>
+    </div>
+
+    <!-- ── Rule panels ── -->
+    <div class="rules">
+      <figure>
+        <canvas data-rule="attract" width="44" height="44"></canvas>
+        <figcaption>Attracted to the river, scattered agents move until they line its
+        banks.</figcaption>
+      </figure>
+      <figure>
+        <canvas data-rule="cohere" width="44" height="44"></canvas>
+        <figcaption>Attracted to each other, agents gather into clusters along the
+        banks.</figcaption>
+      </figure>
+      <figure>
+        <canvas data-rule="destroy" width="44" height="44"></canvas>
+        <figcaption>The bends sweep downstream through a colony, destroying the agents in
+        their path.</figcaption>
+      </figure>
+    </div>
+
+    <p>The river follows the
+    <a href="https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/wr020i011p01659">Howard-Knutson
+    rule</a>, a standard geometric model in geomorphology. Each centerline node migrates
     along its local normal at the rate</p>
 
     <div class="eq">R = &Omega;&thinsp;k<sub>l</sub>W&kappa; + &Gamma;&thinsp;&#10216;k<sub>l</sub>W&kappa;&#10217;,
     &nbsp;&nbsp;&nbsp; &#10216;f&thinsp;&#10217; = &Sigma;<sub>up</sub>&thinsp;f&thinsp;e<sup>&minus;&alpha;s</sup> &frasl; &Sigma;<sub>up</sub>&thinsp;e<sup>&minus;&alpha;s</sup></div>
 
     <p>where &kappa; is curvature, <span class="mvar">s</span> is distance upstream,
-    &Omega; = &minus;1, &Gamma; = 2.5, W = 100 m, and the memory length
-    <span class="mvar">&#8467;</span> = 1/(&alpha;W) is the meander scale. When two banks
-    come within the cutoff distance, the loop is cut off as an oxbow. Each step the channel
-    is rasterized onto a grid, and a distance transform gives every floodplain cell its
-    distance <span class="mvar">D</span> to the river.</p>
+    k<sub>l</sub> is the migration rate, &Omega; = &minus;1, &Gamma; = 2.5, W = 100 m, and
+    the memory length <span class="mvar">&#8467;</span> = 1/(&alpha;W) is the meander scale.
+    When two banks come within the cutoff distance, the loop is cut off as an oxbow. Each
+    step the channel is rasterized onto a grid, and a distance transform gives every
+    floodplain cell its distance <span class="mvar">D</span> to the river.</p>
 
-    <p>Households settle the grid with utility</p>
+    <p><span class="mvar">N</span> agents live on the same grid, one per cell, each with
+    utility</p>
 
     <div class="eq">U = &minus;w<sub>d</sub>&thinsp;D + w<sub>c</sub>&thinsp;C</div>
 
-    <p>with w<sub>d</sub> = 1 and <span class="mvar">C</span> the number of settled
-    neighbors (cohesion). A household the river erodes is relocated to the best open cell:
-    forced migration. The worst-placed household moves to the best open cell when it gains
-    more than the stubbornness <span class="mvar">&mu;</span>: voluntary migration.
-    Population is conserved.</p>
+    <p>where <span class="mvar">C</span> is the number of agents in the eight neighboring
+    cells, w<sub>d</sub> = 1, and the cohesion w<sub>c</sub> is positive for attraction and
+    negative for repulsion. Each step, every agent on a cell the river now occupies dies,
+    and as many new agents are born, each on the open cell of highest
+    <span class="mvar">U</span> next to an existing agent, so the population is conserved.
+    Then, repeatedly, the agent with the lowest <span class="mvar">U</span> moves to the
+    best open cell, as long as that raises its <span class="mvar">U</span> by more than the
+    stubbornness <span class="mvar">&mu;</span>.</p>
 
     <!-- ── Simulator ── -->
     <div id="canvas-stack">
@@ -113,16 +173,16 @@
       <span>t = <span id="info-years">0</span> yr</span> &nbsp;&bull;&nbsp;
       <span>sinuosity <span id="info-sinu">&ndash;</span></span> &nbsp;&bull;&nbsp;
       <span>pop <span id="info-pop">0</span></span> &nbsp;&bull;&nbsp;
-      <span>forced <span id="info-forced">0</span> (&Sigma; <span id="info-forced-cum">0</span>)</span> &nbsp;&bull;&nbsp;
-      <span>voluntary <span id="info-vol">0</span> (&Sigma; <span id="info-vol-cum">0</span>)</span>
+      <span>dead <span id="info-forced">0</span> (&Sigma; <span id="info-forced-cum">0</span>)</span> &nbsp;&bull;&nbsp;
+      <span>moved <span id="info-vol">0</span> (&Sigma; <span id="info-vol-cum">0</span>)</span>
     </div>
 
     <div id="sim-legend">
       <span><span class="chip" style="background:#0028ff;"></span>River</span>
-      <span><span class="chip" style="background:#ff8000;"></span>Stable <span id="cnt-stable">0</span></span>
+      <span><span class="chip" style="background:#ff8000;"></span>Agent <span id="cnt-stable">0</span></span>
       <span><span class="chip" style="background:#1aff1a;"></span>New <span id="cnt-new">0</span></span>
       <span><span class="chip" style="background:#fff;border:1px solid #999;"></span>Abandoned <span id="cnt-abandoned">0</span></span>
-      <span><span class="chip" style="background:#ff1a1a;"></span>Drowned <span id="cnt-drowned">0</span></span>
+      <span><span class="chip" style="background:#ff1a1a;"></span>Dead <span id="cnt-drowned">0</span></span>
       <span><span class="chip" style="background:#26364f;"></span>Oxbow scar</span>
     </div>
 
@@ -131,7 +191,7 @@
         <button id="btn-play">&#9654; Play</button>
         <button id="btn-pause" disabled>&#9646;&#9646; Pause</button>
         <button id="btn-step">Step</button>
-        <button id="btn-reset">Reset village</button>
+        <button id="btn-reset">Reset agents</button>
         <button id="btn-newriver">New river</button>
       </div>
 
@@ -157,7 +217,7 @@
           <span id="val-pop" class="mono">500</span>
 
           <label for="sl-coh">Cohesion <span class="mvar">w<sub>c</sub></span></label>
-          <input id="sl-coh" type="range" min="0" max="8" step="0.25" value="0">
+          <input id="sl-coh" type="range" min="-8" max="8" step="0.25" value="0">
           <span id="val-coh" class="mono">0</span>
 
           <label for="sl-friction">Stubbornness <span class="mvar">&mu;</span> (cells)</label>
@@ -678,7 +738,7 @@ var CELL, COLS, ROWS, NC, GP;        // set by allocGrid()
 var OMEGA = -1.0, GAMMA = 2.5;       // alpha comes from the meander-scale slider
 var WALL_START = 1400, WALL_END = 1800;   // valley-wall ramp (m from axis)
 var W_DIST = 1.0;
-var MAX_SWAPS = 40000;               // full relaxation (7.7), convergent when w_coh = 0
+var MAX_SWAPS = 40000;               // full relaxation (7.7), convergent when w_coh <= 0
 var MAX_SWAPS_COH = 2000;            // bounded relaxation with cohesion: best-response
                                      // with externalities need not converge, so cap per
                                      // step and let relaxation continue across frames
@@ -994,6 +1054,146 @@ window.addEventListener("resize", renderAll);
 
 /* ── Boot ── */
 buildWorld(77);
+})();
+</script>
+
+<!-- ── Rule panels: the settlement CA alone, on a small grid with a sine river ── -->
+<script>
+(function() {
+"use strict";
+
+var STEP_MS = 60;                    // one CA step per frame at ~16 fps
+var FADE = 10;                       // frames a new / abandoned / drowned cell keeps its color
+
+/* attract: static river, random start, voluntary moves only, a few per frame so they show
+   cohere:  the same with cohesion on
+   destroy: migrating river, settled start, forced moves only (mu = infinity)
+   The static panels restart about a second (hold frames) after the last household moves. */
+var SPECS = {
+  attract: { G: 44, N: 200, wCoh: 0,   mu: 0,        swaps: 3, start: "random",
+             amp: 7, lam: 44, speed: 0,   hold: 16,       maxFrames: 600, seed: 1 },
+  cohere:  { G: 44, N: 200, wCoh: 1.5, mu: 0.5,      swaps: 3, start: "random",
+             amp: 7, lam: 44, speed: 0,   hold: 16,       maxFrames: 600, seed: 2 },
+  destroy: { G: 44, N: 500, wCoh: 0,   mu: Infinity, swaps: 0, start: "settled",
+             amp: 9, lam: 44, speed: 0.2, hold: Infinity, maxFrames: 260, seed: 3 }
+};
+
+var RIV = [0, 40, 255], STA = [255, 128, 0], NEW = [26, 255, 26],
+    ABA = [255, 255, 255], DRO = [255, 26, 26], BG = [0, 0, 0];
+
+function makeRuleDemo(o) {
+  var G = o.G, NC = G * G;
+  var GP = { XMIN: 0, YMIN: 0, CELL: 1, ROWS: G, COLS: G };
+  var river = new Uint8Array(NC), dist = new Float64Array(NC), baseU = new Float64Array(NC);
+  var village = new Uint8Array(NC), prev = new Uint8Array(NC), neigh = new Int16Array(NC);
+  var jit = new Float64Array(NC);
+  var ageA = new Uint8Array(NC), ageL = new Uint8Array(NC), ageD = new Uint8Array(NC);
+  var edt = makeEdt(G, G);
+  var rng = mulberry32(o.seed);
+  var phase = 0, idle = 0, frame = 0;
+
+  /* The river is a sine wave across the grid; the phase advances to migrate the bends
+     downstream, and lam = G keeps the pattern periodic. */
+  function fields() {
+    var n = 4 * G + 1, x = new Float64Array(n), y = new Float64Array(n);
+    for (var k = 0; k < n; k++) {
+      x[k] = G * k / (n - 1);
+      y[k] = G / 2 + o.amp * Math.sin(2 * Math.PI * (x[k] - phase) / o.lam);
+    }
+    rasterize(x, y, river, GP);
+    edt(river, dist);
+    computeBaseU(dist, river, 1.0, baseU, NC);
+    // a fixed jitter far below one cell breaks ties at random rather than in scan order
+    for (var i = 0; i < NC; i++) baseU[i] += jit[i];
+  }
+
+  function reset() {
+    var i;
+    for (i = 0; i < NC; i++) jit[i] = 1e-3 * rng();
+    phase = o.lam * rng();
+    fields();
+    village.fill(0); neigh.fill(0);
+    if (o.start === "random") {
+      for (var placed = 0; placed < o.N; ) {
+        i = (rng() * NC) | 0;
+        if (village[i] || river[i]) continue;
+        village[i] = 1;
+        updateNeighbors(neigh, (i / G) | 0, i % G, 1, G, G);
+        placed++;
+      }
+    } else {
+      growVillage(village, neigh, river, baseU, o.wCoh, o.N, pickSeed(baseU, river, G, G), G, G);
+    }
+    ageA.fill(255); ageL.fill(255); ageD.fill(255);
+    idle = 0; frame = 0;
+  }
+
+  /* One step, then a restart once the village has sat still for `hold` frames
+     or after maxFrames. */
+  function step() {
+    if (o.speed) { phase += o.speed; fields(); }
+    prev.set(village);
+    var fv = caStep(village, neigh, river, baseU, o.wCoh, o.mu, o.swaps, G, G);
+    for (var i = 0; i < NC; i++) {
+      if (ageA[i] < 255) ageA[i]++;
+      if (ageL[i] < 255) ageL[i]++;
+      if (ageD[i] < 255) ageD[i]++;
+      if (prev[i] && !village[i]) { if (river[i]) ageD[i] = 0; else ageL[i] = 0; }
+      else if (!prev[i] && village[i]) ageA[i] = 0;
+    }
+    frame++;
+    idle = fv[0] + fv[1] === 0 ? idle + 1 : 0;
+    if (idle > o.hold || frame > o.maxFrames) reset();
+  }
+
+  /* Same colors as the simulator; a change fades into the cell's settled color. */
+  function mix(a, b, f, px, p) {
+    if (f > 1) f = 1;
+    px[p]     = a[0] + (b[0] - a[0]) * f;
+    px[p + 1] = a[1] + (b[1] - a[1]) * f;
+    px[p + 2] = a[2] + (b[2] - a[2]) * f;
+    px[p + 3] = 255;
+  }
+  function paint(px) {
+    for (var i = 0; i < NC; i++) {
+      if (village[i])    mix(NEW, STA, ageA[i] / FADE, px, 4 * i);
+      else if (river[i]) mix(DRO, RIV, ageD[i] / FADE, px, 4 * i);
+      else               mix(ABA, BG,  ageL[i] / FADE, px, 4 * i);
+    }
+  }
+
+  reset();
+  return {
+    G: G, step: step, paint: paint, reset: reset,
+    settled: function() { return !o.speed && idle >= 3; }
+  };
+}
+
+/* Hover plays and leaving pauses; on a touch screen a tap toggles. A panel that had already
+   settled when paused starts over, so playing always shows the households moving. */
+var panels = document.querySelectorAll(".rules canvas[data-rule]");
+Array.prototype.forEach.call(panels, function(cv) {
+  var d = makeRuleDemo(SPECS[cv.getAttribute("data-rule")]);
+  var cx = cv.getContext("2d"), img = cx.createImageData(d.G, d.G);
+  var playing = false, raf = 0, last = 0, touch = false;
+  function draw() { d.paint(img.data); cx.putImageData(img, 0, 0); }
+  function loop(ts) {
+    if (!playing) return;
+    if (ts - last >= STEP_MS) { last = ts; d.step(); draw(); }
+    raf = requestAnimationFrame(loop);
+  }
+  function play() {
+    if (playing) return;
+    if (d.settled()) { d.reset(); draw(); }
+    playing = true; last = 0; raf = requestAnimationFrame(loop);
+  }
+  function pause() { playing = false; cancelAnimationFrame(raf); }
+  cv.addEventListener("pointerdown", function(e) { touch = e.pointerType !== "mouse"; });
+  cv.addEventListener("pointerenter", function(e) { if (e.pointerType === "mouse") play(); });
+  cv.addEventListener("pointerleave", function(e) { if (e.pointerType === "mouse") pause(); });
+  cv.addEventListener("click", function() { if (touch) { if (playing) pause(); else play(); } });
+  draw();
+});
 })();
 </script>
 
