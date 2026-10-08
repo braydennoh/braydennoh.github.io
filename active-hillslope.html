@@ -60,7 +60,7 @@
     <h1>Active Hillslope</h1>
 
     <p>Can sparse biological active matter produce persistent creeping hillslope below its
-    yield angle?</p>
+    critical angle?</p>
   </div>
 
   <div class="main">
@@ -88,7 +88,8 @@
     how much a grain's area grows relative to its own size. Speed does not matter, because the model is
     quasi-static.</p>
 
-    <p>Below is the simulation.</p>
+    <p>Below is the simulation, with bidisperse grains (size ratio 5:3) and Coulomb friction
+    <span class="mvar">&mu;</span> = tan 30&deg;.</p>
 
     <div class="key">
       <span><span class="chip" style="background:#eeeeee;border:1px solid #999;"></span>Passive</span>
@@ -135,7 +136,7 @@
    takes one iteration.  Its exact static state: radii, centres, the
    committed tangential force of every loaded contact between discs
    [i, j, pt] and with a wall [i, wall (0 floor, 1 left, 2 right), pt],
-   and the walls.  On a flat floor a 20 degree wedge sits at its yield
+   and the walls.  On a flat floor a 20 degree wedge sits at its critical
    angle (the bottom discs can roll) and avalanches under the smallest
    activity; at 15 it creeps.  The box was 24.9 wide for the rain; the right wall
    is moved in to 3.5 past the toe, which no disc touches.  Rotations
