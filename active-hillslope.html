@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Hillslope - Brayden Noh</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="appearance.js"></script>
+  <style>
+    /* Hillslope page: the shell (width, nav, columns, text-size panel) comes from style.css;
+       these rules are only what this page adds, drawn like human-river.html */
+    .main { min-width: 0; }
+    .mvar { font-style: italic; font-family: Georgia, "Times New Roman", serif; }
+    .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
+    .key { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px;
+           margin-bottom: 0.8em; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .chip { display: inline-block; width: 10px; height: 10px; vertical-align: middle;
+            margin-right: 3px; }
+    #wedge-canvas { width: 100%; display: block; background: #000; }
+    #sim-info { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+                margin: 6px 0 8px 0; font-variant-numeric: tabular-nums; }
+    #sim-info > span { white-space: nowrap; }
+    .btnrow { margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    /* buttons and sliders: square and flat, drawn like the Appearance box */
+    button { padding: 0.2em 0.8em; cursor: pointer; font-family: inherit; font-size: 13px;
+             border: 1px solid #ddd; border-radius: 0; background: #fafbfc; color: #222; }
+    button:hover:not(:disabled) { background: #f0f2f5; }
+    button:active:not(:disabled) { background: #e6e9ee; }
+    button:disabled { cursor: default; color: #aaa; }
+    .ctl-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 5px 10px;
+                align-items: center; font-size: 85%; max-width: 50%; }
+    .ctl-grid input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+    .ctl-grid input[type=range]::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    .ctl-grid input[type=range]::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+    .ctl-grid input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    .ctl-grid input[type=range]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: #003399; }
+    .ctl-grid input[type=range]:focus-visible { outline: 1px solid #003399; outline-offset: 2px; }
+    .caption { font-size: calc(12px * var(--ts)); line-height: 1.4; color: #666; margin-top: 10px; }
+    .photo { width: 33.333%; margin-bottom: 16px; }           /* a third of the column */
+    .project-page .main .photo img { width: 100%; margin-bottom: 4px; }
+    .photo figcaption { font-size: calc(12px * var(--ts)); line-height: 1.4; color: #666; }
+    @media (max-width: 700px) {
+      .ctl-grid { max-width: none; }
+    }
+  </style>
+</head>
+<body class="project-page">
+
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="research.html">Research</a> <span class="sep">&middot;</span>
+  <a href="artwork.html">Artwork</a> <span class="sep">&middot;</span>
+  <a href="notes.html">Notes</a> <span class="sep">&middot;</span>
+  <a href="aboutme.html">About Me</a>
+</nav>
+
+<div class="columns">
+
+  <div class="sidebar">
+    <h1>Active Hillslope</h1>
+
+    <p>Can sparse biological active matter produce persistent creeping hillslope below its
+    yield angle?</p>
+  </div>
+
+  <div class="main">
+
+    <p>The angle of repose is the steepest angle at which a pile of granular material remains stable
+    without sliding. This has important implications if your house is near a hill. However, hillslope
+    creep has been observed well below this critical angle.</p>
+
+    <p>One reason is these guys.</p>
+
+    <figure class="photo">
+      <img src="assets/img/hillslope/burrower.webp" alt="A small burrowing rodent looking out of its hole in the grass">
+      <figcaption>Photo: <a href="https://gopherblock.com">gopherblock.com</a></figcaption>
+    </figure>
+
+    <p>Burrowing animals displace and deform the soil, which causes micro-failures.</p>
+
+    <p>Here we model hillslope creep with mostly passive grains and a few active ones, all interacting
+    through Coulomb friction. The active grains swell and shrink, representing bioturbation (or freeze-thaw
+    cycles).</p>
+
+    <p>This is a very simple form of active matter. A grain does work on its
+    neighbors by changing its size rather than by moving itself. The activity is set by two
+    parameters, the fraction of grains that are active and the swelling amplitude <span class="mvar">a</span>,
+    how much a grain's area grows relative to its own size. Speed does not matter, because the model is
+    quasi-static.</p>
+
+    <p>Below is the simulation.</p>
+
+    <div class="key">
+      <span><span class="chip" style="background:#eeeeee;border:1px solid #999;"></span>Passive</span>
+      <span><span class="chip" style="background:#ff8000;"></span>Active</span>
+    </div>
+
+    <canvas id="wedge-canvas" aria-label="A wedge of 100 grains between two walls; the active grains swell and shrink"></canvas>
+
+    <div id="sim-info">
+      <span>cycle <span id="info-cycle">0</span></span> &nbsp;&bull;&nbsp;
+      <span>drift <span id="info-drift">0.000</span></span>
+    </div>
+
+    <div class="btnrow">
+      <button id="btn-play">&#9654; Play</button>
+      <button id="btn-pause" disabled>&#9646;&#9646; Pause</button>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <div class="ctl-grid">
+      <label for="sl-act">Active grains</label>
+      <input id="sl-act" type="range" min="0" max="100" step="1" value="3">
+      <span id="val-act" class="mono">3</span>
+      <label for="sl-amp">Swelling <span class="mvar">a</span></label>
+      <input id="sl-amp" type="range" min="0" max="0.5" step="0.05" value="0.3">
+      <span id="val-amp" class="mono">0.30</span>
+      <label for="sl-spd">Speed</label>
+      <input id="sl-spd" type="range" min="0" max="4" step="1" value="2">
+      <span id="val-spd" class="mono">&times;1</span>
+    </div>
+
+    <p class="caption">It may be slow because it's a JavaScript version of <a href="https://qsdem.github.io">qsdem.github.io</a>. With no swelling nothing moves.</p>
+
+  </div>
+</div>
+
+<script>
+/*==DATA==*/
+/* ================================================================
+   The wedge, built like kishino_hill.py wedge --beta 15 --H 5.6 but
+   against flat rigid walls (seed 1): 281 discs rained into the box
+   with friction 1e-3 and settled, the block cut along the 15 degree
+   slant from the top of the left wall, then the material friction on
+   (discs and walls) and settled to the 1e-4 gate; a hold step from it
+   takes one iteration.  Its exact static state: radii, centres, the
+   committed tangential force of every loaded contact between discs
+   [i, j, pt] and with a wall [i, wall (0 floor, 1 left, 2 right), pt],
+   and the walls.  On a flat floor a 20 degree wedge sits at its yield
+   angle (the bottom discs can roll) and avalanches under the smallest
+   activity; at 15 it creeps.  The box was 24.9 wide for the rain; the right wall
+   is moved in to 3.5 past the toe, which no disc touches.  Rotations
+   are left out: only their change within a step enters the contact law.
+   ================================================================ */
+var WEDGE = {"walls":{"floor":0,"left":0,"right":22.0},"r":[0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.3,0.3,0.5,0.3,0.3,0.3,0.5,0.5,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.3,0.3,0.5,0.3,0.3,0.3,0.5,0.3,0.3,0.3,0.3,0.5,0.3,0.5,0.3,0.5,0.5,0.5,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.5,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.5,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.3,0.3,0.3,0.5,0.3,0.3,0.3,0.3,0.5,0.5,0.3,0.3,0.3,0.3,0.3,0.3,0.5,0.3,0.3],"x":[7.48296139942,11.7252303122,3.16329472487,2.77042219716,3.69647833369,7.19259937014,8.94963831215,12.9244775183,11.1606145118,10.8267418502,11.4249105863,1.09432374932,9.72548707811,1.6345623539,3.94558219479,5.19235402753,2.472955022,4.39880407393,7.72397857194,2.86113252189,6.5144998358,10.1414033211,8.99654804475,8.48111752725,14.423004484,5.68931544614,6.69901618485,9.02857668344,0.498512409084,2.56662347355,16.6672791441,6.90453382718,0.29776301592,3.34660294671,10.2271074336,1.46707948966,3.42021379286,9.62726335834,2.74746729498,11.1263010178,15.5453016743,16.0672794556,1.46534055156,9.10204387966,12.0242624568,4.49687740741,13.9884134471,4.48902461391,5.1212271073,0.299815408267,3.72990139773,0.297239372282,2.12011216244,4.69291904167,9.55903009366,6.88507415693,13.2237499043,5.98592002338,5.0134856953,5.90736747445,5.90174248831,3.92905448388,12.3251103294,0.299715908109,1.82011495628,3.32906856724,6.58619154082,6.28701473038,0.818113252954,1.93434497715,7.16934985778,12.6239015672,7.39366852576,8.31324087849,1.33535815555,3.13295012771,10.2263325174,9.92856400239,2.64169177735,3.6282504368,4.56941203355,12.0244105704,1.11565996895,5.3508169224,2.9416569183,18.17219364,14.7487516617,15.0229511123,0.502575050812,8.25471956321,0.498340750102,2.26137151725,10.5266525084,4.02018010465,4.09515085212,13.823065406,2.26294807742,1.98231749605,10.8258345731,9.46498783972],"y":[0.296437021133,0.818062933612,0.297464827863,1.40799905304,3.40560911352,0.817904549118,0.892300924898,0.818697098074,2.06303862627,1.33666411187,0.298629172455,1.99156054202,2.36386268458,0.818297668034,2.86121139993,0.919933425031,2.78456250263,0.81710626371,1.09543714635,0.815424750013,2.25795287939,1.93151161571,1.57035025352,1.26350240081,0.299772024554,0.297086542746,2.82839079355,0.2986246697,3.7887845109,0.293192197979,0.299717181894,1.56092256859,0.893796095124,2.89516711598,1.33807872658,3.0403667343,1.78373504434,0.29951775521,4.44304757758,0.81789694047,0.904812948844,0.299219754827,4.03954599138,2.17606074978,1.5593722784,3.4395318662,1.08045004799,1.40876219273,2.94085010483,0.296676197005,2.3030582433,2.01678121815,3.50233307428,0.296662023904,1.78763097569,0.299494753229,0.299581199815,0.818469130887,1.69768030205,1.61852767807,2.77062061275,1.189198913,0.818817754102,4.56317124157,2.32434056411,1.19096990526,0.819484033755,0.299663777937,0.598548972599,0.298915335325,3.20070538972,0.298973417188,2.43310437947,2.04361756213,0.298559067491,2.33476276089,0.298572602471,0.818250387879,1.99326663657,0.67207255127,2.36172984152,0.299015366688,1.11934837667,2.19194128973,3.66727651312,0.299717256661,0.83233686492,0.299095361132,1.45482384205,0.497612302814,2.79035574245,0.800972257708,0.817737161572,1.78070117801,0.298984751828,0.298532571058,4.08935897901,1.54297649108,0.298941386152,1.19570374227],"pairs":[[0,5,412.623178],[0,55,45.1769688],[0,89,352.283027],[1,39,-112.321865],[1,44,231.274528],[1,62,-68.9979365],[1,81,-49.9916082],[2,19,52.119827],[2,29,448.847167],[2,79,417.010546],[3,19,118.376177],[3,65,75.0673799],[3,78,49.2120019],[3,97,-242.57654],[4,14,-405.011473],[4,84,404.871838],[5,18,247.219968],[5,31,-660.880839],[6,23,-233.023331],[6,27,-180.800494],[6,89,-388.157527],[6,99,802.883647],[7,56,-271.382393],[7,62,271.310688],[8,9,-124.891465],[8,44,124.847336],[9,34,168.509012],[9,39,-305.153336],[9,92,261.274781],[10,39,156.523649],[10,81,240.182095],[10,98,386.666933],[11,51,-470.18999],[11,64,-175.565149],[11,88,25.4370256],[11,90,-213.969072],[11,97,836.430794],[12,21,32.4421905],[12,54,-32.4489204],[13,69,-174.375723],[13,74,124.428952],[13,82,49.924377],[14,33,34.0988845],[14,45,363.25727],[14,50,192.365972],[14,80,-184.723255],[15,25,-152.412022],[15,53,741.366886],[15,58,-427.983673],[15,59,-161.377296],[16,52,48.8803727],[16,64,6.25480963],[16,75,159.956746],[16,84,-214.9882],[17,47,-250.924388],[17,53,429.277371],[17,61,-177.626803],[18,89,-247.246389],[19,29,-133.353755],[19,65,-0.814946054],[19,91,-36.2975511],[20,26,260.607478],[20,31,16.4402805],[20,60,-277.304092],[21,34,-97.4759044],[21,54,64.9840115],[22,23,-61.8993694],[22,99,61.9020204],[23,73,-471.762824],[23,89,765.924434],[24,87,30.5938526],[24,95,-23.9834265],[25,57,-16.2142842],[25,67,-80.9641355],[26,60,93.9514727],[26,70,80.875809],[26,72,-435.663285],[27,37,178.498958],[27,89,-38.6337952],[28,42,337.856906],[28,63,-164.080622],[28,90,-543.269421],[29,91,77.0144924],[30,41,0.0607643514],[31,59,656.502748],[31,72,-13.318304],[32,49,-79.9216439],[32,68,-136.297302],[32,88,-387.451744],[33,75,-34.1098708],[34,77,-71.0615997],[35,42,-387.297016],[35,52,-48.8713203],[35,64,436.577091],[36,65,-15.0274087],[36,93,15.0212363],[37,76,44.4028696],[37,77,55.7687167],[38,84,-70.0283853],[38,96,70.008377],[39,92,65.7391032],[39,98,194.93379],[40,41,184.691389],[40,86,-92.1307319],[40,87,-92.4192995],[42,96,49.5633214],[43,54,58.7375424],[43,73,-58.7290582],[44,62,-356.182922],[45,48,-363.230863],[46,86,-44.6610592],[46,95,44.6912025],[47,58,302.297473],[47,93,-51.5181608],[48,60,323.973893],[48,80,39.3063443],[49,68,49.2340883],[50,75,110.23441],[50,93,-302.888516],[51,88,361.306915],[51,90,-200.858593],[53,94,360.535414],[54,99,-91.3473026],[55,66,-122.549907],[55,67,136.392215],[56,71,-22.1043329],[56,95,394.665593],[57,67,16.214307],[58,80,-317.966603],[58,83,443.449816],[59,83,-494.863129],[60,83,-140.62965],[61,65,1.62156091],[61,79,108.558865],[61,93,67.7167985],[62,71,153.850704],[64,97,-267.373338],[65,79,-60.8729792],[66,67,122.549987],[68,74,137.074895],[68,82,-49.9330542],[69,74,182.591917],[69,91,467.609881],[70,72,-80.8967927],[71,81,293.872288],[72,73,530.239614],[75,78,-236.013242],[76,77,406.131061],[76,92,-132.846609],[76,98,287.422761],[77,92,381.921832],[77,99,-773.708543],[78,97,186.67011],[79,94,-464.276051],[80,83,192.3559],[80,93,270.705216],[84,96,-119.637996],[86,87,136.861796],[91,97,-512.922893],[92,98,-575.716495]],"wpairs":[[0,0,-811.140287],[2,0,-917.321202],[10,0,-784.108557],[24,0,-6.61986209],[25,0,249.678954],[27,0,41.0261517],[28,1,369.506008],[29,0,-393.628376],[30,0,-0.0762610683],[32,1,603.365788],[37,0,-278.424159],[41,0,-184.879175],[49,0,-76.6450837],[49,1,106.574087],[51,1,309.982709],[53,0,-1535.18752],[55,0,-58.5167208],[56,0,-101.170614],[63,1,164.02053],[67,0,-194.117899],[69,0,-475.823152],[71,0,-426.001991],[74,0,-444.32441],[76,0,-605.579033],[81,0,-484.48663],[87,0,-75.1196108],[89,0,-443.830154],[90,1,957.968375],[94,0,103.438826],[95,0,-415.892189],[98,0,-293.957823]]};
+
+/*==CORE==*/
+/* ================================================================
+   Simulation core, no DOM.  A port of kishino_hill.py:
+     k_forces    linear normal spring; incremental tangential spring
+                 with the objective finite-rotation law
+                 (TANGENTIAL_FIX.md); Coulomb limit; no tension; the
+                 per-disc stiffness blocks S (Kishino eq. 11).  The
+                 floor and the two walls are rigid planes with the same
+                 contact law and friction, a plane standing in for a
+                 disc of infinite radius
+     k_fin       accuracy: largest fixing vector / mean contact force
+     k_move      release dX = alpha S^-1 F, capped at 0.2 R, 0.05 rad
+     do_step     iterate to the accuracy or 2000 iterations, commit
+                 the tangential forces
+     relax       committed sub-steps, at most 100; a sub-step that
+                 moves the discs by less than 1e-4 rms ends the step
+                 as a stall (the code's --flow-sub test)
+     cmd_active  R_i(t) = R_i0 sqrt(1 + a sin(2 pi t / T + psi_i)),
+                 masses constant, T = 400 increments per cycle, a
+                 ramped in over a cycle, --tol auto capped at 1e-2
+   ================================================================ */
+var Hill = (function () {
+  'use strict';
+  var KN = 1e6, KT = 0.5e6, RHO = 100, G = 10, ALPHA = 0.75, MU = Math.tan(Math.PI / 6);
+  var CAP_FRAC = 0.2, ROT_CAP = 0.05, SKIN = 0.35, REG = KN / 20, KNKT = KN - KT;
+  var FORCE_FLOOR = RHO * Math.PI * 0.4 * 0.4 * G;        // weight of the R = 0.4 reference disc
+  var N_INC = 400, SUB_ITERS = 2000, SUB_MAX = 100, FLOW_SUB = 1e-4, A_MAX = 0.5;
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function Wedge(data, seed) {
+    var N = data.r.length, i, k;
+    var F = function (n) { return new Float64Array(n || N); };
+    this.N = N; this.data = data; this.walls = data.walls;
+    this.x = F(); this.y = F(); this.th = F(); this.x0 = F(); this.y0 = F(); this.th0 = F();
+    this.ux = F(); this.uy = F(); this.xs = F();
+    this.R = F(); this.R0 = F(); this.m = F(); this.psi = F(); this.Rmx = F();
+    this.fx = F(); this.fy = F(); this.mz = F();
+    this.s11 = F(); this.s12 = F(); this.s13 = F(); this.s22 = F(); this.s23 = F(); this.s33 = F();
+    this.wptBase = F(3 * N); this.wptOut = F(3 * N); this.wa0 = F(3 * N);   // per disc: floor, left, right wall
+    this.act = new Uint8Array(N);
+    this.r0max = 0;
+    for (i = 0; i < N; i++) {
+      this.R0[i] = data.r[i];
+      this.m[i] = RHO * Math.PI * data.r[i] * data.r[i];    // constant, also while an inclusion swells
+      this.r0max = Math.max(this.r0max, data.r[i]);
+    }
+    // the order in which discs become active, and their phases: random (cmd_active), so that n active discs
+    // are always the first n of this order
+    var rng = mulberry32(seed), order = [];
+    for (i = 0; i < N; i++) order.push(i);
+    for (k = 0; k < N; k++) {
+      var q = k + Math.floor(rng() * (N - k)), t = order[k];
+      order[k] = order[q]; order[q] = t;
+      this.psi[order[k]] = 2 * Math.PI * rng();
+    }
+    this.order = order;
+    this.aTarget = 0;
+    this.setActive(0);
+  }
+
+  /* n active discs, then a fresh start from the static wedge */
+  Wedge.prototype.setActive = function (n) {
+    var N = this.N, i;
+    this.act.fill(0);
+    for (i = 0; i < n; i++) this.act[this.order[i]] = 1;
+    this.nPass = N - n;
+    // the largest radius each disc can take: a pair is listed within Rmx_i + Rmx_j + skin, so the list stays
+    // a superset of the contacts between rebuilds at any amplitude up to A_MAX
+    for (i = 0; i < N; i++) this.Rmx[i] = this.act[i] ? this.R0[i] * Math.sqrt(1 + A_MAX) : this.R0[i];
+    this.reset();
+  };
+
+  Wedge.prototype.reset = function () {
+    var d = this.data, N = this.N, i, carry = {};
+    for (i = 0; i < N; i++) {
+      this.x[i] = this.x0[i] = this.xs[i] = d.x[i];
+      this.y[i] = this.y0[i] = d.y[i];
+      this.th[i] = this.th0[i] = 0;
+      this.R[i] = this.R0[i];
+    }
+    for (i = 0; i < d.pairs.length; i++) carry[d.pairs[i][0] * N + d.pairs[i][1]] = d.pairs[i][2];
+    this.wptBase.fill(0);
+    for (i = 0; i < d.wpairs.length; i++) this.wptBase[3 * d.wpairs[i][0] + d.wpairs[i][1]] = d.wpairs[i][2];
+    this.buildPairs(carry);
+    this.aEff = 0; this.inc = 0; this.cycle = 0; this.inStep = false; this.meanPn = FORCE_FLOOR; this.tol = 1e-4;
+  };
+
+  /* the pair list, tangential forces carried by pair */
+  Wedge.prototype.buildPairs = function (carry) {
+    var N = this.N, i, j, c;
+    if (!carry) {
+      carry = {};
+      for (c = 0; c < this.np; c++) if (this.ptBase[c] !== 0) carry[this.ci[c] * N + this.cj[c]] = this.ptBase[c];
+    }
+    var ci = [], cj = [], pt = [];
+    for (i = 0; i < N; i++) {
+      for (j = i + 1; j < N; j++) {
+        var dx = this.x[j] - this.x[i], dy = this.y[j] - this.y[i], cut = this.Rmx[i] + this.Rmx[j] + SKIN;
+        if (dx * dx + dy * dy < cut * cut) {
+          ci.push(i); cj.push(j);
+          pt.push(carry[i * N + j] || 0);
+        }
+      }
+    }
+    this.np = ci.length;
+    this.ci = new Int32Array(ci); this.cj = new Int32Array(cj);
+    this.ptBase = new Float64Array(pt); this.ptOut = new Float64Array(this.np);
+    this.n0x = new Float64Array(this.np); this.n0y = new Float64Array(this.np);
+    this.a0i = new Float64Array(this.np); this.a0j = new Float64Array(this.np);
+    this.pairGeometry0();
+    this.ux.set(this.x); this.uy.set(this.y);
+  };
+
+  /* the step-start contact points: on the line of centres of every pair, a_i0 = (dist0 + R_i - R_j) / 2 from i,
+     and on the normal to each wall, a_i0 = (d0 + R_i) / 2 from i (d0: the distance from the centre to the wall) */
+  Wedge.prototype.pairGeometry0 = function () {
+    var c, i;
+    for (c = 0; c < this.np; c++) {
+      i = this.ci[c]; var j = this.cj[c];
+      var dx0 = this.x0[j] - this.x0[i], dy0 = this.y0[j] - this.y0[i], d0 = Math.sqrt(dx0 * dx0 + dy0 * dy0);
+      this.n0x[c] = dx0 / d0; this.n0y[c] = dy0 / d0;
+      this.a0i[c] = 0.5 * (d0 + this.R[i] - this.R[j]); this.a0j[c] = d0 - this.a0i[c];
+    }
+    var W = this.walls;
+    for (i = 0; i < this.N; i++) {
+      this.wa0[3 * i] = 0.5 * (this.y0[i] - W.floor + this.R[i]);
+      this.wa0[3 * i + 1] = 0.5 * (this.x0[i] - W.left + this.R[i]);
+      this.wa0[3 * i + 2] = 0.5 * (W.right - this.x0[i] + this.R[i]);
+    }
+  };
+
+  /* k_forces + k_fin: the fixing vector (contact forces + weight) and the stiffness block of every disc, the
+     trial tangential force of every contact, the accuracy */
+  Wedge.prototype.forces = function () {
+    var x = this.x, y = this.y, th = this.th, x0 = this.x0, y0 = this.y0, th0 = this.th0, R = this.R;
+    var fx = this.fx, fy = this.fy, mz = this.mz, m = this.m, N = this.N;
+    var s11 = this.s11, s12 = this.s12, s13 = this.s13, s22 = this.s22, s23 = this.s23, s33 = this.s33;
+    var ci = this.ci, cj = this.cj, np = this.np, ptBase = this.ptBase, ptOut = this.ptOut;
+    var N0x = this.n0x, N0y = this.n0y, A0i = this.a0i, A0j = this.a0j;
+    var i, j, c, pnSum = 0, nc = 0, knkt = KNKT;
+    var dx, dy, d2, rc, dist, nx, ny, pn, ti, tj, ti2, tj2, si, sj, ci1, cj1, Dx, Dy, lim, pt, ai, aj, cx, cy, nxx, nyy, nxy;
+    for (i = 0; i < N; i++) {
+      fx[i] = 0; fy[i] = -m[i] * G; mz[i] = 0;             // gravity vertical in the wedge
+      s11[i] = REG; s22[i] = REG; s12[i] = 0; s13[i] = 0; s23[i] = 0; s33[i] = REG * R[i] * R[i];
+    }
+    for (c = 0; c < np; c++) {
+      i = ci[c]; j = cj[c];
+      dx = x[j] - x[i]; dy = y[j] - y[i]; d2 = dx * dx + dy * dy; rc = R[i] + R[j];
+      if (d2 >= rc * rc || d2 < 1e-24) { ptOut[c] = 0; continue; }
+      dist = Math.sqrt(d2); nx = dx / dist; ny = dy / dist; pn = KN * (rc - dist);
+      // objective finite rotation: the material point of each grain at the step-start contact point is carried
+      // through that grain's own rotation within the step; du_t is the tangential part of the relative
+      // displacement of the two points (sin and cos - 1 by the kernel's series)
+      ti = th[i] - th0[i]; tj = th[j] - th0[j]; ti2 = ti * ti; tj2 = tj * tj;
+      si = ti + ti * ti2 * (-1 / 6 + ti2 / 120); sj = tj + tj * tj2 * (-1 / 6 + tj2 / 120);
+      ci1 = ti2 * (-0.5 + ti2 * (1 / 24 - ti2 / 720)); cj1 = tj2 * (-0.5 + tj2 * (1 / 24 - tj2 / 720));
+      Dx = (x[i] - x0[i]) - (x[j] - x0[j]) + A0i[c] * (N0x[c] * ci1 - si * N0y[c]) + A0j[c] * (N0x[c] * cj1 - sj * N0y[c]);
+      Dy = (y[i] - y0[i]) - (y[j] - y0[j]) + A0i[c] * (N0y[c] * ci1 + si * N0x[c]) + A0j[c] * (N0y[c] * cj1 + sj * N0x[c]);
+      lim = MU * pn; pt = ptBase[c] - KT * (Dy * nx - Dx * ny);            // t = (-ny, nx)
+      if (pt > lim) pt = lim; else if (pt < -lim) pt = -lim;
+      ptOut[c] = pt;
+      pnSum += pn; nc++;
+      // f_i += -pn n + pt t, applied at the current contact point: arms a_i = (dist + R_i - R_j) / 2, a_j = dist - a_i
+      ai = 0.5 * (dist + R[i] - R[j]); aj = dist - ai;
+      cx = -pn * nx - pt * ny; cy = pt * nx - pn * ny;
+      nxx = knkt * nx * nx; nyy = knkt * ny * ny; nxy = knkt * nx * ny;
+      fx[i] += cx; fy[i] += cy; mz[i] += ai * pt;
+      s11[i] += KT + nxx; s22[i] += KT + nyy; s12[i] += nxy;
+      s13[i] -= KT * ai * ny; s23[i] += KT * ai * nx; s33[i] += KT * ai * ai;
+      fx[j] -= cx; fy[j] -= cy; mz[j] += aj * pt;               // the same contact seen from j: n -> -n, arm a_j
+      s11[j] += KT + nxx; s22[j] += KT + nyy; s12[j] += nxy;
+      s13[j] += KT * aj * ny; s23[j] -= KT * aj * nx; s33[j] += KT * aj * aj;
+    }
+    pnSum += this.wallForces();
+    nc += this.wnc;
+    var r2m = 0;
+    for (i = 0; i < N; i++) {
+      var meq = mz[i] / R[i], r2 = fx[i] * fx[i] + fy[i] * fy[i] + meq * meq;
+      if (r2 > r2m) r2m = r2;
+    }
+    this.meanPn = nc > 0 ? pnSum / nc : 0;
+    this.frMax = Math.sqrt(r2m) / Math.max(FORCE_FLOOR, this.meanPn);
+  };
+
+  /* the rigid floor and walls, with the contact law of a disc of infinite radius: the contact point sits on the
+     wall's normal at a = (d + R) / 2 from the centre (d: centre to wall), the wall does not move.  Written out for
+     each wall, n = (0, -1) for the floor, (-1, 0) for the left wall, (1, 0) for the right one, t = (-ny, nx).
+     Returns the summed normal force; the number of wall contacts goes to this.wnc */
+  Wedge.prototype.wallForces = function () {
+    var x = this.x, y = this.y, th = this.th, x0 = this.x0, y0 = this.y0, th0 = this.th0, R = this.R, N = this.N;
+    var fx = this.fx, fy = this.fy, mz = this.mz, s11 = this.s11, s22 = this.s22, s13 = this.s13, s23 = this.s23, s33 = this.s33;
+    var wptBase = this.wptBase, wptOut = this.wptOut, wa0 = this.wa0;
+    var wF = this.walls.floor, wL = this.walls.left, wR = this.walls.right, pnSum = 0, nc = 0;
+    for (var i = 0; i < N; i++) {
+      var Ri = R[i], ti = th[i] - th0[i], ti2 = ti * ti;
+      var si = ti + ti * ti2 * (-1 / 6 + ti2 / 120), ci1 = ti2 * (-0.5 + ti2 * (1 / 24 - ti2 / 720));
+      var ux = x[i] - x0[i], uy = y[i] - y0[i], q = 3 * i, d, pn, pt, lim, a, a0;
+      d = y[i] - wF;                                           // the floor: t = (1, 0)
+      if (d < Ri) {
+        pn = KN * (Ri - d); a0 = wa0[q]; a = 0.5 * (d + Ri);
+        pt = wptBase[q] - KT * (ux + a0 * si); lim = MU * pn;
+        if (pt > lim) pt = lim; else if (pt < -lim) pt = -lim;
+        wptOut[q] = pt; pnSum += pn; nc++;
+        fx[i] += pt; fy[i] += pn; mz[i] += a * pt;
+        s11[i] += KT; s22[i] += KN; s13[i] += KT * a; s33[i] += KT * a * a;
+      } else wptOut[q] = 0;
+      d = x[i] - wL;                                           // the left wall: t = (0, -1)
+      if (d < Ri) {
+        pn = KN * (Ri - d); a0 = wa0[q + 1]; a = 0.5 * (d + Ri);
+        pt = wptBase[q + 1] - KT * (a0 * si - uy); lim = MU * pn;
+        if (pt > lim) pt = lim; else if (pt < -lim) pt = -lim;
+        wptOut[q + 1] = pt; pnSum += pn; nc++;
+        fx[i] += pn; fy[i] -= pt; mz[i] += a * pt;
+        s11[i] += KN; s22[i] += KT; s23[i] -= KT * a; s33[i] += KT * a * a;
+      } else wptOut[q + 1] = 0;
+      d = wR - x[i];                                           // the right wall: t = (0, 1)
+      if (d < Ri) {
+        pn = KN * (Ri - d); a0 = wa0[q + 2]; a = 0.5 * (d + Ri);
+        pt = wptBase[q + 2] - KT * (uy + a0 * si); lim = MU * pn;
+        if (pt > lim) pt = lim; else if (pt < -lim) pt = -lim;
+        wptOut[q + 2] = pt; pnSum += pn; nc++;
+        fx[i] -= pn; fy[i] += pt; mz[i] += a * pt;
+        s11[i] += KN; s22[i] += KT; s23[i] += KT * a; s33[i] += KT * a * a;
+      } else wptOut[q + 2] = 0;
+    }
+    this.wnc = nc;
+    return pnSum;
+  };
+
+  /* k_move: every disc at once by alpha S^-1 F, capped; then the skin test of the pair list */
+  Wedge.prototype.move = function () {
+    var x = this.x, y = this.y, th = this.th, R = this.R, ux = this.ux, uy = this.uy, N = this.N;
+    var s11 = this.s11, s12 = this.s12, s13 = this.s13, s22 = this.s22, s23 = this.s23, s33 = this.s33;
+    var fx = this.fx, fy = this.fy, mz = this.mz, md = 0;
+    for (var i = 0; i < N; i++) {
+      var S11 = s11[i], S12 = s12[i], S13 = s13[i], S22 = s22[i], S23 = s23[i], S33 = s33[i];
+      var F1 = fx[i], F2 = fy[i], F3 = mz[i], dx, dy, dw;
+      var det = S11 * (S22 * S33 - S23 * S23) - S12 * (S12 * S33 - S23 * S13) + S13 * (S12 * S23 - S22 * S13);
+      if (Math.abs(det) < 1e-30) { dx = F1 / S11; dy = F2 / S22; dw = F3 / S33; }
+      else {
+        var inv = 1 / det;
+        dx = inv * (F1 * (S22 * S33 - S23 * S23) + F2 * (S13 * S23 - S12 * S33) + F3 * (S12 * S23 - S13 * S22));
+        dy = inv * (F1 * (S13 * S23 - S12 * S33) + F2 * (S11 * S33 - S13 * S13) + F3 * (S12 * S13 - S11 * S23));
+        dw = inv * (F1 * (S12 * S23 - S13 * S22) + F2 * (S12 * S13 - S11 * S23) + F3 * (S11 * S22 - S12 * S12));
+      }
+      var cap = CAP_FRAC * R[i], step = Math.sqrt(dx * dx + dy * dy);
+      if (step > cap) { dx *= cap / step; dy *= cap / step; }
+      if (dw > ROT_CAP) dw = ROT_CAP; else if (dw < -ROT_CAP) dw = -ROT_CAP;
+      x[i] += ALPHA * dx; y[i] += ALPHA * dy; th[i] += ALPHA * dw;
+      var ex = x[i] - ux[i], ey = y[i] - uy[i];
+      if (ex * ex + ey * ey > md) md = ex * ex + ey * ey;
+    }
+    if (md > 0.25 * SKIN * SKIN) this.buildPairs(null);
+  };
+
+  Wedge.prototype.beginStep = function () {
+    this.x0.set(this.x); this.y0.set(this.y); this.th0.set(this.th);
+    this.pairGeometry0();
+    this.itStep = 0;
+  };
+
+  /* the commit: the tangential forces of the last evaluation become the base of the next step */
+  Wedge.prototype.commit = function () {
+    this.ptBase.set(this.ptOut);
+    this.wptBase.set(this.wptOut);
+  };
+
+  /* the end of a (sub-)step: evaluate at the accepted positions and commit.  The increment ends when the
+     accuracy is met, when the sub-step moved the discs by less than FLOW_SUB rms (a stall: further sub-steps
+     would move them by ~1e-6 each), or after SUB_MAX further sub-steps */
+  Wedge.prototype.endStep = function (met) {
+    if (!met) this.forces();
+    this.commit();
+    var done = met || this.nSub >= SUB_MAX;
+    if (!done) {
+      var s2 = 0;
+      for (var i = 0; i < this.N; i++) {
+        var ex = this.x[i] - this.x0[i], ey = this.y[i] - this.y0[i];
+        s2 += ex * ex + ey * ey;
+      }
+      done = Math.sqrt(s2 / this.N) < FLOW_SUB;
+    }
+    if (done) {
+      this.inStep = false;
+      if (this.inc === N_INC) { this.cycle++; this.inc = 0; }
+    } else {
+      this.nSub++;
+      this.beginStep();
+    }
+  };
+
+  /* one increment of t: new radii, then relax.  The amplitude follows the slider within a cycle, as cmd_active
+     ramps it in over the first one */
+  Wedge.prototype.startIncrement = function () {
+    this.inc++;
+    var rate = Math.max(this.aTarget, this.aEff) / N_INC;
+    this.aEff += Math.max(-rate, Math.min(rate, this.aTarget - this.aEff));
+    var a = this.aEff, ph = 2 * Math.PI * this.inc / N_INC;
+    for (var i = 0; i < this.N; i++) {
+      if (this.act[i]) this.R[i] = this.R0[i] * Math.sqrt(1 + a * Math.sin(ph + this.psi[i]));
+    }
+    // --tol auto: a tenth of the force change of one increment over the mean contact force, in [1e-4, 1e-2]
+    // (the code caps it at 1e-3; 1e-2 is the web setting, reached at a >= ~0.03)
+    var df = KN * Math.PI * this.r0max * a / N_INC;
+    this.tol = Math.max(1e-4, Math.min(1e-2, 0.1 * df / Math.max(this.meanPn, FORCE_FLOOR)));
+    this.nSub = 0;
+    this.beginStep();
+    this.inStep = true;
+  };
+
+  /* up to maxIters Kishino iterations, starting at most maxIncs new increments; returns the number started */
+  Wedge.prototype.advance = function (maxIters, maxIncs) {
+    var started = 0;
+    for (var used = 0; used < maxIters; used++) {
+      if (!this.inStep) {
+        if (started >= maxIncs) break;
+        this.startIncrement();
+        started++;
+      }
+      this.forces();
+      this.itStep++;
+      if (this.frMax < this.tol) { this.endStep(true); continue; }
+      this.move();
+      if (this.itStep >= SUB_ITERS) this.endStep(false);
+    }
+    return started;
+  };
+
+  /* mean downslope displacement of the passive discs since the start (NaN when every disc is active) */
+  Wedge.prototype.drift = function () {
+    var s = 0;
+    for (var i = 0; i < this.N; i++) if (!this.act[i]) s += this.x[i] - this.xs[i];
+    return s / this.nPass;
+  };
+
+  return { Wedge: Wedge, N_INC: N_INC };
+})();
+
+/*==VIEW==*/
+(function () {
+  var sim = new Hill.Wedge(WEDGE, 1);
+  var canvas = document.getElementById('wedge-canvas'), ctx = canvas.getContext('2d');
+  var PASSIVE = '#eeeeee', ACTIVE = '#ff8000';            // passive almost white, active the only colour
+  var sliderAct = document.getElementById('sl-act'), sliderAmp = document.getElementById('sl-amp'),
+      sliderSpd = document.getElementById('sl-spd');
+  var btnPlay = document.getElementById('btn-play'), btnPause = document.getElementById('btn-pause');
+  var running = false, i;
+
+  // the window, in disc units: the box itself, its sides and bottom the rigid walls and floor, open at the top
+  // with room above the wedge for the swelling
+  var B = WEDGE.walls, Y1 = -Infinity;
+  for (i = 0; i < sim.N; i++) Y1 = Math.max(Y1, sim.y[i] + sim.R0[i]);
+  var X0 = B.left, X1 = B.right, Y0 = B.floor;
+  Y1 += 0.45;
+
+  sliderAct.max = sim.N;
+  sim.setActive(parseInt(sliderAct.value, 10));
+  sim.aTarget = parseFloat(sliderAmp.value);
+
+  function draw() {
+    var s = canvas.width / (X1 - X0);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (var pass = 0; pass < 2; pass++) {                    // passive, then active on top
+      ctx.fillStyle = pass ? ACTIVE : PASSIVE;
+      ctx.beginPath();
+      for (var k = 0; k < sim.N; k++) {
+        if (sim.act[k] !== pass) continue;
+        var cx = (sim.x[k] - X0) * s, cy = (Y1 - sim.y[k]) * s, r = sim.R[k] * s;   // full size: touching discs meet
+        ctx.moveTo(cx + r, cy);
+        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      }
+      ctx.fill();
+    }
+    var d = sim.drift();
+    document.getElementById('info-cycle').textContent = sim.cycle;
+    document.getElementById('info-drift').textContent = isNaN(d) ? '–' : d.toFixed(3);
+  }
+
+  function resize() {
+    var dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = w * (Y1 - Y0) / (X1 - X0);
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    draw();
+  }
+
+  // playback: Speed sets how many increments start per second (x1: a cycle of 400 in 2 s).  The model is
+  // quasi-static, so this changes only how fast it plays.  Each frame relaxes for at most about 10 ms, so a
+  // device that cannot keep up, or a pile that is flowing, plays slower than that
+  var SPEEDS = [0.25, 0.5, 1, 2, 4], BASE = 2, rate = 0, due = 0, last = 0;
+  function setSpeed() {
+    var v = SPEEDS[parseInt(sliderSpd.value, 10)];
+    rate = Hill.N_INC * v / BASE;                             // increments per second
+    document.getElementById('val-spd').textContent = '\u00d7' + v;
+  }
+  setSpeed();
+
+  function frame(now) {
+    if (!running) return;
+    var dt = last ? Math.min(now - last, 100) : 1000 / 60;
+    last = now;
+    due = Math.min(due + rate * dt / 1000, 40);               // increments due; a slow stretch banks no burst
+    var t0 = performance.now();
+    for (var n = 0; n < 20 && performance.now() - t0 < 10; n++) {
+      due -= sim.advance(400, Math.floor(due));
+      if (!sim.inStep && due < 1) break;
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  function setRunning(on) {
+    running = on;
+    last = 0;
+    btnPlay.disabled = on;
+    btnPause.disabled = !on;
+    if (on) requestAnimationFrame(frame);
+  }
+
+  btnPlay.addEventListener('click', function () { setRunning(true); });
+  btnPause.addEventListener('click', function () { setRunning(false); });
+  document.getElementById('btn-reset').addEventListener('click', function () { sim.reset(); draw(); });
+  sliderAct.addEventListener('input', function () {
+    var n = parseInt(sliderAct.value, 10);
+    document.getElementById('val-act').textContent = n;
+    sim.setActive(n);
+    draw();
+  });
+  sliderSpd.addEventListener('input', setSpeed);
+  sliderAmp.addEventListener('input', function () {
+    sim.aTarget = parseFloat(sliderAmp.value);
+    document.getElementById('val-amp').textContent = sim.aTarget.toFixed(2);
+  });
+  window.addEventListener('resize', resize);
+  resize();
+})();
+</script>
+
+</body>
+</html>
